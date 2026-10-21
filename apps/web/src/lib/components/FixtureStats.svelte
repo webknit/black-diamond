@@ -47,7 +47,7 @@
 					{panel.label}
 				</span>
 				<span class="truncate text-[10px] text-slate-500">
-					{panel.team.leaguePosition ?? '—'}/{panel.team.leagueTeams}
+					<strong class="font-bold text-slate-700">{panel.team.leaguePosition ?? '—'}</strong>/{panel.team.leagueTeams}
 					· {panel.team.fixtures.total.played} played
 				</span>
 			</div>
