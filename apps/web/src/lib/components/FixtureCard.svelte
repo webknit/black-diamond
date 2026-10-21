@@ -33,9 +33,8 @@
 
 	function hasScore() {
 		return (
-			(liveStatuses.has(fixture.status.short) || completedStatuses.has(fixture.status.short)) &&
-			fixture.homeGoals !== null &&
-			fixture.awayGoals !== null
+			liveStatuses.has(fixture.status.short) ||
+			(fixture.homeGoals !== null && fixture.awayGoals !== null)
 		);
 	}
 
@@ -82,7 +81,7 @@
 			<div class="min-w-16 text-center">
 				{#if hasScore()}
 					<p class="text-2xl font-bold tabular-nums tracking-tight text-slate-950">
-						{fixture.homeGoals} <span class="text-slate-400">–</span> {fixture.awayGoals}
+						{fixture.homeGoals ?? 0} <span class="text-slate-400">–</span> {fixture.awayGoals ?? 0}
 					</p>
 				{:else}
 					<p class="text-lg font-semibold tabular-nums text-slate-700">

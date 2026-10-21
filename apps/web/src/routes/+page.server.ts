@@ -1,6 +1,6 @@
-import { getFixturesBetweenDates } from '@black-diamond/database/fixtures';
-import { getFixtureOddsForFixtures } from '@black-diamond/database/fixtureOdds';
-import { getFixtureStatsSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
+import { getFixtureSummariesBetweenDates } from '@black-diamond/database/fixtures';
+import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
+import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 
 const ukTimeZone = 'Europe/London';
 
@@ -33,7 +33,7 @@ export async function load() {
 
 	// The wider UTC window includes every instant in today's UK calendar day,
 	// including the hour that moves when British Summer Time starts or ends.
-	const fixtures = await getFixturesBetweenDates(
+	const fixtures = await getFixtureSummariesBetweenDates(
 		getUtcDateKey(new Date(now.getTime() - 24 * 60 * 60 * 1000)),
 		getUtcDateKey(new Date(now.getTime() + 48 * 60 * 60 * 1000))
 	);
@@ -42,8 +42,8 @@ export async function load() {
 		.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const fixtureIds = todayFixtures.map((fixture) => fixture.fixture.id);
 	const [statsSnapshots, fixtureOdds] = await Promise.all([
-		getFixtureStatsSnapshots(fixtureIds),
-		getFixtureOddsForFixtures(fixtureIds)
+		getFixtureCardSnapshots(fixtureIds),
+		getFixtureCardOdds(fixtureIds)
 	]);
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
@@ -162,7 +162,6 @@ export async function load() {
 					: null,
 				odds: odds
 					? {
-							source: odds.source,
 							odds: odds.odds.map((market) => ({
 								name: market.name,
 								values: market.values.map(({ value, odd }) => ({ value, odd }))
