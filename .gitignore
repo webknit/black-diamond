@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Build output and framework-generated files
+dist/
+build/
+.svelte-kit/
+.output/
+
+# Local environment configuration
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Operating-system files
+.DS_Store
+Thumbs.db

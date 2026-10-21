@@ -1,0 +1,26 @@
+{
+  "name": "@black-diamond/core",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./fixture": {
+      "types": "./src/types/fixture.ts"
+    },
+    "./team": {
+      "types": "./src/types/team.ts"
+    },
+    "./league": {
+      "types": "./src/types/league.ts"
+    },
+    "./leagueStandings": {
+      "types": "./src/types/leagueStandings.ts"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3"
+  }
+}

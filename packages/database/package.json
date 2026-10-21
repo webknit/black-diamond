@@ -1,0 +1,49 @@
+{
+  "name": "@black-diamond/database",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./leagueStandings": {
+      "types": "./src/leagueStandings/index.ts",
+      "default": "./src/leagueStandings/index.ts"
+    },
+    "./indexes": {
+      "types": "./src/indexes/index.ts",
+      "default": "./src/indexes/index.ts"
+    },
+    "./fullSeasonFixtureSyncStates": {
+      "types": "./src/fixtures/operations/fullSeasonFixtureSyncStates/index.ts",
+      "default": "./src/fixtures/operations/fullSeasonFixtureSyncStates/index.ts"
+    },
+    "./fixtures": {
+      "types": "./src/fixtures/index.ts",
+      "default": "./src/fixtures/index.ts"
+    },
+    "./teams": {
+      "types": "./src/teams/index.ts",
+      "default": "./src/teams/index.ts"
+    },
+    "./leagues": {
+      "types": "./src/leagues/index.ts",
+      "default": "./src/leagues/index.ts"
+    },
+    "./mongodb": {
+      "types": "./src/mongodb.ts",
+      "default": "./src/mongodb.ts"
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@black-diamond/core": "workspace:*",
+    "@types/node": "^22.0.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "mongodb": "^7.7.0"
+  }
+}

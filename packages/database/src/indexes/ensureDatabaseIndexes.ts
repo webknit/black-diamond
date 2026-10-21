@@ -1,0 +1,30 @@
+import { getDatabase } from "../mongodb.js";
+
+export async function ensureDatabaseIndexes(): Promise<void> {
+  const database = await getDatabase();
+
+  await database.collection("leagues").createIndex(
+    { "league.id": 1 },
+    { name: "unique_league_id", unique: true },
+  );
+  await database.collection("teams").createIndex(
+    { "team.id": 1 },
+    { name: "unique_team_id", unique: true },
+  );
+  await database.collection("leagueTeams").createIndex(
+    { leagueId: 1, season: 1, teamId: 1 },
+    { name: "unique_league_season_team", unique: true },
+  );
+  await database.collection("fixtures").createIndex(
+    { "fixture.id": 1 },
+    { name: "unique_fixture_id", unique: true },
+  );
+  await database.collection("leagueStandings").createIndex(
+    { "league.id": 1, "league.season": 1 },
+    { name: "unique_league_season", unique: true },
+  );
+  await database.collection("fullSeasonFixtureSyncStates").createIndex(
+    { leagueId: 1, season: 1 },
+    { name: "unique_league_season", unique: true },
+  );
+}
