@@ -1,0 +1,73 @@
+type FixtureRecord = {
+	played: number;
+	wins: number;
+	draws: number;
+	loses: number;
+	goalsFor: number;
+	goalsAgainst: number;
+};
+
+type FixtureStatsTeam = {
+	leaguePosition: number | null;
+	leagueTeams: number;
+	form: string;
+	fixtures: {
+		total: {
+			played: number;
+			goalsFor: number;
+			goalsAgainst: number;
+		};
+	};
+	cleanSheets: {
+		total: number;
+	};
+	summary: {
+		wins: { percentage: number };
+		draws: { percentage: number };
+	};
+};
+
+export type FixtureStatsData = {
+	home: FixtureStatsTeam & {
+		formHome: string;
+		fixtures: FixtureStatsTeam['fixtures'] & { home: FixtureRecord };
+		cleanSheets: FixtureStatsTeam['cleanSheets'] & { home: number };
+	};
+	away: FixtureStatsTeam & {
+		formAway: string;
+		fixtures: FixtureStatsTeam['fixtures'] & { away: FixtureRecord };
+		cleanSheets: FixtureStatsTeam['cleanSheets'] & { away: number };
+	};
+};
+
+export type FixtureOddsData = {
+	odds: Array<{
+		name: string;
+		values: Array<{ value: string; odd: string }>;
+	}>;
+};
+
+export type FixtureCardData = {
+	id: number;
+	timestamp: number;
+	status: {
+		short: string;
+		long: string;
+		elapsed: number | null;
+	};
+	round: string | null;
+	leagueName: string;
+	leagueId: number;
+	leagueCountry: string;
+	leagueLogo: string | null;
+	venueName: string | null;
+	venueCity: string | null;
+	homeTeamName: string;
+	homeTeamLogo: string;
+	awayTeamName: string;
+	awayTeamLogo: string;
+	homeGoals: number | null;
+	awayGoals: number | null;
+	stats: FixtureStatsData | null;
+	odds: FixtureOddsData | null;
+};

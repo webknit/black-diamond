@@ -7,7 +7,7 @@ const preferredBookmakers = [
 ];
 
 export async function syncFixtureOdds(fixtureId: number) {
-  const response = await getApiFootballClient().get<{ response: Array<{ bookmakers: Array<{ id: number; bets: Array<{ id: number; name: string; values: Array<Record<string, unknown>> }> }> }> }>("/odds", { fixture: fixtureId });
+  const response = await getApiFootballClient().get<{ response: Array<{ bookmakers: Array<{ id: number; bets: Array<{ id: number; name: string; values: Array<{ value: string; odd: string }> }> }> }> }>("/odds", { fixture: fixtureId });
   const bookmakers = response.response[0]?.bookmakers ?? [];
   const source = preferredBookmakers.find((bookmaker) => bookmakers.some((item) => item.id === bookmaker.id));
   if (!source) return;
