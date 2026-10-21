@@ -40,6 +40,10 @@
       "types": "./src/fixtureOdds/index.ts",
       "default": "./src/fixtureOdds/index.ts"
     },
+    "./fixtureStatsSnapshots": {
+      "types": "./src/fixtureStatsSnapshots/index.ts",
+      "default": "./src/fixtureStatsSnapshots/index.ts"
+    },
     "./leagues": {
       "types": "./src/leagues/index.ts",
       "default": "./src/leagues/index.ts"

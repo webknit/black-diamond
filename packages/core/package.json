@@ -19,6 +19,9 @@
     "./fixtureOdds": {
       "types": "./src/types/fixtureOdds.ts"
     },
+    "./fixtureStatsSnapshot": {
+      "types": "./src/types/fixtureStatsSnapshot.ts"
+    },
     "./league": {
       "types": "./src/types/league.ts"
     },
