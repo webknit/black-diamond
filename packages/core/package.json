@@ -10,6 +10,12 @@
     "./team": {
       "types": "./src/types/team.ts"
     },
+    "./teamStats": {
+      "types": "./src/types/teamStats.ts"
+    },
+    "./prediction": {
+      "types": "./src/types/prediction.ts"
+    },
     "./league": {
       "types": "./src/types/league.ts"
     },

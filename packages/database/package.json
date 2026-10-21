@@ -28,6 +28,14 @@
       "types": "./src/teams/index.ts",
       "default": "./src/teams/index.ts"
     },
+    "./teamStats": {
+      "types": "./src/teamStats/index.ts",
+      "default": "./src/teamStats/index.ts"
+    },
+    "./predictions": {
+      "types": "./src/predictions/index.ts",
+      "default": "./src/predictions/index.ts"
+    },
     "./leagues": {
       "types": "./src/leagues/index.ts",
       "default": "./src/leagues/index.ts"

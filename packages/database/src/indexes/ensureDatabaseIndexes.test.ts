@@ -59,9 +59,21 @@ describe("ensureDatabaseIndexes", () => {
       { "league.id": 1, "league.season": 1 },
       { name: "unique_league_season", unique: true },
     );
-    expect(mocks.collection).toHaveBeenNthCalledWith(8, "fullSeasonFixtureSyncStates");
+    expect(mocks.collection).toHaveBeenNthCalledWith(8, "teamStats");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       8,
+      { "team.id": 1, "league.id": 1, "league.season": 1 },
+      { name: "unique_team_league_season", unique: true },
+    );
+    expect(mocks.collection).toHaveBeenNthCalledWith(9, "predictions");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      9,
+      { fixtureId: 1 },
+      { name: "unique_fixture_id", unique: true },
+    );
+    expect(mocks.collection).toHaveBeenNthCalledWith(10, "fullSeasonFixtureSyncStates");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      10,
       { leagueId: 1, season: 1 },
       { name: "unique_league_season", unique: true },
     );

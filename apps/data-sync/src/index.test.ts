@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   runDailySync: vi.fn(),
   runHourlySync: vi.fn(),
   runLiveSync: vi.fn(),
+  runWeeklySync: vi.fn(),
 }));
 
 vi.mock("@black-diamond/database/indexes", () => ({
@@ -13,6 +14,7 @@ vi.mock("@black-diamond/database/indexes", () => ({
 vi.mock("./runs/dailySync.js", () => ({ runDailySync: mocks.runDailySync }));
 vi.mock("./runs/hourlySync.js", () => ({ runHourlySync: mocks.runHourlySync }));
 vi.mock("./runs/liveSync.js", () => ({ runLiveSync: mocks.runLiveSync }));
+vi.mock("./runs/weeklySync.js", () => ({ runWeeklySync: mocks.runWeeklySync }));
 
 describe("data-sync entry point", () => {
   beforeEach(() => {
@@ -28,5 +30,6 @@ describe("data-sync entry point", () => {
     );
     expect(mocks.runDailySync).toHaveBeenCalledBefore(mocks.runHourlySync);
     expect(mocks.runHourlySync).toHaveBeenCalledBefore(mocks.runLiveSync);
+    expect(mocks.runLiveSync).toHaveBeenCalledBefore(mocks.runWeeklySync);
   });
 });
