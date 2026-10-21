@@ -8,6 +8,10 @@
       "types": "./src/leagueStandings/index.ts",
       "default": "./src/leagueStandings/index.ts"
     },
+    "./leagueStats": {
+      "types": "./src/leagueStats/index.ts",
+      "default": "./src/leagueStats/index.ts"
+    },
     "./indexes": {
       "types": "./src/indexes/index.ts",
       "default": "./src/indexes/index.ts"

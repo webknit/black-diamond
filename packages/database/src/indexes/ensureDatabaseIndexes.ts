@@ -19,7 +19,15 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { "fixture.id": 1 },
     { name: "unique_fixture_id", unique: true },
   );
+  await database.collection("fixtures").createIndex(
+    { "league.id": 1, "league.season": 1, "fixture.status.short": 1 },
+    { name: "league_season_status" },
+  );
   await database.collection("leagueStandings").createIndex(
+    { "league.id": 1, "league.season": 1 },
+    { name: "unique_league_season", unique: true },
+  );
+  await database.collection("leagueStats").createIndex(
     { "league.id": 1, "league.season": 1 },
     { name: "unique_league_season", unique: true },
   );

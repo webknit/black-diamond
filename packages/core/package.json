@@ -15,6 +15,9 @@
     },
     "./leagueStandings": {
       "types": "./src/types/leagueStandings.ts"
+    },
+    "./leagueStats": {
+      "types": "./src/types/leagueStats.ts"
     }
   },
   "scripts": {
