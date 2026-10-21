@@ -36,6 +36,10 @@
       "types": "./src/predictions/index.ts",
       "default": "./src/predictions/index.ts"
     },
+    "./fixtureOdds": {
+      "types": "./src/fixtureOdds/index.ts",
+      "default": "./src/fixtureOdds/index.ts"
+    },
     "./leagues": {
       "types": "./src/leagues/index.ts",
       "default": "./src/leagues/index.ts"

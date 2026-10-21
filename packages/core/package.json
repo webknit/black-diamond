@@ -16,6 +16,9 @@
     "./prediction": {
       "types": "./src/types/prediction.ts"
     },
+    "./fixtureOdds": {
+      "types": "./src/types/fixtureOdds.ts"
+    },
     "./league": {
       "types": "./src/types/league.ts"
     },
