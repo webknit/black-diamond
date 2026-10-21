@@ -22,23 +22,30 @@ function getUtcDateKey(date: Date): string {
 	return date.toISOString().slice(0, 10);
 }
 
+function isDateKey(value: string | null): value is string {
+	if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+	return getUtcDateKey(new Date(`${value}T00:00:00.000Z`)) === value;
+}
+
 function getOverallTotal(total: number, home: number, away: number): number {
 	return Number.isFinite(total) ? total : home + away;
 }
 
-export async function load() {
-	// Temporary display date while we build the homepage fixture list.
-	const now = new Date('2026-10-24T12:00:00.000Z');
+export async function load({ url }: { url: URL }) {
+	const now = new Date();
 	const todayUk = getUkDateKey(now);
+	const requestedDate = url.searchParams.get('date');
+	const selectedDate = isDateKey(requestedDate) ? requestedDate : todayUk;
+	const selectedDateAtUtc = new Date(`${selectedDate}T00:00:00.000Z`);
 
-	// The wider UTC window includes every instant in today's UK calendar day,
+	// The wider UTC window includes every instant in the selected UK calendar day,
 	// including the hour that moves when British Summer Time starts or ends.
 	const fixtures = await getFixtureSummariesBetweenDates(
-		getUtcDateKey(new Date(now.getTime() - 24 * 60 * 60 * 1000)),
-		getUtcDateKey(new Date(now.getTime() + 48 * 60 * 60 * 1000))
+		getUtcDateKey(new Date(selectedDateAtUtc.getTime() - 24 * 60 * 60 * 1000)),
+		getUtcDateKey(new Date(selectedDateAtUtc.getTime() + 48 * 60 * 60 * 1000))
 	);
 	const todayFixtures = fixtures
-		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
+		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedDate)
 		.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const fixtureIds = todayFixtures.map((fixture) => fixture.fixture.id);
 	const [statsSnapshots, fixtureOdds] = await Promise.all([
@@ -49,6 +56,7 @@ export async function load() {
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
 
 	return {
+		date: selectedDate,
 		fixtures: todayFixtures.map((fixture) => {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
@@ -175,6 +183,6 @@ export async function load() {
 			weekday: 'long',
 			day: 'numeric',
 			month: 'long'
-		}).format(now)
+		}).format(new Date(`${selectedDate}T12:00:00.000Z`))
 	};
 }

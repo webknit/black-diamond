@@ -79,7 +79,7 @@ export const selectedLeagues = [
   // { id: 284, name: "Liga II", country: "Romania" },
   // { id: 363, name: "Premier League", country: "Ethiopia" },
   // { id: 204, name: "1. Lig", country: "Turkey" },
-  // { id: 2, name: "UEFA Champions League", country: "World" },
+  { id: 2, name: "UEFA Champions League", country: "World" },
   // { id: 3, name: "UEFA Europa League", country: "World" },
   // { id: 1, name: "World Cup", country: "World" },
   // { id: 4, name: "Euro Championship", country: "World" },

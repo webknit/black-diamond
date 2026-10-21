@@ -126,7 +126,7 @@
 				<FixtureStats stats={fixture.stats} />
 			{:else}
 				<p class="text-center text-[10px] text-slate-500">
-					Team statistics are not available yet.
+					Team statistics are not available.
 				</p>
 			{/if}
 		</div>
