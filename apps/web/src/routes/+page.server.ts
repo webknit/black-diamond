@@ -92,6 +92,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 					matchStatus: bet.matchStatus,
 					stake: bet.stake,
 					placedOdds: bet.placedOdds,
+					profit: bet.profit,
 					selections
 				}]
 			: [];

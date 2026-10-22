@@ -236,7 +236,7 @@
 							<ul class="divide-y divide-slate-100">
 								{#each data.todaysBets as bet (bet.id)}
 									<li class="py-2 first:pt-0 last:pb-0">
-										<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+										<div class="flex flex-wrap items-center gap-x-3 gap-y-1">
 											<div class="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-600">
 												{#if bet.selections.length === 1}
 													<span class="font-semibold tabular-nums text-slate-800">{formatBetTime(bet.selections[0].timestamp)}</span>
@@ -258,10 +258,19 @@
 													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status}
 												</span>
 											</div>
-											<p class="text-[11px] font-semibold tabular-nums text-slate-800">
-												{formatMoney(bet.stake)} <span class="font-normal text-slate-500">|</span> {bet.placedOdds}
-											</p>
 										</div>
+										<p class="mt-1 flex flex-wrap items-center gap-x-2 text-[11px] tabular-nums text-slate-800">
+											<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> <strong>{formatMoney(bet.stake)}</strong></span>
+											{#if bet.status !== 'pending' && bet.profit !== null}
+												<span class="whitespace-nowrap">
+													<span class="text-slate-500">P/L</span>
+													<span class:text-emerald-700={bet.profit > 0} class:text-rose-700={bet.profit < 0}>
+														<strong>{bet.profit > 0 ? '+' : ''}{formatMoney(bet.profit)}</strong>
+													</span>
+												</span>
+											{/if}
+											<span class="whitespace-nowrap"><span class="text-slate-500">Odds</span> <strong>{bet.placedOdds}</strong></span>
+										</p>
 										{#each bet.selections as selection}
 											<div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
 												<span class="min-w-0 text-slate-800">
