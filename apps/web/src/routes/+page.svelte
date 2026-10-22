@@ -2,23 +2,28 @@
 	import { goto } from '$app/navigation';
 	import FixtureDatePicker from '#lib/components/FixtureDatePicker.svelte';
 	import FixtureGrid from '#lib/components/FixtureGrid.svelte';
+	import FixtureStatusFilter from '#lib/components/FixtureStatusFilter.svelte';
 	import LeagueFilter from '#lib/components/LeagueFilter.svelte';
+	import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 	let isLoading = $state(false);
 	let selectedLeagueIds = $state<number[] | null>(null);
 	let leagueFilterOpen = $state(false);
+	let showFinished = $state(false);
 	let previousDate = $state<string>();
 
 	// Leagues are calculated from this date's fixtures. Reset an old selection when
-	// navigating to another date so it cannot silently filter the new matchday.
+	// navigating to another date so it cannot silently filter the new matchday. Past
+	// dates show finished matches; today and future dates begin focused on upcoming/live.
 	$effect(() => {
 		if (previousDate !== undefined && data.date !== previousDate) {
 			selectedLeagueIds = null;
 			leagueFilterOpen = false;
 		}
 
+		showFinished = data.date < getUkDateKey(new Date());
 		previousDate = data.date;
 	});
 
@@ -50,10 +55,12 @@
 				leagues: countryLeagues
 			}))
 	);
+	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
 	const filteredFixtures = $derived(
 		data.fixtures.filter(
 			(fixture) =>
-				selectedLeagueIds === null || selectedLeagueIds.includes(fixture.leagueId)
+				(selectedLeagueIds === null || selectedLeagueIds.includes(fixture.leagueId)) &&
+				(showFinished || !completedStatuses.has(fixture.status.short))
 		)
 	);
 	const selectedLeagueCount = $derived(
@@ -128,6 +135,7 @@
 
 			{#if data.fixtures.length > 0}
 				<div class="flex shrink-0 flex-wrap items-end gap-3">
+					<FixtureStatusFilter bind:showFinished />
 					<LeagueFilter
 						groups={leaguesByCountry}
 						{selectedLeagueCount}

@@ -5,7 +5,7 @@ import { runHourlySync } from "./runs/hourlySync.js";
 import { runLiveSync } from "./runs/liveSync.js";
 import { runWeeklySync } from "./runs/weeklySync.js";
 import { runThreeHourlySync } from "./runs/threeHourlySync.js";
-import { logSyncStep } from "./utils/logSyncStep.js";
+import { logSyncStep } from "./utils/logging/logSyncStep.js";
 
 await logSyncStep("ensure database indexes", ensureDatabaseIndexes);
 await logSyncStep("daily sync", runDailySync);

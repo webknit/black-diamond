@@ -6,7 +6,7 @@ import { syncTeams } from "../sync/teams/syncTeams.js";
 import { syncTeamStatsForTodaysFixtures } from "../sync/teamStats/syncTeamStatsForTodaysFixtures.js";
 import { syncUpcomingPredictions } from "../sync/predictions/syncUpcomingPredictions.js";
 import { syncFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots.js";
-import { logSyncStep } from "../utils/logSyncStep.js";
+import { logSyncStep } from "../utils/logging/logSyncStep.js";
 
 export async function runDailySync() {
   await logSyncStep("sync selected leagues", syncSelectedLeagues);

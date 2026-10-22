@@ -2,25 +2,12 @@ import { getFixtureSummariesBetweenDates } from '@black-diamond/database/fixture
 import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 import { selectedLeagues } from '@black-diamond/core/selectedLeagues';
+import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 
 const ukTimeZone = 'Europe/London';
 const selectedLeagueOrder = new Map<number, number>(
 	selectedLeagues.map((league, index) => [league.id, index])
 );
-
-function getUkDateKey(date: Date): string {
-	const parts = new Intl.DateTimeFormat('en-GB', {
-		timeZone: ukTimeZone,
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit'
-	}).formatToParts(date);
-
-	const value = (type: Intl.DateTimeFormatPartTypes) =>
-		parts.find((part) => part.type === type)?.value;
-
-	return `${value('year')}-${value('month')}-${value('day')}`;
-}
 
 function getUtcDateKey(date: Date): string {
 	return date.toISOString().slice(0, 10);
