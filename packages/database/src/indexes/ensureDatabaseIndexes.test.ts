@@ -101,5 +101,17 @@ describe("ensureDatabaseIndexes", () => {
       { email: 1 },
       { name: "unique_account_email", unique: true },
     );
+    expect(mocks.collection).toHaveBeenNthCalledWith(15, "bets");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      15,
+      { id: 1 },
+      { name: "unique_bet_id", unique: true },
+    );
+    expect(mocks.collection).toHaveBeenNthCalledWith(16, "bets");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      16,
+      { accountId: 1, status: 1, "selections.fixture.id": 1 },
+      { name: "account_status_selection_fixture" },
+    );
   });
 });

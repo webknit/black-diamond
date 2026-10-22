@@ -3,9 +3,12 @@
 	import FixtureDatePicker from '#lib/components/FixtureDatePicker.svelte';
 	import FixtureGrid from '#lib/components/FixtureGrid.svelte';
 	import FixtureStatusFilter from '#lib/components/FixtureStatusFilter.svelte';
+	import BetSlip from '#lib/components/BetSlip.svelte';
+	import type { BetSlipSelection } from '#lib/components/BetSlip.svelte';
 	import LeagueFilter from '#lib/components/LeagueFilter.svelte';
 	import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 	import type { PageProps } from './$types';
+	import type { FixtureCardData, FixtureOddSelection } from '#lib/types/fixtureCard.js';
 
 	let { data }: PageProps = $props();
 	let isLoading = $state(false);
@@ -13,6 +16,7 @@
 	let leagueFilterOpen = $state(false);
 	let showFinished = $state(false);
 	let previousDate = $state<string>();
+	let betSlipSelections = $state<BetSlipSelection[]>([]);
 
 	// Leagues are calculated from this date's fixtures. Reset an old selection when
 	// navigating to another date so it cannot silently filter the new matchday. Past
@@ -112,6 +116,26 @@
 		}
 	}
 
+	function chooseOdd(fixture: FixtureCardData, selection: FixtureOddSelection) {
+		if (!data.account) {
+			void goto('/login');
+			return;
+		}
+
+		const existingSelectionIndex = betSlipSelections.findIndex(
+			(item) =>
+				item.fixture.id === fixture.id &&
+				item.selection.marketName === selection.marketName &&
+				item.selection.value === selection.value
+		);
+		if (existingSelectionIndex === -1) {
+			betSlipSelections = [...betSlipSelections, { fixture, selection }];
+			return;
+		}
+
+		betSlipSelections = betSlipSelections.filter((_, index) => index !== existingSelectionIndex);
+	}
+
 </script>
 
 <svelte:head>
@@ -153,7 +177,18 @@
 		</header>
 
 		<div aria-busy={isLoading}>
-			<FixtureGrid fixtures={filteredFixtures} hasFixtures={data.fixtures.length > 0} />
+			<FixtureGrid fixtures={filteredFixtures} hasFixtures={data.fixtures.length > 0} placedSelectionKeys={data.placedBetSelectionKeys} onSelectOdd={chooseOdd} />
 		</div>
 	</div>
 </main>
+
+{#if betSlipSelections.length > 0 && data.account}
+	<BetSlip
+		selections={betSlipSelections}
+		balance={data.account.currentBalance}
+		currency={data.account.currency}
+		onRemove={(index) => (betSlipSelections = betSlipSelections.filter((_, itemIndex) => itemIndex !== index))}
+		onClose={() => (betSlipSelections = [])}
+		onPlaced={() => (betSlipSelections = [])}
+	/>
+{/if}

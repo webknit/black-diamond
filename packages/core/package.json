@@ -34,6 +34,9 @@
     "./account": {
       "types": "./src/types/account.ts"
     },
+    "./bet": {
+      "types": "./src/types/bet.ts"
+    },
     "./selectedLeagues": {
       "types": "./src/config/selectedLeagues.ts",
       "default": "./src/config/selectedLeagues.ts"

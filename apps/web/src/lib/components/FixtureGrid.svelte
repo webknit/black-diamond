@@ -1,13 +1,17 @@
 <script lang="ts">
 	import FixtureCard from './FixtureCard.svelte';
-	import type { FixtureCardData } from '../types/fixtureCard';
+	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
 	let {
 		fixtures,
-		hasFixtures
+		hasFixtures,
+		placedSelectionKeys = [],
+		onSelectOdd
 	}: {
 		fixtures: FixtureCardData[];
 		hasFixtures: boolean;
+		placedSelectionKeys?: string[];
+		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
 	} = $props();
 </script>
 
@@ -24,7 +28,7 @@
 {:else}
 	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 2xl:gap-5">
 		{#each fixtures as fixture (fixture.id)}
-			<FixtureCard {fixture} />
+			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} />
 		{/each}
 	</div>
 {/if}

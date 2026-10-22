@@ -47,6 +47,12 @@ export type FixtureOddsData = {
 	}>;
 };
 
+export type FixtureOddSelection = {
+	marketName: string;
+	value: string;
+	odd: string | null;
+};
+
 export type FixtureCardData = {
 	id: number;
 	timestamp: number;

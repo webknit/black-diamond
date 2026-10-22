@@ -4,16 +4,18 @@
 
 	let leaguesMenuOpen = $state(false);
 	let leaguesMenu = $state<HTMLElement>();
+	let accountMenuOpen = $state(false);
+	let accountMenu = $state<HTMLElement>();
 
 	onMount(() => {
 		function closeOnOutsideClick(event: PointerEvent) {
-			if (leaguesMenu && event.target instanceof Node && !leaguesMenu.contains(event.target)) {
-				leaguesMenuOpen = false;
-			}
+			if (!(event.target instanceof Node)) return;
+			if (leaguesMenu && !leaguesMenu.contains(event.target)) leaguesMenuOpen = false;
+			if (accountMenu && !accountMenu.contains(event.target)) accountMenuOpen = false;
 		}
 
 		function closeOnEscape(event: KeyboardEvent) {
-			if (event.key === 'Escape') leaguesMenuOpen = false;
+			if (event.key === 'Escape') { leaguesMenuOpen = false; accountMenuOpen = false; }
 		}
 
 		document.addEventListener('pointerdown', closeOnOutsideClick);
@@ -88,18 +90,18 @@
 				{/if}
 			</div>
 			{#if page.data.account}
-				{#if page.url.pathname === '/account'}
-					<span aria-current="page" class="inline-flex h-4 items-center text-xs font-bold leading-none text-slate-950">
+				<div bind:this={accountMenu} class="relative">
+					<button type="button" aria-expanded={accountMenuOpen} aria-haspopup="true" class="inline-flex h-4 items-center gap-1 border-0 bg-transparent p-0 text-xs font-medium leading-none text-slate-700" class:font-bold={page.url.pathname.startsWith('/account')} class:text-slate-950={page.url.pathname.startsWith('/account')} onclick={() => (accountMenuOpen = !accountMenuOpen)}>
 						Account
-					</span>
-				{:else}
-					<a
-						class="inline-flex h-4 items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950"
-						href="/account"
-					>
-						Account
-					</a>
-				{/if}
+						<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="m5 7.5 5 5 5-5" /></svg>
+					</button>
+					{#if accountMenuOpen}
+						<div class="absolute left-0 z-20 mt-2 w-32 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+							{#if page.url.pathname === '/account'}<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Account</span>{:else}<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50" href="/account" onclick={() => (accountMenuOpen = false)}>Account</a>{/if}
+							{#if page.url.pathname === '/account/bets'}<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Bets</span>{:else}<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50" href="/account/bets" onclick={() => (accountMenuOpen = false)}>Bets</a>{/if}
+						</div>
+					{/if}
+				</div>
 			{:else if page.url.pathname === '/login'}
 				<span aria-current="page" class="inline-flex h-4 items-center text-xs font-bold leading-none text-slate-950">
 					Log in

@@ -30,7 +30,11 @@
 				<p class="mt-3 text-sm text-slate-600">
 					Starting balance: {formatCurrency(data.account.startingBalance, data.account.currency)}
 				</p>
+				<p class="mt-1 text-sm text-slate-600">
+					Outstanding bets: {data.pendingBetSummary.count} · {formatCurrency(data.pendingBetSummary.totalStake, data.account.currency)} staked
+				</p>
 			</section>
+			<a class="mt-4 inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700" href="/account/bets">View bets</a>
 		</div>
 	</main>
 {/if}

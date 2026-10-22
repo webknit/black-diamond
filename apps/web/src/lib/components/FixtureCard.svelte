@@ -1,9 +1,17 @@
 <script lang="ts">
 	import FixtureOdds from './FixtureOdds.svelte';
 	import FixtureStats from './FixtureStats.svelte';
-	import type { FixtureCardData } from '../types/fixtureCard';
+	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
-	let { fixture }: { fixture: FixtureCardData } = $props();
+	let {
+		fixture,
+		placedSelectionKeys = [],
+		onSelectOdd
+	}: {
+		fixture: FixtureCardData;
+		placedSelectionKeys?: string[];
+		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
+	} = $props();
 
 	const ukTimeZone = 'Europe/London';
 	const liveStatuses = new Set(['1H', '2H', 'ET', 'P', 'LIVE', 'HT', 'BT']);
@@ -131,6 +139,6 @@
 			{/if}
 		</div>
 
-		<FixtureOdds odds={fixture.odds} />
+		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
 	</div>
 </article>
