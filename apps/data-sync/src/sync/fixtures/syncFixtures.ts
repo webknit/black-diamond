@@ -1,4 +1,4 @@
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncCurrentSeasonFixtures } from "./syncCurrentSeasonFixtures.js";
 
 export async function syncFixtures() {

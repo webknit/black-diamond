@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const syncCurrentSeasonFixtures = vi.hoisted(() => vi.fn());
 vi.mock("./syncCurrentSeasonFixtures.js", () => ({ syncCurrentSeasonFixtures }));
 
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncFixtures } from "./syncFixtures.js";
 
 describe("syncFixtures", () => {

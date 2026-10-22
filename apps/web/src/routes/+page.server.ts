@@ -1,8 +1,12 @@
 import { getFixtureSummariesBetweenDates } from '@black-diamond/database/fixtures';
 import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
+import { selectedLeagues } from '@black-diamond/core/selectedLeagues';
 
 const ukTimeZone = 'Europe/London';
+const selectedLeagueOrder = new Map<number, number>(
+	selectedLeagues.map((league, index) => [league.id, index])
+);
 
 function getUkDateKey(date: Date): string {
 	const parts = new Intl.DateTimeFormat('en-GB', {
@@ -72,6 +76,7 @@ export async function load({ url }: { url: URL }) {
 				round: fixture.league.round,
 				leagueName: fixture.league.name,
 				leagueId: fixture.league.id,
+				leagueOrder: selectedLeagueOrder.get(fixture.league.id) ?? Number.MAX_SAFE_INTEGER,
 				leagueCountry: fixture.league.country,
 				leagueLogo: fixture.league.logo,
 				venueName: fixture.fixture.venue.name,

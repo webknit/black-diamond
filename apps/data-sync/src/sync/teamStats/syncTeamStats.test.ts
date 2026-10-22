@@ -13,4 +13,13 @@ describe("syncTeamStats", () => {
     expect(mocks.get).toHaveBeenCalledWith("/teams/statistics", { team: 33, league: 39, season: 2026 });
     expect(mocks.upsertTeamStats).toHaveBeenCalledWith(stats);
   });
+
+  it("skips an empty API response instead of attempting an invalid database write", async () => {
+    mocks.getApiFootballClient.mockReturnValue({ get: mocks.get });
+    mocks.get.mockResolvedValue({ response: [] });
+
+    await expect(syncTeamStats(33, 39, 2026)).resolves.toBeNull();
+
+    expect(mocks.upsertTeamStats).not.toHaveBeenCalled();
+  });
 });

@@ -7,9 +7,11 @@ describe("createApiFootballClient", () => {
       ok: true,
       json: async () => ({ response: [] }),
     });
+    const rateLimiter = { waitForTurn: vi.fn() };
     const client = createApiFootballClient({
       apiKey: "test-key",
       fetch: fetch as unknown as typeof globalThis.fetch,
+      rateLimiter,
     });
 
     await client.get("/teams", { league: 39, season: 2026, unused: undefined });
@@ -22,6 +24,7 @@ describe("createApiFootballClient", () => {
       method: "GET",
       headers: { "x-apisports-key": "test-key" },
     });
+    expect(rateLimiter.waitForTurn).toHaveBeenCalledOnce();
   });
 
   it("rejects an empty API key", () => {

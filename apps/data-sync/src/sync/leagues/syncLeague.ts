@@ -1,5 +1,5 @@
 import { upsertLeague } from "@black-diamond/database/leagues";
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
 import type { ApiFootballLeaguesResponse } from "../../providers/api-football/types/leagues.js";
 

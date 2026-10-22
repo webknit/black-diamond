@@ -36,10 +36,28 @@
 			...new Map(
 				data.fixtures.map((fixture) => [
 					fixture.leagueId,
-					{ id: fixture.leagueId, name: fixture.leagueName }
+					{
+						id: fixture.leagueId,
+						name: fixture.leagueName,
+						country: fixture.leagueCountry || 'Other',
+						order: fixture.leagueOrder
+					}
 				])
 			).values()
-		].sort((a, b) => a.name.localeCompare(b.name))
+		].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
+	);
+	const leaguesByCountry = $derived(
+		Object.entries(
+			leagues.reduce<Record<string, typeof leagues>>((groups, league) => {
+				(groups[league.country] ??= []).push(league);
+				return groups;
+			}, {})
+		)
+			.sort(([, leaguesA], [, leaguesB]) => leaguesA[0].order - leaguesB[0].order)
+			.map(([country, countryLeagues]) => ({
+				country,
+				leagues: countryLeagues
+			}))
 	);
 	const filteredFixtures = $derived(
 		data.fixtures.filter(
@@ -60,6 +78,38 @@
 			: currentSelection.filter((id) => id !== leagueId);
 
 		if (selectedLeagueIds.length === leagues.length) selectedLeagueIds = null;
+	}
+
+	function toggleCountry(leagueIds: number[], checked: boolean) {
+		const currentSelection = selectedLeagueIds ?? leagues.map((league) => league.id);
+		const countryLeagueIds = new Set(leagueIds);
+		selectedLeagueIds = checked
+			? [...new Set([...currentSelection, ...leagueIds])]
+			: currentSelection.filter((id) => !countryLeagueIds.has(id));
+
+		if (selectedLeagueIds.length === leagues.length) selectedLeagueIds = null;
+	}
+
+	function isLeagueSelected(leagueId: number): boolean {
+		return selectedLeagueIds === null || selectedLeagueIds.includes(leagueId);
+	}
+
+	function areAllCountryLeaguesSelected(leagueIds: number[]): boolean {
+		return leagueIds.every(isLeagueSelected);
+	}
+
+	function areSomeCountryLeaguesSelected(leagueIds: number[]): boolean {
+		return leagueIds.some(isLeagueSelected) && !areAllCountryLeaguesSelected(leagueIds);
+	}
+
+	function indeterminateCheckbox(node: HTMLInputElement, indeterminate: boolean) {
+		node.indeterminate = indeterminate;
+
+		return {
+			update(value: boolean) {
+				node.indeterminate = value;
+			}
+		};
 	}
 
 	async function changeDate(event: Event) {
@@ -148,16 +198,39 @@
 									Select all
 								</button>
 							</div>
-							{#each leagues as league (league.id)}
-								<label class="flex cursor-pointer items-center gap-2 rounded px-1 py-1.5 text-sm text-slate-700 hover:bg-slate-50">
-									<input
-										type="checkbox"
-										checked={selectedLeagueIds === null || selectedLeagueIds.includes(league.id)}
-										onchange={(event) => toggleLeague(league.id, event.currentTarget.checked)}
-										class="size-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-700"
-									/>
-									<span class="truncate">{league.name}</span>
-								</label>
+							{#each leaguesByCountry as group, index (group.country)}
+								<section class:mt-3={index > 0}>
+									<label class="flex cursor-pointer items-center gap-2 rounded px-1 pb-1 text-[10px] font-bold uppercase tracking-wide text-slate-600 hover:text-slate-800">
+										<input
+											type="checkbox"
+											checked={areAllCountryLeaguesSelected(group.leagues.map((league) => league.id))}
+											use:indeterminateCheckbox={areSomeCountryLeaguesSelected(
+												group.leagues.map((league) => league.id)
+											)}
+											onchange={(event) =>
+												toggleCountry(
+													group.leagues.map((league) => league.id),
+													event.currentTarget.checked
+												)
+											}
+											class="size-3.5 rounded border-slate-300 text-emerald-700 focus:ring-emerald-700"
+										/>
+										<span>{group.country}</span>
+									</label>
+									<div class="ml-1 border-l border-slate-200 pl-3">
+										{#each group.leagues as league (league.id)}
+											<label class="flex cursor-pointer items-center gap-2 rounded px-1 py-1.5 text-sm text-slate-700 hover:bg-slate-50">
+											<input
+												type="checkbox"
+												checked={isLeagueSelected(league.id)}
+												onchange={(event) => toggleLeague(league.id, event.currentTarget.checked)}
+												class="size-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-700"
+											/>
+											<span class="truncate">{league.name}</span>
+											</label>
+										{/each}
+									</div>
+								</section>
 							{/each}
 						</div>
 					</details>

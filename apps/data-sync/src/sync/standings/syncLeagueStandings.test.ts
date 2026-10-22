@@ -38,7 +38,7 @@ describe("syncLeagueStandings", () => {
     expect(mocks.upsertLeagueStandings).toHaveBeenCalledWith(standings);
   });
 
-  it("rejects missing stored leagues, seasons, or API standings", async () => {
+  it("rejects missing stored leagues or seasons", async () => {
     mocks.getLeagueById.mockResolvedValueOnce(null);
     await expect(syncLeagueStandings(39)).rejects.toThrow(
       "league ID 39 is not in MongoDB",
@@ -47,9 +47,12 @@ describe("syncLeagueStandings", () => {
     mocks.getLeagueById.mockResolvedValueOnce({ seasons: [] });
     await expect(syncLeagueStandings(39)).rejects.toThrow("has no current season");
 
+  });
+
+  it("skips an empty API response instead of stopping all configured leagues", async () => {
     mocks.get.mockResolvedValueOnce({ response: [] });
-    await expect(syncLeagueStandings(39)).rejects.toThrow(
-      "API-Football returned no standings",
-    );
+
+    await expect(syncLeagueStandings(39)).resolves.toBeNull();
+    expect(mocks.upsertLeagueStandings).not.toHaveBeenCalled();
   });
 });

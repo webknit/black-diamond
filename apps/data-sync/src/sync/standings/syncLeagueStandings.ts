@@ -33,9 +33,10 @@ export async function syncLeagueStandings(leagueId: number) {
   const standings = response.response[0];
 
   if (!standings) {
-    throw new Error(
-      `API-Football returned no standings for league ID ${leagueId} and season ${currentSeason.year}`,
+    console.warn(
+      `[data-sync] No standings returned for league ${leagueId}, season ${currentSeason.year}`,
     );
+    return null;
   }
 
   await upsertLeagueStandings(standings);

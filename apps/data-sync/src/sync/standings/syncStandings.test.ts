@@ -4,7 +4,7 @@ const syncLeagueStandings = vi.hoisted(() => vi.fn());
 
 vi.mock("./syncLeagueStandings.js", () => ({ syncLeagueStandings }));
 
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncStandings } from "./syncStandings.js";
 
 describe("syncStandings", () => {

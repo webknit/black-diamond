@@ -1,4 +1,4 @@
-import { selectedLeagues } from "../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncTeamStatsForLeague } from "../sync/teamStats/syncTeamStatsForLeague.js";
 import { logSyncStep } from "../utils/logSyncStep.js";
 

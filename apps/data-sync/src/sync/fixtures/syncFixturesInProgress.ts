@@ -1,6 +1,6 @@
 import { upsertFixtures } from "@black-diamond/database/fixtures";
 
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
 import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures.js";
 

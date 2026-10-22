@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ syncLeagueStatsForLeague: vi.fn() }));
 
-vi.mock("../../config/selectedLeagues.js", () => ({
+vi.mock("@black-diamond/core/selectedLeagues", () => ({
   selectedLeagues: [{ id: 39 }, { id: 140 }],
 }));
 vi.mock("./syncLeagueStatsForLeague.js", () => ({

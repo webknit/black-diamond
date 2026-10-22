@@ -1,15 +1,20 @@
+import { createRateLimiter } from "./rateLimiter.js";
+
 const API_FOOTBALL_BASE_URL = "https://v3.football.api-sports.io";
+const REQUEST_INTERVAL_MS = 1000 / 6;
 
 type QueryValue = string | number | boolean | undefined;
 
 export type ApiFootballClientOptions = {
   apiKey: string;
   fetch?: typeof globalThis.fetch;
+  rateLimiter?: { waitForTurn: () => Promise<void> };
 };
 
 export function createApiFootballClient({
   apiKey,
   fetch = globalThis.fetch,
+  rateLimiter = createRateLimiter({ minimumIntervalMs: REQUEST_INTERVAL_MS }),
 }: ApiFootballClientOptions) {
   if (!apiKey.trim()) {
     throw new Error("API_FOOTBALL_API_KEY must be provided");
@@ -26,6 +31,8 @@ export function createApiFootballClient({
         url.searchParams.set(name, String(value));
       }
     }
+
+    await rateLimiter.waitForTurn();
 
     const response = await fetch(url, {
       method: "GET",

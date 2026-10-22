@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const syncLeague = vi.hoisted(() => vi.fn());
 vi.mock("./syncLeague.js", () => ({ syncLeague }));
 
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncSelectedLeagues } from "./syncSelectedLeagues.js";
 
 describe("syncSelectedLeagues", () => {

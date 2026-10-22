@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
+    "@black-diamond/core": "workspace:*",
     "@black-diamond/database": "workspace:*"
   },
   "scripts": {
@@ -15,7 +16,6 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@black-diamond/core": "workspace:*",
     "@types/node": "^22.0.0",
     "tsx": "^4.0.0",
     "typescript": "^6.0.3",

@@ -58,6 +58,7 @@ export type FixtureCardData = {
 	round: string | null;
 	leagueName: string;
 	leagueId: number;
+	leagueOrder: number;
 	leagueCountry: string;
 	leagueLogo: string | null;
 	venueName: string | null;

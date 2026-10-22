@@ -30,6 +30,10 @@
     },
     "./leagueStats": {
       "types": "./src/types/leagueStats.ts"
+    },
+    "./selectedLeagues": {
+      "types": "./src/config/selectedLeagues.ts",
+      "default": "./src/config/selectedLeagues.ts"
     }
   },
   "scripts": {

@@ -18,5 +18,5 @@ export type ApiFootballTeamStatisticsResponse = {
   parameters: Record<string, string>;
   errors: Record<string, unknown>;
   results: number;
-  response: TeamStats;
+  response: TeamStats | [];
 };

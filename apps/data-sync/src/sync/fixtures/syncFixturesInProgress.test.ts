@@ -12,7 +12,7 @@ vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { selectedLeagues } from "../../config/selectedLeagues.js";
+import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncFixturesInProgress } from "./syncFixturesInProgress.js";
 
 describe("syncFixturesInProgress", () => {
