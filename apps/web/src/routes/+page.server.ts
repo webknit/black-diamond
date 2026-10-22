@@ -228,6 +228,7 @@ export const actions: Actions = {
 		const submittedSelections = getSubmittedSelections(formData);
 		const stake = Number(getTextField(formData, 'stake'));
 		const placedOdds = Number(getTextField(formData, 'placedOdds'));
+		const matchStatus = formData.get('isUnmatched') === 'on' ? 'unmatched' : 'matched';
 
 		if (!submittedSelections || !Number.isFinite(stake) || stake <= 0 || !Number.isFinite(placedOdds) || placedOdds <= 1) {
 			return fail(400, { betError: 'Choose valid selections, odds greater than 1.00, and a stake greater than £0.' });
@@ -300,6 +301,7 @@ export const actions: Actions = {
 				selections,
 				placedOdds,
 				stake,
+				matchStatus,
 				status: 'pending',
 				returnAmount: null,
 				profit: null,

@@ -24,6 +24,7 @@
 	} = $props();
 
 	let stake = $state('');
+	let isUnmatched = $state(false);
 	let placedOdds = $state('');
 	let hasEditedPlacedOdds = $state(false);
 	let betError = $state<string | null>(null);
@@ -105,6 +106,7 @@
 				<input class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm tabular-nums outline-none focus:border-emerald-600" name="stake" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" bind:value={stake} required />
 			</label>
 		</div>
+		<label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="isUnmatched" bind:checked={isUnmatched} /> Unmatched — do not settle yet</label>
 		<div class="flex justify-between text-[11px] text-slate-500">
 			<span>Available {currencyFormatter.format(balance)}</span>
 			{#if potentialReturn !== null}<span>Return {currencyFormatter.format(potentialReturn)}</span>{/if}

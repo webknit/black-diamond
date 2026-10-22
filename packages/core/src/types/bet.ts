@@ -18,6 +18,7 @@ export type Bet = {
   selections: BetSelection[];
   placedOdds: number;
   stake: number;
+  matchStatus: "matched" | "unmatched";
   status: "pending" | "won" | "lost" | "void";
   returnAmount: number | null;
   profit: number | null;

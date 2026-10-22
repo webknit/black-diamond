@@ -10,7 +10,7 @@ const bet = {
     fixture: { id: 1, date: "2026-10-22", homeTeamName: "Home", awayTeamName: "Away" },
     market: { type: "matchWinner" as const, name: "Match Winner", outcome: "home" as const, selection: "Home", line: null },
     referenceOdds: 1.8, referenceOddsSource: "Bet365" as const,
-  }], placedOdds: 1.8, stake: 10, status: "pending" as const,
+  }], placedOdds: 1.8, stake: 10, matchStatus: "matched" as const, status: "pending" as const,
   returnAmount: null, profit: null, placedAt: "2026-10-22T00:00:00.000Z", settledAt: null,
 };
 
