@@ -1,15 +1,3 @@
-import { ensureDatabaseIndexes } from "@black-diamond/database/indexes";
+import { runSelectedSync } from "./runSelectedSync.js";
 
-import { runDailySync } from "./runs/dailySync.js";
-import { runHourlySync } from "./runs/hourlySync.js";
-import { runLiveSync } from "./runs/liveSync.js";
-import { runWeeklySync } from "./runs/weeklySync.js";
-import { runThreeHourlySync } from "./runs/threeHourlySync.js";
-import { logSyncStep } from "./utils/logging/logSyncStep.js";
-
-await logSyncStep("ensure database indexes", ensureDatabaseIndexes);
-await logSyncStep("daily sync", runDailySync);
-await logSyncStep("hourly sync", runHourlySync);
-await logSyncStep("live sync", runLiveSync);
-await logSyncStep("three-hourly sync", runThreeHourlySync);
-await logSyncStep("weekly sync", runWeeklySync);
+await runSelectedSync(process.argv[2]);

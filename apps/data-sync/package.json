@@ -8,8 +8,14 @@
     "@black-diamond/database": "workspace:*"
   },
   "scripts": {
-    "dev": "node --env-file=.env --import tsx --watch src/index.ts",
-    "start": "node --env-file=.env --import tsx src/index.ts",
+    "dev": "node --env-file-if-exists=.env --import tsx --watch src/index.ts daily",
+    "start": "pnpm run sync:daily",
+    "sync": "node --env-file-if-exists=.env --import tsx src/index.ts",
+    "sync:daily": "pnpm run sync -- daily",
+    "sync:hourly": "pnpm run sync -- hourly",
+    "sync:live": "pnpm run sync -- live",
+    "sync:three-hourly": "pnpm run sync -- three-hourly",
+    "sync:weekly": "pnpm run sync -- weekly",
     "check:database": "node --env-file=.env --import tsx src/checkDatabaseConnection.ts",
     "ensure:database-indexes": "node --env-file=.env --import tsx src/ensureDatabaseIndexes.ts",
     "check": "tsc --noEmit",
