@@ -1,11 +1,9 @@
 <script lang="ts">
 	let {
 		date,
-		isLoading = false,
 		onDateChange
 	}: {
 		date: string;
-		isLoading?: boolean;
 		onDateChange: (event: Event) => void;
 	} = $props();
 </script>
@@ -28,10 +26,3 @@
 		/>
 	</div>
 </form>
-
-{#if isLoading}
-	<p class="flex items-center gap-2 text-xs font-medium text-slate-500" role="status">
-		<span class="size-3 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span>
-		Loading fixtures…
-	</p>
-{/if}

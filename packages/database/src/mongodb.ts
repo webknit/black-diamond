@@ -1,4 +1,4 @@
-import { Db, MongoClient } from "mongodb";
+import { Db, MongoClient, type ClientSession } from "mongodb";
 
 let databasePromise: Promise<Db> | undefined;
 let databaseConfiguration: { connectionString: string; databaseName: string } | undefined;
@@ -28,6 +28,24 @@ export function getDatabase(): Promise<Db> {
   });
 
   return databasePromise;
+}
+
+export async function withDatabaseTransaction<T>(
+  operation: (database: Db, session: ClientSession) => Promise<T>,
+): Promise<T> {
+  const database = await getDatabase();
+  const session = database.client.startSession();
+
+  try {
+    let result!: T;
+    await session.withTransaction(async () => {
+      result = await operation(database, session);
+      return result;
+    });
+    return result;
+  } finally {
+    await session.endSession();
+  }
 }
 
 async function connectToDatabase(): Promise<Db> {

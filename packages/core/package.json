@@ -34,6 +34,9 @@
     "./account": {
       "types": "./src/types/account.ts"
     },
+    "./balanceTransaction": {
+      "types": "./src/types/balanceTransaction.ts"
+    },
     "./bet": {
       "types": "./src/types/bet.ts"
     },

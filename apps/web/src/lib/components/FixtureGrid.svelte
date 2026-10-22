@@ -5,17 +5,24 @@
 	let {
 		fixtures,
 		hasFixtures,
+		isLoading = false,
 		placedSelectionKeys = [],
 		onSelectOdd
 	}: {
 		fixtures: FixtureCardData[];
 		hasFixtures: boolean;
+		isLoading?: boolean;
 		placedSelectionKeys?: string[];
 		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
 	} = $props();
 </script>
 
-{#if !hasFixtures}
+{#if isLoading}
+	<section class="rounded-2xl border border-slate-200 bg-white px-6 py-14 text-center" role="status">
+		<span class="mx-auto block size-6 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span>
+		<p class="mt-3 text-sm font-medium text-slate-600">Loading fixtures…</p>
+	</section>
+{:else if !hasFixtures}
 	<section class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
 		<h2 class="text-lg font-semibold text-slate-950">No fixtures on this date</h2>
 		<p class="mt-2 text-sm text-slate-600">There are no matches scheduled for this date.</p>

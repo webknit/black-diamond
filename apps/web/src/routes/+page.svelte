@@ -154,10 +154,10 @@
 					Fixtures
 				</h1>
 				<p class="mt-1 mb-3 text-sm text-slate-600">{data.today} · All times UK</p>
-				<FixtureDatePicker date={data.date} {isLoading} onDateChange={changeDate} />
+				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
 			</div>
 
-			{#if data.fixtures.length > 0}
+			{#if data.fixtures.length > 0 && !isLoading}
 				<div class="flex shrink-0 flex-wrap items-end gap-3">
 					<FixtureStatusFilter bind:showFinished />
 					<LeagueFilter
@@ -177,7 +177,13 @@
 		</header>
 
 		<div aria-busy={isLoading}>
-			<FixtureGrid fixtures={filteredFixtures} hasFixtures={data.fixtures.length > 0} placedSelectionKeys={data.placedBetSelectionKeys} onSelectOdd={chooseOdd} />
+			<FixtureGrid
+				fixtures={filteredFixtures}
+				hasFixtures={data.fixtures.length > 0}
+				{isLoading}
+				placedSelectionKeys={data.placedBetSelectionKeys}
+				onSelectOdd={chooseOdd}
+			/>
 		</div>
 	</div>
 </main>

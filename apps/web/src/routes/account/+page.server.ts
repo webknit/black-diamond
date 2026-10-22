@@ -1,11 +1,21 @@
 import { addAccountDeposit } from '@black-diamond/database/accounts';
-import { getPendingBetSummaryByAccountId } from '@black-diamond/database/bets';
+import { getBetsByAccountId, getPendingBetSummaryByAccountId } from '@black-diamond/database/bets';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export async function load({ locals }: { locals: App.Locals }) {
 	if (!locals.accountId) throw redirect(303, '/login');
-	return { pendingBetSummary: await getPendingBetSummaryByAccountId(locals.accountId) };
+	const [pendingBetSummary, bets] = await Promise.all([
+		getPendingBetSummaryByAccountId(locals.accountId),
+		getBetsByAccountId(locals.accountId)
+	]);
+	return {
+		pendingBetSummary,
+		realizedProfitLoss: bets.reduce(
+			(total, bet) => total + (bet.status === 'pending' ? 0 : (bet.profit ?? 0)),
+			0
+		),
+	};
 }
 
 export const actions: Actions = {

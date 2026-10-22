@@ -1,7 +1,13 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const mocks = vi.hoisted(() => ({ collection: vi.fn(), getDatabase: vi.fn(), insertOne: vi.fn(), updateOne: vi.fn() }));
-vi.mock("../../mongodb.js", () => ({ getDatabase: mocks.getDatabase }));
+const mocks = vi.hoisted(() => ({
+  collection: vi.fn(),
+  withDatabaseTransaction: vi.fn(),
+  insertOne: vi.fn(),
+  updateOne: vi.fn(),
+  findOne: vi.fn(),
+}));
+vi.mock("../../mongodb.js", () => ({ withDatabaseTransaction: mocks.withDatabaseTransaction }));
 
 import { insufficientBalanceErrorCode, placeBet } from "./placeBet.js";
 
@@ -15,44 +21,61 @@ const bet = {
 };
 
 describe("placeBet", () => {
+  beforeEach(() => vi.clearAllMocks());
+
   it("reserves the stake then stores the pending bet", async () => {
-    mocks.getDatabase.mockResolvedValue({ collection: mocks.collection });
+    const session = {};
+    mocks.withDatabaseTransaction.mockImplementation((operation) =>
+      operation({ collection: mocks.collection }, session),
+    );
     mocks.collection.mockImplementation((name: string) => name === "accounts"
-      ? { updateOne: mocks.updateOne }
+      ? { updateOne: mocks.updateOne, findOne: mocks.findOne }
       : { insertOne: mocks.insertOne });
     mocks.updateOne.mockResolvedValue({ modifiedCount: 1 });
+    mocks.findOne.mockResolvedValue({ currentBalance: 90 });
 
     await placeBet(bet);
 
     expect(mocks.updateOne).toHaveBeenCalledWith(
       { id: "main", currentBalance: { $gte: 10 } },
       { $inc: { currentBalance: -10 }, $set: { updatedAt: bet.placedAt } },
+      { session },
     );
-    expect(mocks.insertOne).toHaveBeenCalledWith(bet);
+    expect(mocks.insertOne).toHaveBeenCalledWith(bet, { session });
+    expect(mocks.insertOne).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accountId: "main",
+        type: "bet_stake",
+        amount: -10,
+        balanceAfter: 90,
+        occurredAt: bet.placedAt,
+        referenceId: bet.id,
+      }),
+      { session },
+    );
   });
 
   it("rejects the bet when the account does not have enough balance", async () => {
-    mocks.getDatabase.mockResolvedValue({ collection: mocks.collection });
+    mocks.withDatabaseTransaction.mockImplementation((operation) =>
+      operation({ collection: mocks.collection }, {}),
+    );
     mocks.collection.mockReturnValue({ updateOne: mocks.updateOne });
     mocks.updateOne.mockResolvedValue({ modifiedCount: 0 });
 
     await expect(placeBet(bet)).rejects.toMatchObject({ code: insufficientBalanceErrorCode });
   });
 
-  it("restores the reserved stake when storing the bet fails", async () => {
-    mocks.getDatabase.mockResolvedValue({ collection: mocks.collection });
+  it("propagates ledger write errors so the transaction is aborted", async () => {
+    mocks.withDatabaseTransaction.mockImplementation((operation) =>
+      operation({ collection: mocks.collection }, {}),
+    );
     mocks.collection.mockImplementation((name: string) => name === "accounts"
-      ? { updateOne: mocks.updateOne }
+      ? { updateOne: mocks.updateOne, findOne: mocks.findOne }
       : { insertOne: mocks.insertOne });
     mocks.updateOne.mockResolvedValue({ modifiedCount: 1 });
-    mocks.insertOne.mockRejectedValue(new Error("Mongo write failed"));
+    mocks.findOne.mockResolvedValue({ currentBalance: 90 });
+    mocks.insertOne.mockRejectedValue(new Error("Ledger write failed"));
 
-    await expect(placeBet(bet)).rejects.toThrow("Mongo write failed");
-
-    expect(mocks.updateOne).toHaveBeenNthCalledWith(
-      2,
-      { id: "main" },
-      expect.objectContaining({ $inc: { currentBalance: 10 } }),
-    );
+    await expect(placeBet(bet)).rejects.toThrow("Ledger write failed");
   });
 });

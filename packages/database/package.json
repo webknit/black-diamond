@@ -8,6 +8,10 @@
       "types": "./src/bets/index.ts",
       "default": "./src/bets/index.ts"
     },
+    "./balanceTransactions": {
+      "types": "./src/balanceTransactions/index.ts",
+      "default": "./src/balanceTransactions/index.ts"
+    },
     "./accounts": {
       "types": "./src/accounts/index.ts",
       "default": "./src/accounts/index.ts"
