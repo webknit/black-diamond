@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { refreshAll } from '$app/navigation';
 	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
 	export type BetSlipSelection = {
@@ -80,13 +81,13 @@
 		class="mt-3 space-y-2"
 		use:enhance={() => {
 			betError = null;
-			return async ({ result, update }) => {
+			return async ({ result }) => {
 				if (result.type === 'failure') {
 					betError = (result.data as { betError?: string }).betError ?? 'Unable to place this bet.';
 					return;
 				}
 				onPlaced();
-				await update();
+				await refreshAll();
 			};
 		}}
 	>

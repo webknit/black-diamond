@@ -201,8 +201,10 @@
 			{/if}
 		</header>
 
-		{#if data.account && data.date === data.todayDate}
-			<section class="mb-6 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:px-4" aria-labelledby="todays-bets-heading">
+		<div class="grid items-start gap-6 min-[1100px]:grid-cols-[20rem_minmax(0,1fr)]">
+			{#if data.account && data.date === data.todayDate}
+				<aside class="min-[1100px]:order-1 min-[1100px]:sticky min-[1100px]:top-4">
+			<section class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:px-4" aria-labelledby="todays-bets-heading">
 				<button
 					type="button"
 					class="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 text-left"
@@ -299,16 +301,18 @@
 					</div>
 				{/if}
 			</section>
-		{/if}
+				</aside>
+			{/if}
 
-		<div aria-busy={isLoading}>
-			<FixtureGrid
-				fixtures={filteredFixtures}
-				hasFixtures={data.fixtures.length > 0}
-				{isLoading}
-				placedSelectionKeys={data.placedBetSelectionKeys}
-				onSelectOdd={chooseOdd}
-			/>
+			<div class="min-[1100px]:order-2" aria-busy={isLoading}>
+				<FixtureGrid
+					fixtures={filteredFixtures}
+					hasFixtures={data.fixtures.length > 0}
+					{isLoading}
+					placedSelectionKeys={data.placedBetSelectionKeys}
+					onSelectOdd={chooseOdd}
+				/>
+			</div>
 		</div>
 	</div>
 </main>

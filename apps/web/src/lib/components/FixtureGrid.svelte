@@ -33,7 +33,7 @@
 		<p class="mt-2 text-sm text-slate-600">Select at least one league to show its fixtures.</p>
 	</section>
 {:else}
-	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 2xl:gap-5">
+	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 min-[1100px]:!grid-cols-3 min-[1536px]:grid-cols-5 2xl:gap-5">
 		{#each fixtures as fixture (fixture.id)}
 			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} />
 		{/each}

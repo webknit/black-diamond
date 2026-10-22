@@ -261,7 +261,7 @@ function getSubmittedSelections(formData: FormData): SubmittedBetSelection[] | n
 }
 
 export const actions: Actions = {
-	placeBet: async ({ request, locals, url }) => {
+	placeBet: async ({ request, locals }) => {
 		if (!locals.accountId) throw redirect(303, '/login');
 
 		const formData = await request.formData();
@@ -316,9 +316,6 @@ export const actions: Actions = {
 			const price = market?.values.find(
 				(candidate) => candidate.value.toLowerCase() === selectionValue.toLowerCase()
 			);
-			if (oddsDocument && (!market || !price || !Number.isFinite(Number(price.odd)))) {
-				return fail(400, { betError: 'One of the selected reference markets is no longer available.' });
-			}
 
 			selections.push({
 				fixture: {
@@ -355,9 +352,6 @@ export const actions: Actions = {
 			throw error;
 		}
 
-		const selectedDate = getTextField(formData, 'date');
-		const redirectUrl = new URL(url.pathname, url);
-		if (isDateKey(selectedDate)) redirectUrl.searchParams.set('date', selectedDate);
-		throw redirect(303, `${redirectUrl.pathname}${redirectUrl.search}`);
+		return { success: true };
 	}
 };
