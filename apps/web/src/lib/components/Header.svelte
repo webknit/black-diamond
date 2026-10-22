@@ -87,6 +87,31 @@
 					</div>
 				{/if}
 			</div>
+			{#if page.data.account}
+				{#if page.url.pathname === '/account'}
+					<span aria-current="page" class="inline-flex h-4 items-center text-xs font-bold leading-none text-slate-950">
+						Account
+					</span>
+				{:else}
+					<a
+						class="inline-flex h-4 items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950"
+						href="/account"
+					>
+						Account
+					</a>
+				{/if}
+			{:else if page.url.pathname === '/login'}
+				<span aria-current="page" class="inline-flex h-4 items-center text-xs font-bold leading-none text-slate-950">
+					Log in
+				</span>
+			{:else}
+				<a
+					class="inline-flex h-4 items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950"
+					href="/login"
+				>
+					Log in
+				</a>
+			{/if}
 		</nav>
 	</div>
 </header>

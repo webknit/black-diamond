@@ -6,5 +6,8 @@ export const variables = defineEnvVars({
 	},
 	MONGODB_DATABASE: {
 		description: 'MongoDB database name for server-side data access'
+	},
+	SESSION_SECRET: {
+		description: 'Secret used to sign authenticated session cookies'
 	}
 });

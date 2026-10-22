@@ -31,6 +31,9 @@
     "./leagueStats": {
       "types": "./src/types/leagueStats.ts"
     },
+    "./account": {
+      "types": "./src/types/account.ts"
+    },
     "./selectedLeagues": {
       "types": "./src/config/selectedLeagues.ts",
       "default": "./src/config/selectedLeagues.ts"

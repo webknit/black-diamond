@@ -89,5 +89,17 @@ describe("ensureDatabaseIndexes", () => {
       { leagueId: 1, season: 1 },
       { name: "unique_league_season", unique: true },
     );
+    expect(mocks.collection).toHaveBeenNthCalledWith(13, "accounts");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      13,
+      { id: 1 },
+      { name: "unique_account_id", unique: true },
+    );
+    expect(mocks.collection).toHaveBeenNthCalledWith(14, "accounts");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      14,
+      { email: 1 },
+      { name: "unique_account_email", unique: true },
+    );
   });
 });

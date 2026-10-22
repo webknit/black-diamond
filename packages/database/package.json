@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "exports": {
+    "./accounts": {
+      "types": "./src/accounts/index.ts",
+      "default": "./src/accounts/index.ts"
+    },
     "./leagueStandings": {
       "types": "./src/leagueStandings/index.ts",
       "default": "./src/leagueStandings/index.ts"

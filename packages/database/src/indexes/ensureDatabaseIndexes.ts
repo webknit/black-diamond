@@ -48,4 +48,10 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { leagueId: 1, season: 1 },
     { name: "unique_league_season", unique: true },
   );
+  await database.collection("accounts").createIndex(
+    { id: 1 }, { name: "unique_account_id", unique: true },
+  );
+  await database.collection("accounts").createIndex(
+    { email: 1 }, { name: "unique_account_email", unique: true },
+  );
 }
