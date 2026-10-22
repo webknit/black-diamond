@@ -1,4 +1,4 @@
-import adapter from 'amplify-adapter';
+import adapter from '@sveltejs/adapter-node';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
@@ -13,7 +13,7 @@ export default defineConfig({
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
 
-			adapter: adapter()
+			adapter: adapter({ out: 'build' })
 		})
 	]
 });
