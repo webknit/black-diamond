@@ -315,6 +315,9 @@ export const actions: Actions = {
 			throw error;
 		}
 
-		throw redirect(303, `${url.pathname}${url.search}`);
+		const selectedDate = getTextField(formData, 'date');
+		const redirectUrl = new URL(url.pathname, url);
+		if (isDateKey(selectedDate)) redirectUrl.searchParams.set('date', selectedDate);
+		throw redirect(303, `${redirectUrl.pathname}${redirectUrl.search}`);
 	}
 };

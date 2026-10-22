@@ -9,6 +9,7 @@
 
 	let {
 		selections,
+		date,
 		balance,
 		currency,
 		onRemove,
@@ -16,6 +17,7 @@
 		onPlaced
 	}: {
 		selections: BetSlipSelection[];
+		date: string;
 		balance: number;
 		currency: string;
 		onRemove: (index: number) => void;
@@ -89,6 +91,7 @@
 		}}
 	>
 		<input type="hidden" name="selections" value={JSON.stringify(selections.map(({ fixture, selection }) => ({ fixtureId: fixture.id, ...selection })))} />
+		<input type="hidden" name="date" value={date} />
 
 		{#if selections.length > 1 && combinedOdds !== null}
 			<div class="flex items-center justify-between text-xs">

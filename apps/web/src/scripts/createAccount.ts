@@ -80,6 +80,7 @@ await createAccount({
 	email,
 	passwordHash: await hashPassword(password),
 	startingBalance,
+	totalDeposits: 0,
 	currentBalance: startingBalance,
 	currency: 'GBP',
 	createdAt: now,

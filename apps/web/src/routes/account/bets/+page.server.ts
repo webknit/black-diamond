@@ -1,10 +1,23 @@
 import { deleteBet, getBetsByAccountId, markBetMatched } from '@black-diamond/database/bets';
+import { getFixtureScoresByIds } from '@black-diamond/database/fixtures';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export async function load({ locals }: { locals: App.Locals }) {
 	if (!locals.accountId) throw redirect(303, '/login');
-	return { bets: await getBetsByAccountId(locals.accountId) };
+	const bets = await getBetsByAccountId(locals.accountId);
+	const fixtureIds = [...new Set(bets.flatMap((bet) => bet.selections.map((selection) => selection.fixture.id)))];
+	const fixtureScores = await getFixtureScoresByIds(fixtureIds);
+	const scoresByFixtureId = new Map(fixtureScores.map((score) => [score.fixtureId, score]));
+	return {
+		bets: bets.map((bet) => ({
+			...bet,
+			selections: bet.selections.map((selection) => ({
+				...selection,
+				score: scoresByFixtureId.get(selection.fixture.id) ?? null
+			}))
+		}))
+	};
 }
 
 export const actions: Actions = {

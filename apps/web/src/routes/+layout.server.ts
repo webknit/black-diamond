@@ -11,6 +11,7 @@ export async function load({ locals }: { locals: App.Locals }) {
 			id: account.id,
 			email: account.email,
 			startingBalance: account.startingBalance,
+			totalDeposits: account.totalDeposits ?? 0,
 			currentBalance: account.currentBalance,
 			currency: account.currency
 		}

@@ -185,6 +185,7 @@
 {#if betSlipSelections.length > 0 && data.account}
 	<BetSlip
 		selections={betSlipSelections}
+		date={data.date}
 		balance={data.account.currentBalance}
 		currency={data.account.currency}
 		onRemove={(index) => (betSlipSelections = betSlipSelections.filter((_, itemIndex) => itemIndex !== index))}
