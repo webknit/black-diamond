@@ -17,6 +17,7 @@
 	let showFinished = $state(false);
 	let previousDate = $state<string>();
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
+	let todaysBetsExpanded = $state(true);
 
 	// Leagues are calculated from this date's fixtures. Reset an old selection when
 	// navigating to another date so it cannot silently filter the new matchday. Past
@@ -72,6 +73,30 @@
 			? leagues.length
 			: leagues.filter((league) => selectedLeagueIds?.includes(league.id) ?? false).length
 	);
+	const todaysBetWins = $derived(data.todaysBets.filter((bet) => bet.status === 'won').length);
+	const todaysBetLosses = $derived(data.todaysBets.filter((bet) => bet.status === 'lost').length);
+	const todaysBetsToPlay = $derived(
+		data.todaysBets.filter((bet) => bet.status === 'pending' && bet.matchStatus === 'matched').length
+	);
+	const todaysUnmatchedBets = $derived(
+		data.todaysBets.filter((bet) => bet.matchStatus === 'unmatched').length
+	);
+
+	function formatBetTime(timestamp: number) {
+		return new Intl.DateTimeFormat('en-GB', {
+			timeZone: 'Europe/London',
+			hour: '2-digit',
+			minute: '2-digit'
+		}).format(new Date(timestamp * 1000));
+	}
+
+	function formatMoney(value: number) {
+		return new Intl.NumberFormat('en-GB', {
+			style: 'currency',
+			currency: data.account?.currency ?? 'GBP',
+			minimumFractionDigits: 2
+		}).format(value);
+	}
 
 	function toggleLeague(leagueId: number, checked: boolean) {
 		const currentSelection = selectedLeagueIds ?? leagues.map((league) => league.id);
@@ -175,6 +200,97 @@
 				</div>
 			{/if}
 		</header>
+
+		{#if data.account && data.date === data.todayDate}
+			<section class="mb-6 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:px-4" aria-labelledby="todays-bets-heading">
+				<button
+					type="button"
+					class="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 text-left"
+					aria-expanded={todaysBetsExpanded}
+					aria-controls="todays-bets-content"
+					onclick={() => (todaysBetsExpanded = !todaysBetsExpanded)}
+				>
+					<span id="todays-bets-heading" class="text-sm font-semibold text-slate-950">
+						Today's bets ({data.todaysBets.length})
+					</span>
+					<span class="flex items-center gap-2 text-[11px] font-medium tabular-nums text-slate-600">
+						{todaysBetWins}/{todaysBetLosses} · {todaysBetsToPlay} to play
+						{#if todaysUnmatchedBets > 0} · {todaysUnmatchedBets} unmatched{/if}
+						<svg
+							aria-hidden="true"
+							viewBox="0 0 20 20"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							class="size-3 transition-transform"
+							class:rotate-180={todaysBetsExpanded}
+						><path d="m5 7.5 5 5 5-5" /></svg>
+					</span>
+				</button>
+
+				{#if todaysBetsExpanded}
+					<div id="todays-bets-content" class="mt-2 border-t border-slate-100 pt-2">
+						{#if data.todaysBets.length === 0}
+							<p class="py-1 text-xs text-slate-600">No bets on today's fixtures yet.</p>
+						{:else}
+							<ul class="divide-y divide-slate-100">
+								{#each data.todaysBets as bet (bet.id)}
+									<li class="py-2 first:pt-0 last:pb-0">
+										<div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+											<div class="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-600">
+												{#if bet.selections.length === 1}
+													<span class="font-semibold tabular-nums text-slate-800">{formatBetTime(bet.selections[0].timestamp)}</span>
+													<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold">{bet.selections[0].status}</span>
+												{:else}
+													<span class="font-semibold text-slate-800">{bet.selections.length}-fold</span>
+												{/if}
+												<span
+													class="rounded px-1 py-0.5 font-medium"
+													class:bg-amber-100={bet.status === 'pending'}
+													class:text-amber-800={bet.status === 'pending'}
+													class:bg-emerald-100={bet.status === 'won'}
+													class:text-emerald-800={bet.status === 'won'}
+													class:bg-rose-100={bet.status === 'lost'}
+													class:text-rose-800={bet.status === 'lost'}
+													class:bg-slate-100={bet.status === 'void' || bet.matchStatus === 'unmatched'}
+													class:text-slate-700={bet.status === 'void' || bet.matchStatus === 'unmatched'}
+												>
+													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status}
+												</span>
+											</div>
+											<p class="text-[11px] font-semibold tabular-nums text-slate-800">
+												{formatMoney(bet.stake)} <span class="font-normal text-slate-500">|</span> {bet.placedOdds}
+											</p>
+										</div>
+										{#each bet.selections as selection}
+											<div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
+												<span class="min-w-0 text-slate-800">
+													<span class="font-medium">{selection.market}</span>
+													<span class="text-slate-600">
+														· {selection.homeTeamName}
+														{#if selection.homeGoals !== null && selection.awayGoals !== null}
+															<strong class="mx-1 tabular-nums text-slate-900">{selection.homeGoals}–{selection.awayGoals}</strong>
+														{:else}
+															<span class="mx-1">v</span>
+														{/if}
+														{selection.awayTeamName}
+													</span>
+												</span>
+												{#if bet.selections.length > 1}
+													<span class="text-[10px] tabular-nums text-slate-500">
+														{formatBetTime(selection.timestamp)} · {selection.status}
+													</span>
+												{/if}
+											</div>
+										{/each}
+									</li>
+								{/each}
+							</ul>
+						{/if}
+					</div>
+				{/if}
+			</section>
+		{/if}
 
 		<div aria-busy={isLoading}>
 			<FixtureGrid

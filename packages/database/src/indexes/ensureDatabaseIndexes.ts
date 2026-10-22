@@ -61,6 +61,10 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { accountId: 1, status: 1, "selections.fixture.id": 1 },
     { name: "account_status_selection_fixture" },
   );
+  await database.collection("bets").createIndex(
+    { accountId: 1, placedAt: -1, id: -1 },
+    { name: "account_bet_placed_at" },
+  );
   await database.collection("balanceTransactions").createIndex(
     { id: 1 }, { name: "unique_balance_transaction_id", unique: true },
   );

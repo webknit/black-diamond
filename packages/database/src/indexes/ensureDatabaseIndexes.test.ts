@@ -113,15 +113,21 @@ describe("ensureDatabaseIndexes", () => {
       { accountId: 1, status: 1, "selections.fixture.id": 1 },
       { name: "account_status_selection_fixture" },
     );
-    expect(mocks.collection).toHaveBeenNthCalledWith(17, "balanceTransactions");
+    expect(mocks.collection).toHaveBeenNthCalledWith(17, "bets");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       17,
-      { id: 1 },
-      { name: "unique_balance_transaction_id", unique: true },
+      { accountId: 1, placedAt: -1, id: -1 },
+      { name: "account_bet_placed_at" },
     );
     expect(mocks.collection).toHaveBeenNthCalledWith(18, "balanceTransactions");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       18,
+      { id: 1 },
+      { name: "unique_balance_transaction_id", unique: true },
+    );
+    expect(mocks.collection).toHaveBeenNthCalledWith(19, "balanceTransactions");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      19,
       { accountId: 1, occurredAt: 1, id: 1 },
       { name: "account_balance_transaction_date" },
     );

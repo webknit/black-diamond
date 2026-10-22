@@ -45,6 +45,15 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const todayFixtures = fixtures
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedDate)
 		.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
+	const todaysFixtureSummaries =
+		selectedDate === todayUk
+			? todayFixtures
+			: (await getFixtureSummariesBetweenDates(
+					getUtcDateKey(new Date(new Date(`${todayUk}T00:00:00.000Z`).getTime() - 24 * 60 * 60 * 1000)),
+					getUtcDateKey(new Date(new Date(`${todayUk}T00:00:00.000Z`).getTime() + 48 * 60 * 60 * 1000))
+				))
+					.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
+					.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const fixtureIds = todayFixtures.map((fixture) => fixture.fixture.id);
 	const [statsSnapshots, fixtureOdds] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
@@ -52,17 +61,47 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	]);
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
-	const placedBetSelectionKeys = locals.accountId
-		? (await getBetsByAccountId(locals.accountId)).flatMap((bet) =>
+	const bets = locals.accountId ? await getBetsByAccountId(locals.accountId) : [];
+	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
 					`${selection.fixture.id}|${selection.market.name.toLowerCase()}|${selection.market.selection.toLowerCase()}`
 				)
-			)
-		: [];
+			);
+	const todayFixtureById = new Map(
+		todaysFixtureSummaries.map((fixture) => [fixture.fixture.id, fixture])
+	);
+	const todaysBets = bets.flatMap((bet) => {
+		const selections = bet.selections.flatMap((selection) => {
+			const fixture = todayFixtureById.get(selection.fixture.id);
+			if (!fixture) return [];
+			return [{
+				fixtureId: fixture.fixture.id,
+				timestamp: fixture.fixture.timestamp,
+				status: fixture.fixture.status.short,
+				homeTeamName: fixture.teams.home.name,
+				awayTeamName: fixture.teams.away.name,
+				homeGoals: fixture.goals.home,
+				awayGoals: fixture.goals.away,
+				market: selection.market.selection
+			}];
+		});
+		return selections.length > 0
+			? [{
+					id: bet.id,
+					status: bet.status,
+					matchStatus: bet.matchStatus,
+					stake: bet.stake,
+					placedOdds: bet.placedOdds,
+					selections
+				}]
+			: [];
+	});
 
 	return {
 		date: selectedDate,
+		todayDate: todayUk,
 		placedBetSelectionKeys,
+		todaysBets,
 		fixtures: todayFixtures.map((fixture) => {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
