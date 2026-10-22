@@ -10,6 +10,7 @@ applications:
             - pnpm install --frozen-lockfile
         build:
           commands:
+            - env | grep -E '^(MONGODB_URI|MONGODB_DATABASE|SESSION_SECRET)=' > apps/web/.env.production
             - pnpm --filter web build
       artifacts:
         baseDirectory: apps/web/build
