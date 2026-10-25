@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
 	import FixtureDatePicker from '#lib/components/FixtureDatePicker.svelte';
 	import FixtureGrid from '#lib/components/FixtureGrid.svelte';
 	import FixtureStatusFilter from '#lib/components/FixtureStatusFilter.svelte';
@@ -12,25 +13,12 @@
 
 	let { data }: PageProps = $props();
 	let isLoading = $state(false);
-	let selectedLeagueIds = $state<number[] | null>(null);
+	let selectedLeagueIds = $state<number[] | null>(getLeagueIdsFromQuery(page.url.searchParams.get('leagues')));
 	let leagueFilterOpen = $state(false);
-	let showFinished = $state(false);
-	let previousDate = $state<string>();
+	let showFinished = $state(getShowFinishedFromQuery());
+	let previousFilterSearch = $state(page.url.search);
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
 	let todaysBetsExpanded = $state(true);
-
-	// Leagues are calculated from this date's fixtures. Reset an old selection when
-	// navigating to another date so it cannot silently filter the new matchday. Past
-	// dates show finished matches; today and future dates begin focused on upcoming/live.
-	$effect(() => {
-		if (previousDate !== undefined && data.date !== previousDate) {
-			selectedLeagueIds = null;
-			leagueFilterOpen = false;
-		}
-
-		showFinished = data.date < getUkDateKey(new Date());
-		previousDate = data.date;
-	});
 
 	const leagues = $derived(
 		[
@@ -83,6 +71,38 @@
 	);
 	const showTodaysBets = $derived(Boolean(data.account && data.date === data.todayDate));
 
+	function getLeagueIdsFromQuery(value: string | null): number[] | null {
+		if (value === null) return null;
+		if (value === 'none') return [];
+
+		return [...new Set(
+			value
+				.split(',')
+				.map(Number)
+				.filter((leagueId) => Number.isSafeInteger(leagueId) && leagueId > 0)
+		)];
+	}
+
+	function getDefaultShowFinished(): boolean {
+		return data.date < getUkDateKey(new Date());
+	}
+
+	function getShowFinishedFromQuery(): boolean {
+		const showFinishedQuery = page.url.searchParams.get('ft');
+		return showFinishedQuery === null ? getDefaultShowFinished() : showFinishedQuery === '1';
+	}
+
+	// The URL is the source of truth for shareable filters. This also restores them
+	// after a refresh, browser navigation, or opening a copied link.
+	$effect(() => {
+		const search = page.url.search;
+		if (search === previousFilterSearch) return;
+
+		selectedLeagueIds = getLeagueIdsFromQuery(page.url.searchParams.get('leagues'));
+		showFinished = getShowFinishedFromQuery();
+		previousFilterSearch = search;
+	});
+
 	function formatBetTime(timestamp: number) {
 		return new Intl.DateTimeFormat('en-GB', {
 			timeZone: 'Europe/London',
@@ -99,23 +119,52 @@
 		}).format(value);
 	}
 
+	function updateFilterQuery(nextLeagueIds: number[] | null, nextShowFinished: boolean) {
+		const url = new URL(page.url.href);
+		url.searchParams.delete('leagues');
+		url.searchParams.delete('ft');
+
+		if (nextLeagueIds !== null) {
+			url.searchParams.set(
+				'leagues',
+				nextLeagueIds.length === 0 ? 'none' : [...nextLeagueIds].sort((a, b) => a - b).join(',')
+			);
+		}
+
+		if (nextShowFinished !== getDefaultShowFinished()) {
+			url.searchParams.set('ft', nextShowFinished ? '1' : '0');
+		}
+
+		void goto(`${url.pathname}${url.search}`);
+	}
+
+	function setShowFinished(nextShowFinished: boolean) {
+		showFinished = nextShowFinished;
+		updateFilterQuery(selectedLeagueIds, nextShowFinished);
+	}
+
+	function setSelectedLeagueIds(nextLeagueIds: number[] | null) {
+		selectedLeagueIds = nextLeagueIds;
+		updateFilterQuery(nextLeagueIds, showFinished);
+	}
+
 	function toggleLeague(leagueId: number, checked: boolean) {
 		const currentSelection = selectedLeagueIds ?? leagues.map((league) => league.id);
-		selectedLeagueIds = checked
+		const nextLeagueIds = checked
 			? [...currentSelection, leagueId]
 			: currentSelection.filter((id) => id !== leagueId);
 
-		if (selectedLeagueIds.length === leagues.length) selectedLeagueIds = null;
+		setSelectedLeagueIds(nextLeagueIds.length === leagues.length ? null : nextLeagueIds);
 	}
 
 	function toggleCountry(leagueIds: number[], checked: boolean) {
 		const currentSelection = selectedLeagueIds ?? leagues.map((league) => league.id);
 		const countryLeagueIds = new Set(leagueIds);
-		selectedLeagueIds = checked
+		const nextLeagueIds = checked
 			? [...new Set([...currentSelection, ...leagueIds])]
 			: currentSelection.filter((id) => !countryLeagueIds.has(id));
 
-		if (selectedLeagueIds.length === leagues.length) selectedLeagueIds = null;
+		setSelectedLeagueIds(nextLeagueIds.length === leagues.length ? null : nextLeagueIds);
 	}
 
 	function isLeagueSelected(leagueId: number): boolean {
@@ -136,7 +185,9 @@
 
 		isLoading = true;
 		try {
-			await goto(`?date=${encodeURIComponent(input.value)}`);
+			const url = new URL(page.url.href);
+			url.searchParams.set('date', input.value);
+			await goto(`${url.pathname}${url.search}`);
 		} finally {
 			isLoading = false;
 		}
@@ -185,7 +236,7 @@
 
 			{#if data.fixtures.length > 0 && !isLoading}
 				<div class="flex shrink-0 flex-wrap items-end gap-3">
-					<FixtureStatusFilter bind:showFinished />
+					<FixtureStatusFilter {showFinished} onChange={setShowFinished} />
 					<LeagueFilter
 						groups={leaguesByCountry}
 						{selectedLeagueCount}
@@ -195,8 +246,8 @@
 						{areSomeCountryLeaguesSelected}
 						onToggleLeague={toggleLeague}
 						onToggleCountry={toggleCountry}
-						onSelectAll={() => (selectedLeagueIds = null)}
-						onDeselectAll={() => (selectedLeagueIds = [])}
+						onSelectAll={() => setSelectedLeagueIds(null)}
+						onDeselectAll={() => setSelectedLeagueIds([])}
 						bind:isOpen={leagueFilterOpen}
 					/>
 				</div>
