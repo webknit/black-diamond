@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  calculateLeagueStats: vi.fn(),
+  calculateLeagueStatsSnapshots: vi.fn(),
   getLeagueById: vi.fn(),
   upsertLeagueStats: vi.fn(),
 }));
 
 vi.mock("@black-diamond/database/leagueStats", () => ({
-  calculateLeagueStats: mocks.calculateLeagueStats,
+  calculateLeagueStatsSnapshots: mocks.calculateLeagueStatsSnapshots,
   upsertLeagueStats: mocks.upsertLeagueStats,
 }));
 vi.mock("@black-diamond/database/leagues", () => ({
@@ -19,22 +19,22 @@ import { syncLeagueStatsForLeague } from "./syncLeagueStatsForLeague.js";
 describe("syncLeagueStatsForLeague", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("calculates and stores stats for the current season", async () => {
-    const stats = { league: { id: 39, season: 2026 } };
+  it("calculates and stores round snapshots for the current season", async () => {
+    const snapshots = [{ league: { id: 39, season: 2026 }, round: "Regular Season - 10" }];
     mocks.getLeagueById.mockResolvedValue({
       league: { id: 39, name: "Premier League" },
       country: { name: "England" },
       seasons: [{ year: 2026, current: true }],
     });
-    mocks.calculateLeagueStats.mockResolvedValue(stats);
+    mocks.calculateLeagueStatsSnapshots.mockResolvedValue(snapshots);
 
-    await expect(syncLeagueStatsForLeague(39)).resolves.toBe(stats);
-    expect(mocks.calculateLeagueStats).toHaveBeenCalledWith({
+    await expect(syncLeagueStatsForLeague(39)).resolves.toBe(snapshots);
+    expect(mocks.calculateLeagueStatsSnapshots).toHaveBeenCalledWith({
       id: 39,
       name: "Premier League",
       country: "England",
       season: 2026,
     });
-    expect(mocks.upsertLeagueStats).toHaveBeenCalledWith(stats);
+    expect(mocks.upsertLeagueStats).toHaveBeenCalledWith(snapshots[0]);
   });
 });

@@ -2,12 +2,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   ensureDatabaseIndexes: vi.fn(),
+  runBackfill: vi.fn(),
   runDailySync: vi.fn(),
   runFullSync: vi.fn(),
   runHourlySync: vi.fn(),
   runLiveSync: vi.fn(),
   runThreeHourlySync: vi.fn(),
   runWeeklySync: vi.fn(),
+  backfillLeagueStats: vi.fn(),
+  syncLeagueStats: vi.fn(),
   getSyncRunState: vi.fn(),
   markSyncRunCompleted: vi.fn(),
   markSyncRunFailed: vi.fn(),
@@ -25,6 +28,7 @@ vi.mock("@black-diamond/database/syncRunStates", () => ({
   scheduledSyncRunNames: ["daily", "hourly", "live", "three-hourly", "weekly"],
 }));
 vi.mock("./runs/dailySync.js", () => ({ runDailySync: mocks.runDailySync }));
+vi.mock("./runs/backfill.js", () => ({ runBackfill: mocks.runBackfill }));
 vi.mock("./runs/fullSync.js", () => ({ runFullSync: mocks.runFullSync }));
 vi.mock("./runs/hourlySync.js", () => ({ runHourlySync: mocks.runHourlySync }));
 vi.mock("./runs/liveSync.js", () => ({ runLiveSync: mocks.runLiveSync }));
@@ -32,6 +36,12 @@ vi.mock("./runs/threeHourlySync.js", () => ({
   runThreeHourlySync: mocks.runThreeHourlySync,
 }));
 vi.mock("./runs/weeklySync.js", () => ({ runWeeklySync: mocks.runWeeklySync }));
+vi.mock("./sync/leagueStats/backfillLeagueStats.js", () => ({
+  backfillLeagueStats: mocks.backfillLeagueStats,
+}));
+vi.mock("./sync/leagueStats/syncLeagueStats.js", () => ({
+  syncLeagueStats: mocks.syncLeagueStats,
+}));
 
 import { getSyncRun, runSelectedSync } from "./runSelectedSync.js";
 
@@ -56,9 +66,12 @@ describe("selected sync run", () => {
 
   it("maps each Railway command name to its sync run", () => {
     expect(getSyncRun("all").label).toBe("full sync");
+    expect(getSyncRun("backfill").label).toBe("backfill");
     expect(getSyncRun("indexes").label).toBe("ensure database indexes");
     expect(getSyncRun("hourly").label).toBe("hourly sync");
     expect(getSyncRun("live").label).toBe("live sync");
+    expect(getSyncRun("league-stats").label).toBe("sync league stats");
+    expect(getSyncRun("league-stats-backfill").label).toBe("backfill league stats");
     expect(getSyncRun("three-hourly").label).toBe("three-hourly sync");
     expect(getSyncRun("weekly").label).toBe("weekly sync");
   });

@@ -9,9 +9,17 @@ export async function getLeagueStats(leagueIds: number[]): Promise<LeagueStats[]
 
   return database
     .collection<LeagueStats>("leagueStats")
-    .find(
-      { "league.id": { $in: leagueIds } },
-      { projection: { _id: 0 } },
-    )
+    .aggregate<LeagueStats>([
+      {
+        $match: {
+          "league.id": { $in: leagueIds },
+          round: { $exists: true },
+        },
+      },
+      { $sort: { "league.season": -1, roundLastFixtureTimestamp: -1 } },
+      { $group: { _id: "$league.id", stats: { $first: "$$ROOT" } } },
+      { $replaceRoot: { newRoot: "$stats" } },
+      { $project: { _id: 0 } },
+    ])
     .toArray();
 }

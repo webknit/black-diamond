@@ -1,10 +1,10 @@
 import {
-  calculateLeagueStats,
+  calculateLeagueStatsSnapshots,
   upsertLeagueStats,
 } from "@black-diamond/database/leagueStats";
 import { getLeagueById } from "@black-diamond/database/leagues";
 
-export async function syncLeagueStatsForLeague(leagueId: number) {
+export async function syncLeagueStatsForLeague(leagueId: number, seasonYear?: number) {
   const league = await getLeagueById(leagueId);
 
   if (!league) {
@@ -13,22 +13,26 @@ export async function syncLeagueStatsForLeague(leagueId: number) {
     );
   }
 
-  const currentSeason = league.seasons.find((season) => season.current);
+  const season = seasonYear === undefined
+    ? league.seasons.find((candidate) => candidate.current)
+    : league.seasons.find((candidate) => candidate.year === seasonYear);
 
-  if (!currentSeason) {
+  if (!season) {
     throw new Error(
-      `Cannot sync league stats: league ID ${leagueId} has no current season`,
+      `Cannot sync league stats: league ID ${leagueId} does not include season ${seasonYear ?? "current"}`,
     );
   }
 
-  const stats = await calculateLeagueStats({
+  const snapshots = await calculateLeagueStatsSnapshots({
     id: league.league.id,
     name: league.league.name,
     country: league.country.name,
-    season: currentSeason.year,
+    season: season.year,
   });
 
-  await upsertLeagueStats(stats);
+  for (const snapshot of snapshots) {
+    await upsertLeagueStats(snapshot);
+  }
 
-  return stats;
+  return snapshots;
 }

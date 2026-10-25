@@ -20,7 +20,7 @@
 				League stats
 			</h1>
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">
-				Results from completed current-season fixtures.
+				Cumulative results through each league’s latest round.
 			</p>
 		</header>
 
@@ -37,6 +37,7 @@
 					<thead class="border-b border-slate-200 bg-slate-50 text-[9px] font-bold uppercase tracking-wide text-slate-500">
 						<tr>
 							<th scope="col" class="sticky left-0 z-20 min-w-32 border-r border-slate-200 bg-slate-50 px-2 py-2 shadow-[3px_0_5px_-4px_rgba(15,23,42,0.45)]">League</th>
+							<th scope="col" class="px-2 py-2">Through</th>
 							<th scope="col" class="px-2 py-2 text-right">Played</th>
 							<th scope="col" class="px-2 py-2 text-right">Goals / game</th>
 							<th scope="col" class="px-2 py-2 text-right">BTTS</th>
@@ -57,6 +58,7 @@
 										{stats.league.country} · {stats.league.season}
 									</p>
 								</th>
+								<td class="whitespace-nowrap px-2 py-2 text-slate-700">{stats.round}</td>
 								<td class="px-2 py-2 text-right tabular-nums text-slate-700">{stats.fixturesPlayed}</td>
 								<td class="px-2 py-2 text-right font-semibold tabular-nums text-slate-900">{stats.goalsPerFixture.toFixed(2)}</td>
 								<td class="px-2 py-2 text-right tabular-nums text-slate-700">{formatPercentage(stats.bttsPercentage)}</td>

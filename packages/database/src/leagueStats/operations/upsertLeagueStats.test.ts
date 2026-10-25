@@ -11,8 +11,8 @@ vi.mock("../../mongodb.js", () => ({ getDatabase: mocks.getDatabase }));
 import { upsertLeagueStats } from "./upsertLeagueStats.js";
 
 describe("upsertLeagueStats", () => {
-  it("upserts a league season's calculated statistics", async () => {
-    const stats = { league: { id: 39, season: 2026 } } as never;
+  it("upserts a league season round's calculated statistics", async () => {
+    const stats = { league: { id: 39, season: 2026 }, round: "Regular Season - 10" } as never;
     mocks.getDatabase.mockResolvedValue({ collection: mocks.collection });
     mocks.collection.mockReturnValue({ updateOne: mocks.updateOne });
 
@@ -20,7 +20,7 @@ describe("upsertLeagueStats", () => {
 
     expect(mocks.collection).toHaveBeenCalledWith("leagueStats");
     expect(mocks.updateOne).toHaveBeenCalledWith(
-      { "league.id": 39, "league.season": 2026 },
+      { "league.id": 39, "league.season": 2026, round: "Regular Season - 10" },
       { $set: stats },
       { upsert: true },
     );

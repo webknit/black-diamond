@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  getFixturesWithoutStatsSnapshots: vi.fn(),
+  getFixturesForStatsSnapshotBackfill: vi.fn(),
   syncFixtureStatsSnapshot: vi.fn(),
 }));
 
 vi.mock("@black-diamond/database/fixtures", () => ({
-  getFixturesWithoutStatsSnapshots: mocks.getFixturesWithoutStatsSnapshots,
+  getFixturesForStatsSnapshotBackfill: mocks.getFixturesForStatsSnapshotBackfill,
 }));
 vi.mock("./syncFixtureStatsSnapshot.js", () => ({
   syncFixtureStatsSnapshot: mocks.syncFixtureStatsSnapshot,
@@ -21,11 +21,11 @@ describe("backfillFixtureStatsSnapshots", () => {
       { fixture: { id: 1, timestamp: 1_000 } },
       { fixture: { id: 2, timestamp: 2_000 } },
     ];
-    mocks.getFixturesWithoutStatsSnapshots.mockResolvedValue(fixtures);
+    mocks.getFixturesForStatsSnapshotBackfill.mockResolvedValue(fixtures);
 
     await expect(backfillFixtureStatsSnapshots()).resolves.toBe(2);
 
-    expect(mocks.getFixturesWithoutStatsSnapshots).toHaveBeenCalledWith(
+    expect(mocks.getFixturesForStatsSnapshotBackfill).toHaveBeenCalledWith(
       selectedLeagues.map((league) => league.id),
     );
     expect(mocks.syncFixtureStatsSnapshot).toHaveBeenNthCalledWith(1, fixtures[0]);

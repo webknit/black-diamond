@@ -17,6 +17,7 @@ export async function load() {
 			)
 			.map((stats) => ({
 				league: stats.league,
+				round: stats.round,
 				fixturesPlayed: stats.fixturesPlayed,
 				goalsPerFixture: stats.goals.averagePerFixture,
 				bttsPercentage: stats.btts.percentage,

@@ -9,6 +9,7 @@ export async function upsertLeagueStats(stats: LeagueStats): Promise<void> {
     {
       "league.id": stats.league.id,
       "league.season": stats.league.season,
+      round: stats.round,
     },
     { $set: stats },
     { upsert: true },

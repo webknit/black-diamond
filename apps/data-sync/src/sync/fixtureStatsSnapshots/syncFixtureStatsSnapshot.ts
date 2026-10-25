@@ -85,7 +85,8 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
         btts = 0,
         o05 = 0,
         o15 = 0,
-        o25 = 0;
+        o25 = 0,
+        o35 = 0;
       for (const item of items) {
         const isHome = item.teams.home.id === team.id;
         const f = isHome ? item.goals.home! : item.goals.away!;
@@ -101,6 +102,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
         if (t > 0) o05++;
         if (t > 1) o15++;
         if (t > 2) o25++;
+        if (t > 3) o35++;
       }
       const p = (n: number) => (items.length ? (n / items.length) * 100 : 0);
       return {
@@ -119,6 +121,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
           over0_5: { count: o05, percentage: p(o05) },
           over1_5: { count: o15, percentage: p(o15) },
           over2_5: { count: o25, percentage: p(o25) },
+          over3_5: { count: o35, percentage: p(o35) },
           under0_5: {
             count: items.length - o05,
             percentage: p(items.length - o05),
@@ -131,12 +134,21 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
             count: items.length - o25,
             percentage: p(items.length - o25),
           },
+          under3_5: {
+            count: items.length - o35,
+            percentage: p(items.length - o35),
+          },
         },
       };
     };
     const total = record(all),
       h = record(home),
-      a = record(away);
+      a = record(away),
+      last5 = record(
+        [...all]
+          .sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
+          .slice(-5),
+      );
     return {
       team: { id: team.id, name: team.name, logo: team.logo },
       leaguePosition: leaguePositions.get(team.id) ?? null,
@@ -149,6 +161,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
       cleanSheets: { home: h.cs, away: a.cs, total: total.cs },
       failedToScore: { home: h.fts, away: a.fts, total: total.fts },
       summary: total.summary,
+      last5: { played: last5.played, ...last5.summary },
     };
   };
   await upsertFixtureStatsSnapshot({

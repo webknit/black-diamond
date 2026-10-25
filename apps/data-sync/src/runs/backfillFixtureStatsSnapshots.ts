@@ -3,7 +3,7 @@ import { logSyncStep } from "../utils/logging/logSyncStep.js";
 
 export async function runFixtureStatsSnapshotBackfill(): Promise<void> {
   await logSyncStep(
-    "backfill missing fixture stats snapshots",
+    "rebuild fixture stats snapshots",
     backfillFixtureStatsSnapshots,
   );
 }

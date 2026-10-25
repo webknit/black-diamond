@@ -33,6 +33,24 @@
 		<a class="text-xl font-semibold tracking-tight text-slate-950" href="/">♦ Black Diamond</a>
 
 		<nav class="mt-4 flex items-center gap-5" aria-label="Main navigation">
+			{#if page.url.pathname === '/analysis'}
+				<span aria-current="page" class="inline-flex items-center text-xs font-bold leading-none text-slate-950">
+					Analysis
+				</span>
+			{:else}
+				<a class="inline-flex items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950" href="/analysis">
+					Analysis
+				</a>
+			{/if}
+			{#if page.url.pathname === '/strategies'}
+				<span aria-current="page" class="inline-flex items-center text-xs font-bold leading-none text-slate-950">
+					Strategies
+				</span>
+			{:else}
+				<a class="inline-flex items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950" href="/strategies">
+					Strategies
+				</a>
+			{/if}
 			<div bind:this={leaguesMenu} class="relative flex items-center">
 				<button
 					type="button"

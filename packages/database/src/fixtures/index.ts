@@ -6,3 +6,5 @@ export { getFixtureSummariesBetweenDates } from "./operations/getFixtureSummarie
 export { getFixturesBefore } from "./operations/getFixturesBefore.js";
 export { getFixturesAwaitingResult } from "./operations/getFixturesAwaitingResult.js";
 export { getFixturesWithoutStatsSnapshots } from "./operations/getFixturesWithoutStatsSnapshots.js";
+export { getFixturesForStatsSnapshotBackfill } from "./operations/getFixturesForStatsSnapshotBackfill.js";
+export { getFixtureSeasonsForLeague } from "./operations/getFixtureSeasonsForLeague.js";

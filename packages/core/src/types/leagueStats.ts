@@ -10,6 +10,9 @@ export type LeagueStats = {
     country: string;
     season: number;
   };
+  round: string;
+  roundLastFixtureTimestamp: number;
+  calculatedAt: Date;
   fixturesPlayed: number;
   results: {
     homeWins: CountAndPercentage;

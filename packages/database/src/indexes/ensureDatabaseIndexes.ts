@@ -1,4 +1,5 @@
 import { getDatabase } from "../mongodb.js";
+import { MongoServerError } from "mongodb";
 
 export async function ensureDatabaseIndexes(): Promise<void> {
   const database = await getDatabase();
@@ -27,13 +28,29 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { "fixture.timestamp": 1, "fixture.status.short": 1 },
     { name: "fixture_timestamp_status" },
   );
+  await database.collection("fixtures").createIndex(
+    { "league.id": 1, "fixture.status.short": 1, "fixture.timestamp": 1 },
+    { name: "league_status_timestamp" },
+  );
+  await database.collection("fixtures").createIndex(
+    { "league.id": 1, "league.season": 1, "fixture.timestamp": 1 },
+    { name: "league_season_timestamp" },
+  );
   await database.collection("leagueStandings").createIndex(
     { "league.id": 1, "league.season": 1 },
     { name: "unique_league_season", unique: true },
   );
-  await database.collection("leagueStats").createIndex(
-    { "league.id": 1, "league.season": 1 },
-    { name: "unique_league_season", unique: true },
+  const leagueStats = database.collection("leagueStats");
+
+  try {
+    await leagueStats.dropIndex("unique_league_season");
+  } catch (error) {
+    if (!(error instanceof MongoServerError) || error.code !== 27) throw error;
+  }
+
+  await leagueStats.createIndex(
+    { "league.id": 1, "league.season": 1, round: 1 },
+    { name: "unique_league_season_round", unique: true },
   );
   await database.collection("teamStats").createIndex(
     { "team.id": 1, "league.id": 1, "league.season": 1 },
