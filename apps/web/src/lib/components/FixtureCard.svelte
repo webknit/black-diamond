@@ -1,6 +1,7 @@
 <script lang="ts">
 	import FixtureOdds from './FixtureOdds.svelte';
 	import FixtureStats from './FixtureStats.svelte';
+	import FixtureEvents from './FixtureEvents.svelte';
 	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
 	let {
@@ -103,6 +104,14 @@
 				>
 					{formatStatus()}
 				</p>
+				<FixtureEvents
+					events={fixture.events}
+					homeTeam={{ id: fixture.homeTeamId, name: fixture.homeTeamName, logo: fixture.homeTeamLogo }}
+					awayTeam={{ id: fixture.awayTeamId, name: fixture.awayTeamName, logo: fixture.awayTeamLogo }}
+					homeGoals={fixture.homeGoals}
+					awayGoals={fixture.awayGoals}
+					status={formatStatus()}
+				/>
 			</div>
 
 			<div class="min-w-0 text-center">

@@ -19,6 +19,9 @@
     "./fixtureOdds": {
       "types": "./src/types/fixtureOdds.ts"
     },
+    "./fixtureEvents": {
+      "types": "./src/types/fixtureEvents.ts"
+    },
     "./fixtureStatsSnapshot": {
       "types": "./src/types/fixtureStatsSnapshot.ts"
     },

@@ -4,6 +4,7 @@ import type { Actions } from './$types';
 import { getFixtureById, getFixtureSummariesBetweenDates } from '@black-diamond/database/fixtures';
 import { getFixtureCardOdds, getFixtureOddsForFixtures } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
+import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
 import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { insufficientBalanceErrorCode, placeBet } from '@black-diamond/database/bets';
 import { getBetsByAccountId } from '@black-diamond/database/bets';
@@ -83,14 +84,16 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 					.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
 					.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const fixtureIds = todayFixtures.map((fixture) => fixture.fixture.id);
-	const [statsSnapshots, fixtureOdds, predictions] = await Promise.all([
+	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
 		getFixtureCardOdds(fixtureIds),
-		getPredictionsForFixtures(fixtureIds)
+		getPredictionsForFixtures(fixtureIds),
+		getFixtureEventsForFixtures(fixtureIds)
 	]);
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
 	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
+	const eventsByFixtureId = new Map(fixtureEvents.map((fixtureEvent) => [fixtureEvent.fixtureId, fixtureEvent.events]));
 	const bets = locals.accountId ? await getBetsByAccountId(locals.accountId) : [];
 	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
@@ -155,8 +158,10 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 				venueName: fixture.fixture.venue.name,
 				venueCity: fixture.fixture.venue.city,
 				homeTeamName: fixture.teams.home.name,
+				homeTeamId: fixture.teams.home.id,
 				homeTeamLogo: fixture.teams.home.logo,
 				awayTeamName: fixture.teams.away.name,
+				awayTeamId: fixture.teams.away.id,
 				awayTeamLogo: fixture.teams.away.logo,
 				homeGoals: fixture.goals.home,
 				awayGoals: fixture.goals.away,
@@ -254,7 +259,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 							}))
 						}
 					: null,
-				prediction: prediction ? getFixturePrediction(prediction.response) : null
+				prediction: prediction ? getFixturePrediction(prediction.response) : null,
+				events: eventsByFixtureId.get(fixture.fixture.id) ?? []
 			};
 		}),
 		today: new Intl.DateTimeFormat('en-GB', {

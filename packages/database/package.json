@@ -56,6 +56,10 @@
       "types": "./src/fixtureOdds/index.ts",
       "default": "./src/fixtureOdds/index.ts"
     },
+    "./fixtureEvents": {
+      "types": "./src/fixtureEvents/index.ts",
+      "default": "./src/fixtureEvents/index.ts"
+    },
     "./fixtureStatsSnapshots": {
       "types": "./src/fixtureStatsSnapshots/index.ts",
       "default": "./src/fixtureStatsSnapshots/index.ts"

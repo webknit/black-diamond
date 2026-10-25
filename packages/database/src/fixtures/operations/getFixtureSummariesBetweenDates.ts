@@ -16,8 +16,8 @@ type FixtureSummaryProjection = {
     round: string | null;
   };
   teams: {
-    home: { name: string; logo: string };
-    away: { name: string; logo: string };
+    home: { id: number; name: string; logo: string };
+    away: { id: number; name: string; logo: string };
   };
   goals: { home: number | null; away: number | null };
 };
@@ -49,8 +49,10 @@ export async function getFixtureSummariesBetweenDates(startDate: string, endDate
           "league.logo": 1,
           "league.round": 1,
           "teams.home.name": 1,
+					"teams.home.id": 1,
           "teams.home.logo": 1,
           "teams.away.name": 1,
+					"teams.away.id": 1,
           "teams.away.logo": 1,
           "goals.home": 1,
           "goals.away": 1,

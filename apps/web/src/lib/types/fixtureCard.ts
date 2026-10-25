@@ -79,12 +79,16 @@ export type FixtureCardData = {
 	venueName: string | null;
 	venueCity: string | null;
 	homeTeamName: string;
+	homeTeamId: number;
 	homeTeamLogo: string;
 	awayTeamName: string;
+	awayTeamId: number;
 	awayTeamLogo: string;
 	homeGoals: number | null;
 	awayGoals: number | null;
 	stats: FixtureStatsData | null;
 	odds: FixtureOddsData | null;
 	prediction: FixturePredictionData | null;
+	events: FixtureEvent[];
 };
+import type { FixtureEvent } from '@black-diamond/core/fixtureEvents';
