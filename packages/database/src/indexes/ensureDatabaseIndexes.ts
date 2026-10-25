@@ -21,6 +21,10 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { name: "unique_fixture_id", unique: true },
   );
   await database.collection("fixtures").createIndex(
+    { "fixture.date": 1 },
+    { name: "fixture_date" },
+  );
+  await database.collection("fixtures").createIndex(
     { "league.id": 1, "league.season": 1, "fixture.status.short": 1 },
     { name: "league_season_status" },
   );
@@ -88,6 +92,10 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   await database.collection("bets").createIndex(
     { accountId: 1, status: 1, "selections.fixture.id": 1 },
     { name: "account_status_selection_fixture" },
+  );
+  await database.collection("bets").createIndex(
+    { accountId: 1, "selections.fixture.id": 1 },
+    { name: "account_selection_fixture" },
   );
   await database.collection("bets").createIndex(
     { accountId: 1, placedAt: -1, id: -1 },
