@@ -21,6 +21,7 @@
 		onToggleLeague,
 		onToggleCountry,
 		onSelectAll,
+		onDeselectAll,
 		isOpen = $bindable(false)
 	}: {
 		groups: CountryGroup[];
@@ -32,6 +33,7 @@
 		onToggleLeague: (leagueId: number, checked: boolean) => void;
 		onToggleCountry: (leagueIds: number[], checked: boolean) => void;
 		onSelectAll: () => void;
+		onDeselectAll: () => void;
 		isOpen?: boolean;
 	} = $props();
 
@@ -75,16 +77,25 @@
 		Leagues
 		<span class="ml-1 text-xs text-slate-500">{selectedLeagueCount}/{totalLeagueCount}</span>
 	</summary>
-	<div class="absolute left-0 top-full z-20 mt-2 max-h-[calc(100dvh-8rem)] w-64 max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
-		<div class="mb-2 flex items-center justify-between">
+	<div class="fixed inset-x-4 top-4 z-20 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-[calc(100dvh-8rem)] sm:w-64">
+		<div class="mb-2">
 			<p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Include leagues</p>
-			<button
-				type="button"
-				class="text-xs font-semibold text-emerald-700 hover:text-emerald-900"
-				onclick={onSelectAll}
-			>
-				Select all
-			</button>
+			<div class="mt-1.5 flex items-center gap-3">
+				<button
+					type="button"
+					class="text-xs font-semibold text-slate-600 hover:text-slate-900"
+					onclick={onDeselectAll}
+				>
+					Deselect all
+				</button>
+				<button
+					type="button"
+					class="text-xs font-semibold text-emerald-700 hover:text-emerald-900"
+					onclick={onSelectAll}
+				>
+					Select all
+				</button>
+			</div>
 		</div>
 		{#each groups as group, index (group.country)}
 			<section class:mt-3={index > 0}>

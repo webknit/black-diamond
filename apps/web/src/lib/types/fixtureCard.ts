@@ -47,6 +47,15 @@ export type FixtureOddsData = {
 	}>;
 };
 
+export type FixturePredictionData = {
+	advice: string | null;
+	percent: {
+		home: string | null;
+		draw: string | null;
+		away: string | null;
+	};
+};
+
 export type FixtureOddSelection = {
 	marketName: string;
 	value: string;
@@ -77,4 +86,5 @@ export type FixtureCardData = {
 	awayGoals: number | null;
 	stats: FixtureStatsData | null;
 	odds: FixtureOddsData | null;
+	prediction: FixturePredictionData | null;
 };

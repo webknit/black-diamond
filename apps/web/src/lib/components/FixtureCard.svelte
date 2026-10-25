@@ -139,6 +139,21 @@
 			{/if}
 		</div>
 
+		{#if fixture.prediction}
+			<div class="mt-2 border-t border-slate-100 pt-2 text-center text-[10px]">
+				<div class="flex items-start justify-center">
+				{#if fixture.prediction.advice}
+					<span class="font-medium text-slate-700">
+						{fixture.prediction.advice}
+					</span>
+				{/if}
+				</div>
+				<span class="mt-1 inline-block tabular-nums text-slate-500">
+					H {fixture.prediction.percent.home ?? '–'} · D {fixture.prediction.percent.draw ?? '–'} · A {fixture.prediction.percent.away ?? '–'}
+				</span>
+			</div>
+		{/if}
+
 		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
 	</div>
 </article>

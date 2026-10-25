@@ -4,6 +4,7 @@ import type { Actions } from './$types';
 import { getFixtureById, getFixtureSummariesBetweenDates } from '@black-diamond/database/fixtures';
 import { getFixtureCardOdds, getFixtureOddsForFixtures } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
+import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { insufficientBalanceErrorCode, placeBet } from '@black-diamond/database/bets';
 import { getBetsByAccountId } from '@black-diamond/database/bets';
 import type { BetSelection } from '@black-diamond/core/bet';
@@ -27,6 +28,33 @@ function isDateKey(value: string | null): value is string {
 
 function getOverallTotal(total: number, home: number, away: number): number {
 	return Number.isFinite(total) ? total : home + away;
+}
+
+function getStringValue(value: unknown): string | null {
+	return typeof value === 'string' && value.trim() ? value : null;
+}
+
+function getRecordValue(value: unknown): Record<string, unknown> | null {
+	return value !== null && typeof value === 'object' && !Array.isArray(value)
+		? value as Record<string, unknown>
+		: null;
+}
+
+function getFixturePrediction(response: Record<string, unknown>) {
+	const predictions = getRecordValue(response.predictions);
+	if (!predictions) return null;
+
+	const percent = getRecordValue(predictions.percent);
+	const prediction = {
+		advice: getStringValue(predictions.advice),
+		percent: {
+			home: getStringValue(percent?.home),
+			draw: getStringValue(percent?.draw),
+			away: getStringValue(percent?.away)
+		}
+	};
+
+	return prediction.advice || Object.values(prediction.percent).some(Boolean) ? prediction : null;
 }
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
@@ -55,12 +83,14 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 					.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
 					.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const fixtureIds = todayFixtures.map((fixture) => fixture.fixture.id);
-	const [statsSnapshots, fixtureOdds] = await Promise.all([
+	const [statsSnapshots, fixtureOdds, predictions] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
-		getFixtureCardOdds(fixtureIds)
+		getFixtureCardOdds(fixtureIds),
+		getPredictionsForFixtures(fixtureIds)
 	]);
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
+	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
 	const bets = locals.accountId ? await getBetsByAccountId(locals.accountId) : [];
 	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
@@ -106,6 +136,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		fixtures: todayFixtures.map((fixture) => {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
+			const prediction = predictionsByFixtureId.get(fixture.fixture.id);
 
 			return {
 				id: fixture.fixture.id,
@@ -222,7 +253,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 								values: market.values.map(({ value, odd }) => ({ value, odd }))
 							}))
 						}
-					: null
+					: null,
+				prediction: prediction ? getFixturePrediction(prediction.response) : null
 			};
 		}),
 		today: new Intl.DateTimeFormat('en-GB', {

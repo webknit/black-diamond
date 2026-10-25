@@ -177,7 +177,7 @@
 					Black Diamond · Matchday
 				</p>
 				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-					Fixtures
+					Fixtures <span class="text-slate-500">({filteredFixtures.length})</span>
 				</h1>
 				<p class="mt-1 mb-3 text-sm text-slate-600">{data.today} · All times UK</p>
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
@@ -196,6 +196,7 @@
 						onToggleLeague={toggleLeague}
 						onToggleCountry={toggleCountry}
 						onSelectAll={() => (selectedLeagueIds = null)}
+						onDeselectAll={() => (selectedLeagueIds = [])}
 						bind:isOpen={leagueFilterOpen}
 					/>
 				</div>
