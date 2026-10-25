@@ -2,6 +2,7 @@
 	import FixtureOdds from './FixtureOdds.svelte';
 	import FixtureStats from './FixtureStats.svelte';
 	import FixtureEvents from './FixtureEvents.svelte';
+	import LeagueStandingsModal from './LeagueStandingsModal.svelte';
 	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
 	let {
@@ -17,6 +18,11 @@
 	const ukTimeZone = 'Europe/London';
 	const liveStatuses = new Set(['1H', '2H', 'ET', 'P', 'LIVE', 'HT', 'BT']);
 	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
+	let leagueStandingsOpen = $state(false);
+
+	function openLeagueStandings() {
+		leagueStandingsOpen = true;
+	}
 
 	function formatKickoff(timestamp: number) {
 		return new Intl.DateTimeFormat('en-GB', {
@@ -129,8 +135,10 @@
 
 		<div class="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-[10px] text-slate-500">
 			<span>{formatDate(fixture.timestamp)}</span>
-			<span aria-hidden="true">·</span>
-			<span>KO {formatKickoff(fixture.timestamp)}</span>
+			{#if completedStatuses.has(fixture.status.short)}
+				<span aria-hidden="true">·</span>
+				<span>KO {formatKickoff(fixture.timestamp)}</span>
+			{/if}
 			{#if fixture.round}<span aria-hidden="true">·</span><span>{fixture.round}</span>{/if}
 			{#if fixture.venueName}
 				<span aria-hidden="true">·</span>
@@ -142,7 +150,12 @@
 
 		<div class="mt-3 border-t border-slate-100 pt-3">
 			{#if fixture.stats}
-				<FixtureStats stats={fixture.stats} />
+				<FixtureStats
+					stats={fixture.stats}
+					homeTeamId={fixture.homeTeamId}
+					awayTeamId={fixture.awayTeamId}
+					onOpenLeagueStandings={openLeagueStandings}
+				/>
 			{:else}
 				<p class="text-center text-[10px] text-slate-500">
 					Team statistics are not available.
@@ -167,4 +180,11 @@
 
 		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
 	</div>
+	<LeagueStandingsModal
+		leagueId={fixture.leagueId}
+		season={fixture.leagueSeason}
+		leagueName={fixture.leagueName}
+		highlightedTeamIds={[fixture.homeTeamId, fixture.awayTeamId]}
+		bind:isOpen={leagueStandingsOpen}
+	/>
 </article>

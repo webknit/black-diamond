@@ -16,7 +16,7 @@
 	let selectedLeagueIds = $state<number[] | null>(getLeagueIdsFromQuery(page.url.searchParams.get('leagues')));
 	let leagueFilterOpen = $state(false);
 	let showFinished = $state(getShowFinishedFromQuery());
-	let previousFilterSearch = $state(page.url.search);
+	let previousFilterStateKey = $state<string>();
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
 	let todaysBetsExpanded = $state(true);
 
@@ -56,6 +56,9 @@
 				(showFinished || !completedStatuses.has(fixture.status.short))
 		)
 	);
+	const fixtureFilterKey = $derived(
+		`${showFinished}:${selectedLeagueIds === null ? 'all' : selectedLeagueIds.join(',')}`
+	);
 	const selectedLeagueCount = $derived(
 		selectedLeagueIds === null
 			? leagues.length
@@ -83,8 +86,8 @@
 		)];
 	}
 
-	function getDefaultShowFinished(): boolean {
-		return data.date < getUkDateKey(new Date());
+	function getDefaultShowFinished(date = data.date): boolean {
+		return date < getUkDateKey(new Date());
 	}
 
 	function getShowFinishedFromQuery(): boolean {
@@ -95,12 +98,12 @@
 	// The URL is the source of truth for shareable filters. This also restores them
 	// after a refresh, browser navigation, or opening a copied link.
 	$effect(() => {
-		const search = page.url.search;
-		if (search === previousFilterSearch) return;
+		const filterStateKey = `${data.date}:${page.url.search}`;
+		if (filterStateKey === previousFilterStateKey) return;
 
 		selectedLeagueIds = getLeagueIdsFromQuery(page.url.searchParams.get('leagues'));
 		showFinished = getShowFinishedFromQuery();
-		previousFilterSearch = search;
+		previousFilterStateKey = filterStateKey;
 	});
 
 	function formatBetTime(timestamp: number) {
@@ -119,7 +122,7 @@
 		}).format(value);
 	}
 
-	function updateFilterQuery(nextLeagueIds: number[] | null, nextShowFinished: boolean) {
+	async function updateFilterQuery(nextLeagueIds: number[] | null, nextShowFinished: boolean) {
 		const url = new URL(page.url.href);
 		url.searchParams.delete('leagues');
 		url.searchParams.delete('ft');
@@ -135,17 +138,22 @@
 			url.searchParams.set('ft', nextShowFinished ? '1' : '0');
 		}
 
-		void goto(`${url.pathname}${url.search}`);
+		isLoading = true;
+		try {
+			await goto(`${url.pathname}${url.search}`);
+		} finally {
+			isLoading = false;
+		}
 	}
 
 	function setShowFinished(nextShowFinished: boolean) {
 		showFinished = nextShowFinished;
-		updateFilterQuery(selectedLeagueIds, nextShowFinished);
+		void updateFilterQuery(selectedLeagueIds, nextShowFinished);
 	}
 
 	function setSelectedLeagueIds(nextLeagueIds: number[] | null) {
 		selectedLeagueIds = nextLeagueIds;
-		updateFilterQuery(nextLeagueIds, showFinished);
+		void updateFilterQuery(nextLeagueIds, showFinished);
 	}
 
 	function toggleLeague(leagueId: number, checked: boolean) {
@@ -187,6 +195,12 @@
 		try {
 			const url = new URL(page.url.href);
 			url.searchParams.set('date', input.value);
+		url.searchParams.delete('ft');
+		if (getDefaultShowFinished(input.value)) {
+			showFinished = true;
+		} else if (showFinished) {
+			url.searchParams.set('ft', '1');
+		}
 			await goto(`${url.pathname}${url.search}`);
 		} finally {
 			isLoading = false;
@@ -234,7 +248,7 @@
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
 			</div>
 
-			{#if data.fixtures.length > 0 && !isLoading}
+			{#if data.fixtures.length > 0}
 				<div class="flex shrink-0 flex-wrap items-end gap-3">
 					<FixtureStatusFilter {showFinished} onChange={setShowFinished} />
 					<LeagueFilter
@@ -360,13 +374,15 @@
 			{/if}
 
 			<div class="min-[1100px]:order-2" aria-busy={isLoading}>
-				<FixtureGrid
-					fixtures={filteredFixtures}
-					hasFixtures={data.fixtures.length > 0}
-					{isLoading}
-					placedSelectionKeys={data.placedBetSelectionKeys}
-					onSelectOdd={chooseOdd}
-				/>
+				{#key fixtureFilterKey}
+					<FixtureGrid
+						fixtures={filteredFixtures}
+						hasFixtures={data.fixtures.length > 0}
+						{isLoading}
+						placedSelectionKeys={data.placedBetSelectionKeys}
+						onSelectOdd={chooseOdd}
+					/>
+				{/key}
 			</div>
 		</div>
 	</div>

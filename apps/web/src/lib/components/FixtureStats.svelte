@@ -1,7 +1,17 @@
 <script lang="ts">
 	import type { FixtureStatsData } from '../types/fixtureCard';
 
-	let { stats }: { stats: FixtureStatsData } = $props();
+	let {
+		stats,
+		homeTeamId,
+		awayTeamId,
+		onOpenLeagueStandings
+	}: {
+		stats: FixtureStatsData;
+		homeTeamId: number;
+		awayTeamId: number;
+		onOpenLeagueStandings: (teamId: number) => void;
+	} = $props();
 
 	function outcomes(form: string) {
 		return [...form];
@@ -26,6 +36,7 @@
 	{#each [
 		{
 			label: 'Home',
+			teamId: homeTeamId,
 			team: stats.home,
 			form: stats.home.formHome,
 			overallForm: stats.home.form,
@@ -34,6 +45,7 @@
 		},
 		{
 			label: 'Away',
+			teamId: awayTeamId,
 			team: stats.away,
 			form: stats.away.formAway,
 			overallForm: stats.away.form,
@@ -46,10 +58,19 @@
 				<span class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
 					{panel.label}
 				</span>
-				<span class="truncate text-[10px] text-slate-500">
-					<strong class="font-bold text-slate-700">{panel.team.leaguePosition ?? '—'}</strong>/{panel.team.leagueTeams}
-					· {panel.team.fixtures.total.played} played
-				</span>
+				{#if panel.team.leaguePosition !== null}
+					<button
+						type="button"
+						class="cursor-pointer text-[10px] text-slate-500 hover:text-emerald-700"
+						onclick={() => onOpenLeagueStandings(panel.teamId)}
+						aria-label={`Open league table for ${panel.label.toLowerCase()} team`}
+					>
+						<strong class="font-bold text-slate-700">{panel.team.leaguePosition}</strong>/{panel.team.leagueTeams}
+						· {panel.team.fixtures.total.played} played
+					</button>
+				{:else}
+					<span class="text-[10px] text-slate-500">—/{panel.team.leagueTeams} · {panel.team.fixtures.total.played} played</span>
+				{/if}
 			</div>
 
 			<div class="mt-1 flex items-center gap-2">

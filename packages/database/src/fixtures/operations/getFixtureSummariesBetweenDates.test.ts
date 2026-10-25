@@ -31,6 +31,7 @@ describe("getFixtureSummariesBetweenDates", () => {
           "league.country": 1,
           "league.logo": 1,
           "league.round": 1,
+					"league.season": 1,
 					"teams.home.id": 1,
           "teams.home.name": 1,
           "teams.home.logo": 1,

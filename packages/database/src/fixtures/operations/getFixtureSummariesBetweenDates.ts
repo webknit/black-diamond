@@ -14,6 +14,7 @@ type FixtureSummaryProjection = {
     country: string;
     logo: string | null;
     round: string | null;
+		season: number;
   };
   teams: {
     home: { id: number; name: string; logo: string };
@@ -48,6 +49,7 @@ export async function getFixtureSummariesBetweenDates(startDate: string, endDate
           "league.country": 1,
           "league.logo": 1,
           "league.round": 1,
+					"league.season": 1,
           "teams.home.name": 1,
 					"teams.home.id": 1,
           "teams.home.logo": 1,

@@ -152,6 +152,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 				round: fixture.league.round,
 				leagueName: fixture.league.name,
 				leagueId: fixture.league.id,
+				leagueSeason: fixture.league.season,
 				leagueOrder: selectedLeagueOrder.get(fixture.league.id) ?? Number.MAX_SAFE_INTEGER,
 				leagueCountry: fixture.league.country,
 				leagueLogo: fixture.league.logo,
