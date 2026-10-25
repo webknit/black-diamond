@@ -137,7 +137,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	])];
 	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, bets] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
-		getFixtureCardOdds(marketFixtureIds),
+		getFixtureCardOdds(fixtureIds),
 		getPredictionsForFixtures(marketFixtureIds),
 		getFixtureEventsForFixtures(fixtureIds),
 		locals.accountId
