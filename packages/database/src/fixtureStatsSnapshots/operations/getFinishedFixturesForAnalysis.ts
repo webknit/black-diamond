@@ -6,7 +6,12 @@ export type FinishedFixtureForAnalysis = Fixture & {
   fixtureStatsSnapshot: FixtureStatsSnapshot | null;
 };
 
-export async function getFinishedFixturesForAnalysis(leagueIds: number[]) {
+type LeagueSeason = { leagueId: number; season: number };
+
+export async function getFinishedFixturesForAnalysis(
+  leagueIds: number[],
+  leagueSeasons?: LeagueSeason[],
+) {
   if (leagueIds.length === 0) return [];
 
   const database = await getDatabase();
@@ -17,6 +22,14 @@ export async function getFinishedFixturesForAnalysis(leagueIds: number[]) {
         $match: {
           "league.id": { $in: leagueIds },
           "fixture.status.short": { $in: ["FT", "AET", "PEN"] },
+          ...(leagueSeasons && leagueSeasons.length > 0
+            ? {
+                $or: leagueSeasons.map(({ leagueId, season }) => ({
+                  "league.id": leagueId,
+                  "league.season": season,
+                })),
+              }
+            : {}),
         },
       },
       { $sort: { "fixture.timestamp": 1 } },

@@ -120,6 +120,8 @@
 
 		<div class="mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-0.5 text-[10px] text-slate-500">
 			<span>{formatDate(fixture.timestamp)}</span>
+			<span aria-hidden="true">·</span>
+			<span>KO {formatKickoff(fixture.timestamp)}</span>
 			{#if fixture.round}<span aria-hidden="true">·</span><span>{fixture.round}</span>{/if}
 			{#if fixture.venueName}
 				<span aria-hidden="true">·</span>

@@ -26,15 +26,14 @@ const strategies = [
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
 	const selectedLeagueIds = selectedLeagues.map((league) => league.id);
-	const [leagueStats, finishedFixtures] = await Promise.all([
-		getLeagueStats(selectedLeagueIds),
-		getFinishedFixturesForAnalysis(selectedLeagueIds)
-	]);
-	const leagueStatsByLeagueAndSeason = new Map(
-		leagueStats.map((stats) => [`${stats.league.id}:${stats.league.season}`, stats])
-	);
-	const currentSeasonFinishedFixtures = finishedFixtures.filter(
-		(fixture) => leagueStatsByLeagueAndSeason.has(`${fixture.league.id}:${fixture.league.season}`)
+	const leagueStats = await getLeagueStats(selectedLeagueIds);
+	const currentLeagueSeasons = leagueStats.map((stats) => ({
+		leagueId: stats.league.id,
+		season: stats.league.season
+	}));
+	const currentSeasonFinishedFixtures = await getFinishedFixturesForAnalysis(
+		selectedLeagueIds,
+		currentLeagueSeasons
 	);
 	const oldestSelectableWeek = new Date(now);
 	oldestSelectableWeek.setUTCDate(oldestSelectableWeek.getUTCDate() - 28);
@@ -45,9 +44,12 @@ export async function load({ url }: { url: URL }) {
 		.sort((left, right) => right.localeCompare(left));
 	const requestedWeek = url.searchParams.get('week');
 	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
-	const historicalOdds = await getFixtureOddsForFixtures(
-		currentSeasonFinishedFixtures.map((fixture) => fixture.fixture.id)
-	);
+	const fixturesWithRelevantOdds = selectedWeek === 'all'
+		? currentSeasonFinishedFixtures
+		: currentSeasonFinishedFixtures.filter(
+				(fixture) => getUkWeekStartDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedWeek
+			);
+	const historicalOdds = await getFixtureOddsForFixtures(fixturesWithRelevantOdds.map((fixture) => fixture.fixture.id));
 	const historicalOddsByFixtureId = new Map(historicalOdds.map((odds) => [odds.fixtureId, odds]));
 	const historicalLeagueTotals = new Map<number, { fixtures: number; over25: number }>();
 	let historicalFixturesWithPreMatchOdds = 0;

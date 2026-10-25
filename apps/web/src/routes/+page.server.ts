@@ -133,7 +133,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		todayDate: todayUk,
 		placedBetSelectionKeys,
 		todaysBets,
-		fixtures: todayFixtures.map((fixture) => {
+		fixtures: todayFixtures.filter((fixture) => fixture.fixture.status.short !== 'PST').map((fixture) => {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
 			const prediction = predictionsByFixtureId.get(fixture.fixture.id);
