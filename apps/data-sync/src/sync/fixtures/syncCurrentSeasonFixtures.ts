@@ -12,6 +12,7 @@ import { getUtcDateString } from "../../utils/time/getUtcDateString.js";
 
 export async function syncCurrentSeasonFixtures(
   leagueId: number,
+  dateRange?: FixtureDateRange,
 ) {
   const league = await getLeagueById(leagueId);
 
@@ -42,9 +43,24 @@ export async function syncCurrentSeasonFixtures(
     return { ...result, syncType: "full-season" as const };
   }
 
-  const result = await syncLeagueFixtures(leagueId, getDailyFixtureDateRange());
+  const result = await syncLeagueFixtures(
+    leagueId,
+    dateRange ?? getDailyFixtureDateRange(),
+  );
 
   return { ...result, syncType: "daily-window" as const };
+}
+
+export function getFixtureRecoveryDateRange(
+  lastCompletedAt: Date | undefined,
+  now = new Date(),
+): FixtureDateRange {
+  if (!lastCompletedAt) return getDailyFixtureDateRange(now);
+
+  return {
+    from: getUtcDateString(lastCompletedAt, -1),
+    to: getUtcDateString(now, 14),
+  };
 }
 
 export function getDailyFixtureDateRange(now = new Date()): FixtureDateRange {

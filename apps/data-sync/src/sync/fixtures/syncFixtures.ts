@@ -1,8 +1,13 @@
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
+import type { FixtureDateRange } from "./syncLeagueFixtures.js";
 import { syncCurrentSeasonFixtures } from "./syncCurrentSeasonFixtures.js";
 
-export async function syncFixtures() {
+export async function syncFixtures(dateRange?: FixtureDateRange) {
   for (const league of selectedLeagues) {
-    await syncCurrentSeasonFixtures(league.id);
+    if (dateRange) {
+      await syncCurrentSeasonFixtures(league.id, dateRange);
+    } else {
+      await syncCurrentSeasonFixtures(league.id);
+    }
   }
 }

@@ -24,6 +24,7 @@ vi.mock("./syncFullCurrentSeasonFixtures.js", () => ({
 
 import {
   getDailyFixtureDateRange,
+  getFixtureRecoveryDateRange,
   syncCurrentSeasonFixtures,
 } from "./syncCurrentSeasonFixtures.js";
 
@@ -82,5 +83,14 @@ describe("syncCurrentSeasonFixtures", () => {
       from: "2026-10-20",
       to: "2026-11-04",
     });
+  });
+
+  it("extends the fixture window from the previous successful daily run", () => {
+    expect(
+      getFixtureRecoveryDateRange(
+        new Date("2026-10-17T03:45:00Z"),
+        new Date("2026-10-21T12:00:00Z"),
+      ),
+    ).toEqual({ from: "2026-10-16", to: "2026-11-04" });
   });
 });

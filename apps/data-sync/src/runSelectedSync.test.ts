@@ -7,10 +7,20 @@ const mocks = vi.hoisted(() => ({
   runLiveSync: vi.fn(),
   runThreeHourlySync: vi.fn(),
   runWeeklySync: vi.fn(),
+  getSyncRunState: vi.fn(),
+  markSyncRunCompleted: vi.fn(),
+  markSyncRunFailed: vi.fn(),
+  markSyncRunStarted: vi.fn(),
 }));
 
 vi.mock("@black-diamond/database/indexes", () => ({
   ensureDatabaseIndexes: mocks.ensureDatabaseIndexes,
+}));
+vi.mock("@black-diamond/database/syncRunStates", () => ({
+  getSyncRunState: mocks.getSyncRunState,
+  markSyncRunCompleted: mocks.markSyncRunCompleted,
+  markSyncRunFailed: mocks.markSyncRunFailed,
+  markSyncRunStarted: mocks.markSyncRunStarted,
 }));
 vi.mock("./runs/dailySync.js", () => ({ runDailySync: mocks.runDailySync }));
 vi.mock("./runs/hourlySync.js", () => ({ runHourlySync: mocks.runHourlySync }));
@@ -23,7 +33,10 @@ vi.mock("./runs/weeklySync.js", () => ({ runWeeklySync: mocks.runWeeklySync }));
 import { getSyncRun, runSelectedSync } from "./runSelectedSync.js";
 
 describe("selected sync run", () => {
-  beforeEach(() => vi.clearAllMocks());
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getSyncRunState.mockResolvedValue(null);
+  });
 
   it("runs only the requested sync", async () => {
     await runSelectedSync("daily");
@@ -34,6 +47,8 @@ describe("selected sync run", () => {
     expect(mocks.runLiveSync).not.toHaveBeenCalled();
     expect(mocks.runThreeHourlySync).not.toHaveBeenCalled();
     expect(mocks.runWeeklySync).not.toHaveBeenCalled();
+    expect(mocks.markSyncRunStarted).toHaveBeenCalledWith("daily");
+    expect(mocks.markSyncRunCompleted).toHaveBeenCalledWith("daily");
   });
 
   it("maps each Railway command name to its sync run", () => {
@@ -54,5 +69,17 @@ describe("selected sync run", () => {
   it("rejects an unknown or missing sync run", () => {
     expect(() => getSyncRun()).toThrow("Choose a sync run");
     expect(() => getSyncRun("monthly")).toThrow("Choose a sync run");
+  });
+
+  it("records a failed scheduled sync", async () => {
+    mocks.runLiveSync.mockRejectedValueOnce(new Error("API unavailable"));
+
+    await expect(runSelectedSync("live")).rejects.toThrow("API unavailable");
+
+    expect(mocks.markSyncRunFailed).toHaveBeenCalledWith(
+      "live",
+      expect.objectContaining({ message: "API unavailable" }),
+    );
+    expect(mocks.markSyncRunCompleted).not.toHaveBeenCalled();
   });
 });

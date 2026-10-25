@@ -89,45 +89,51 @@ describe("ensureDatabaseIndexes", () => {
       { leagueId: 1, season: 1 },
       { name: "unique_league_season", unique: true },
     );
-    expect(mocks.collection).toHaveBeenNthCalledWith(13, "accounts");
+    expect(mocks.collection).toHaveBeenNthCalledWith(13, "syncRunStates");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       13,
-      { id: 1 },
-      { name: "unique_account_id", unique: true },
+      { run: 1 },
+      { name: "unique_sync_run", unique: true },
     );
     expect(mocks.collection).toHaveBeenNthCalledWith(14, "accounts");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       14,
-      { email: 1 },
-      { name: "unique_account_email", unique: true },
+      { id: 1 },
+      { name: "unique_account_id", unique: true },
     );
-    expect(mocks.collection).toHaveBeenNthCalledWith(15, "bets");
+    expect(mocks.collection).toHaveBeenNthCalledWith(15, "accounts");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       15,
-      { id: 1 },
-      { name: "unique_bet_id", unique: true },
+      { email: 1 },
+      { name: "unique_account_email", unique: true },
     );
     expect(mocks.collection).toHaveBeenNthCalledWith(16, "bets");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       16,
-      { accountId: 1, status: 1, "selections.fixture.id": 1 },
-      { name: "account_status_selection_fixture" },
+      { id: 1 },
+      { name: "unique_bet_id", unique: true },
     );
     expect(mocks.collection).toHaveBeenNthCalledWith(17, "bets");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       17,
-      { accountId: 1, placedAt: -1, id: -1 },
-      { name: "account_bet_placed_at" },
+      { accountId: 1, status: 1, "selections.fixture.id": 1 },
+      { name: "account_status_selection_fixture" },
     );
-    expect(mocks.collection).toHaveBeenNthCalledWith(18, "balanceTransactions");
+    expect(mocks.collection).toHaveBeenNthCalledWith(18, "bets");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       18,
-      { id: 1 },
-      { name: "unique_balance_transaction_id", unique: true },
+      { accountId: 1, placedAt: -1, id: -1 },
+      { name: "account_bet_placed_at" },
     );
     expect(mocks.collection).toHaveBeenNthCalledWith(19, "balanceTransactions");
     expect(mocks.createIndex).toHaveBeenNthCalledWith(
       19,
+      { id: 1 },
+      { name: "unique_balance_transaction_id", unique: true },
+    );
+    expect(mocks.collection).toHaveBeenNthCalledWith(20, "balanceTransactions");
+    expect(mocks.createIndex).toHaveBeenNthCalledWith(
+      20,
       { accountId: 1, occurredAt: 1, id: 1 },
       { name: "account_balance_transaction_date" },
     );

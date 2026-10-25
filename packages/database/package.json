@@ -28,6 +28,10 @@
       "types": "./src/indexes/index.ts",
       "default": "./src/indexes/index.ts"
     },
+    "./syncRunStates": {
+      "types": "./src/syncRunStates/index.ts",
+      "default": "./src/syncRunStates/index.ts"
+    },
     "./fullSeasonFixtureSyncStates": {
       "types": "./src/fixtures/operations/fullSeasonFixtureSyncStates/index.ts",
       "default": "./src/fixtures/operations/fullSeasonFixtureSyncStates/index.ts"
