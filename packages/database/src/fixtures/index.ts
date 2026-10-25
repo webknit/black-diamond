@@ -5,3 +5,4 @@ export { getFixtureScoresByIds } from "./operations/getFixtureScoresByIds.js";
 export { getFixtureSummariesBetweenDates } from "./operations/getFixtureSummariesBetweenDates.js";
 export { getFixturesBefore } from "./operations/getFixturesBefore.js";
 export { getFixturesAwaitingResult } from "./operations/getFixturesAwaitingResult.js";
+export { getCompletedFixturesWithoutStatsSnapshots } from "./operations/getCompletedFixturesWithoutStatsSnapshots.js";

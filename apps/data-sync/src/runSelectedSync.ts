@@ -8,6 +8,7 @@ import {
   type ScheduledSyncRunName,
 } from "@black-diamond/database/syncRunStates";
 import { runDailySync } from "./runs/dailySync.js";
+import { runFixtureStatsSnapshotBackfill } from "./runs/backfillFixtureStatsSnapshots.js";
 import { runFullSync } from "./runs/fullSync.js";
 import { runHourlySync } from "./runs/hourlySync.js";
 import { runLiveSync } from "./runs/liveSync.js";
@@ -17,6 +18,10 @@ import { logSyncStep } from "./utils/logging/logSyncStep.js";
 
 const syncRuns = {
   all: { label: "full sync", run: runFullSync },
+  "backfill:fixture-stats-snapshots": {
+    label: "fixture stats snapshot backfill",
+    run: runFixtureStatsSnapshotBackfill,
+  },
   indexes: { label: "ensure database indexes", run: ensureDatabaseIndexes },
   daily: {
     label: "daily sync",
