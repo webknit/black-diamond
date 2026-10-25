@@ -22,6 +22,12 @@ type Totals = {
   under2_5: number;
 };
 
+type RoundDetails = {
+  phase: string | null;
+  number: number | null;
+  totalInPhase: number | null;
+};
+
 const completedFixtureStatuses = new Set(["FT", "AET", "PEN"]);
 
 function emptyTotals(): Totals {
@@ -80,9 +86,43 @@ function countAndPercentage(count: number, fixturesPlayed: number) {
   };
 }
 
+function parseRound(round: string): { phase: string; number: number } | null {
+  const match = /^(.*) - (\d+)$/.exec(round);
+
+  if (!match) return null;
+
+  return { phase: match[1], number: Number(match[2]) };
+}
+
+function getRoundDetails(rounds: Iterable<string>): Map<string, RoundDetails> {
+  const parsedRounds = [...rounds].map((round) => ({ round, parsed: parseRound(round) }));
+  const totalsByPhase = new Map<string, number>();
+
+  for (const { parsed } of parsedRounds) {
+    if (!parsed) continue;
+
+    totalsByPhase.set(
+      parsed.phase,
+      Math.max(totalsByPhase.get(parsed.phase) ?? 0, parsed.number),
+    );
+  }
+
+  return new Map(parsedRounds.map(({ round, parsed }) => [
+    round,
+    parsed
+      ? {
+          phase: parsed.phase,
+          number: parsed.number,
+          totalInPhase: totalsByPhase.get(parsed.phase) ?? null,
+        }
+      : { phase: null, number: null, totalInPhase: null },
+  ]));
+}
+
 function buildSnapshot(
   league: LeagueStatsInput,
   round: string,
+  roundDetails: RoundDetails,
   roundLastFixtureTimestamp: number,
   totals: Totals,
 ): LeagueStats {
@@ -92,6 +132,9 @@ function buildSnapshot(
   return {
     league,
     round,
+    roundPhase: roundDetails.phase,
+    roundNumber: roundDetails.number,
+    totalRoundsInPhase: roundDetails.totalInPhase,
     roundLastFixtureTimestamp,
     calculatedAt: new Date(),
     fixturesPlayed: totals.fixturesPlayed,
@@ -142,6 +185,7 @@ export async function calculateLeagueStatsSnapshots(
   }
 
   const completedFixtures = fixtures.filter(isCompletedFixture);
+  const roundDetails = getRoundDetails(rounds.keys());
   const totals = emptyTotals();
   let completedFixtureIndex = 0;
 
@@ -159,6 +203,12 @@ export async function calculateLeagueStatsSnapshots(
         completedFixtureIndex += 1;
       }
 
-      return buildSnapshot(league, round, roundLastFixtureTimestamp, totals);
+      return buildSnapshot(
+        league,
+        round,
+        roundDetails.get(round) ?? { phase: null, number: null, totalInPhase: null },
+        roundLastFixtureTimestamp,
+        totals,
+      );
     });
 }

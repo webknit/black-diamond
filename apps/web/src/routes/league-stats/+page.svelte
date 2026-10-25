@@ -58,7 +58,9 @@
 										{stats.league.country} · {stats.league.season}
 									</p>
 								</th>
-								<td class="whitespace-nowrap px-2 py-2 text-slate-700">{stats.round}</td>
+								<td class="whitespace-nowrap px-2 py-2 text-slate-700">
+									{stats.round}{#if stats.totalRoundsInPhase !== null}<span class="ml-1 opacity-60">/ {stats.totalRoundsInPhase}</span>{/if}
+								</td>
 								<td class="px-2 py-2 text-right tabular-nums text-slate-700">{stats.fixturesPlayed}</td>
 								<td class="px-2 py-2 text-right font-semibold tabular-nums text-slate-900">{stats.goalsPerFixture.toFixed(2)}</td>
 								<td class="px-2 py-2 text-right tabular-nums text-slate-700">{formatPercentage(stats.bttsPercentage)}</td>

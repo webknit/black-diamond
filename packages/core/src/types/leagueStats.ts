@@ -11,6 +11,9 @@ export type LeagueStats = {
     season: number;
   };
   round: string;
+  roundPhase: string | null;
+  roundNumber: number | null;
+  totalRoundsInPhase: number | null;
   roundLastFixtureTimestamp: number;
   calculatedAt: Date;
   fixturesPlayed: number;

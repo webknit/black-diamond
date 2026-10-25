@@ -37,6 +37,9 @@ describe("calculateLeagueStatsSnapshots", () => {
     expect(snapshots).toHaveLength(2);
     expect(snapshots[0]).toMatchObject({
       round: "Regular Season - 1",
+      roundPhase: "Regular Season",
+      roundNumber: 1,
+      totalRoundsInPhase: 2,
       roundLastFixtureTimestamp: 200,
       fixturesPlayed: 2,
       over2_5: { count: 1, percentage: 50 },
