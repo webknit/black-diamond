@@ -4,3 +4,4 @@ export { getFixtureById } from "./operations/getFixtureById.js";
 export { getFixtureScoresByIds } from "./operations/getFixtureScoresByIds.js";
 export { getFixtureSummariesBetweenDates } from "./operations/getFixtureSummariesBetweenDates.js";
 export { getFixturesBefore } from "./operations/getFixturesBefore.js";
+export { getFixturesAwaitingResult } from "./operations/getFixturesAwaitingResult.js";

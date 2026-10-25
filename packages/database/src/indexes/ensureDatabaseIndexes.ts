@@ -23,6 +23,10 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { "league.id": 1, "league.season": 1, "fixture.status.short": 1 },
     { name: "league_season_status" },
   );
+  await database.collection("fixtures").createIndex(
+    { "fixture.timestamp": 1, "fixture.status.short": 1 },
+    { name: "fixture_timestamp_status" },
+  );
   await database.collection("leagueStandings").createIndex(
     { "league.id": 1, "league.season": 1 },
     { name: "unique_league_season", unique: true },

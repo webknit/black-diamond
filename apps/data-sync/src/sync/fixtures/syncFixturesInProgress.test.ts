@@ -1,30 +1,43 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
   get: vi.fn(),
-  upsertFixtures: vi.fn(),
+  getFixturesAwaitingResult: vi.fn(),
+  upsertFixtures: vi.fn<(fixtures: unknown[]) => void>(),
 }));
 
 vi.mock("@black-diamond/database/fixtures", () => ({
+  getFixturesAwaitingResult: mocks.getFixturesAwaitingResult,
   upsertFixtures: mocks.upsertFixtures,
 }));
 vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { syncFixturesInProgress } from "./syncFixturesInProgress.js";
 
 describe("syncFixturesInProgress", () => {
-  it("fetches and stores fixtures currently in progress for selected leagues", async () => {
-    const fixtures = [{ fixture: { id: 10 } }];
-    mocks.get.mockResolvedValue({ response: fixtures });
+  beforeEach(() => vi.clearAllMocks());
 
-    await expect(syncFixturesInProgress()).resolves.toBe(fixtures);
+  it("refreshes persisted in-progress fixtures so a newly finished match is stored", async () => {
+    const fixturesAwaitingResult = [{ fixture: { id: 10 } }];
+    const completedFixture = {
+      fixture: { id: 10, status: { short: "FT" } },
+    };
+    mocks.get.mockResolvedValueOnce({ response: [completedFixture] });
+    mocks.getFixturesAwaitingResult.mockResolvedValue(fixturesAwaitingResult);
 
-    expect(mocks.get).toHaveBeenCalledWith("/fixtures", {
-      live: selectedLeagues.map((league) => league.id).join("-"),
-    });
-    expect(mocks.upsertFixtures).toHaveBeenCalledWith(fixtures);
+    await expect(syncFixturesInProgress()).resolves.toEqual([completedFixture]);
+
+    expect(mocks.get).toHaveBeenCalledWith("/fixtures", { ids: "10" });
+    expect(mocks.upsertFixtures.mock.calls).toContainEqual([[completedFixture]]);
+  });
+
+  it("does not make an ID refresh request when no fixture is in progress", async () => {
+    mocks.getFixturesAwaitingResult.mockResolvedValue([]);
+
+    await expect(syncFixturesInProgress()).resolves.toEqual([]);
+
+    expect(mocks.get).not.toHaveBeenCalled();
   });
 });
