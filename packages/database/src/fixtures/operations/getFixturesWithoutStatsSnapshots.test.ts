@@ -9,29 +9,44 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("../../mongodb.js", () => ({ getDatabase: mocks.getDatabase }));
 
-import { getCompletedFixturesWithoutStatsSnapshots } from "./getCompletedFixturesWithoutStatsSnapshots.js";
+import { getFixturesWithoutStatsSnapshots } from "./getFixturesWithoutStatsSnapshots.js";
 
-describe("getCompletedFixturesWithoutStatsSnapshots", () => {
+describe("getFixturesWithoutStatsSnapshots", () => {
   it("does not connect when no leagues are selected", async () => {
-    await expect(getCompletedFixturesWithoutStatsSnapshots([])).resolves.toEqual([]);
+    await expect(getFixturesWithoutStatsSnapshots([])).resolves.toEqual([]);
     expect(mocks.getDatabase).not.toHaveBeenCalled();
   });
 
-  it("finds selected-league completed fixtures with no existing snapshot", async () => {
+  it("finds selected-league in-progress or completed fixtures with no snapshot", async () => {
     mocks.getDatabase.mockResolvedValue({ collection: mocks.collection });
     mocks.collection.mockReturnValue({ aggregate: mocks.aggregate });
     mocks.aggregate.mockReturnValue({ toArray: mocks.toArray });
     mocks.toArray.mockResolvedValue([{ fixture: { id: 1 } }]);
 
-    await expect(
-      getCompletedFixturesWithoutStatsSnapshots([39, 140]),
-    ).resolves.toEqual([{ fixture: { id: 1 } }]);
+    await expect(getFixturesWithoutStatsSnapshots([39, 140])).resolves.toEqual([
+      { fixture: { id: 1 } },
+    ]);
 
     expect(mocks.aggregate).toHaveBeenCalledWith([
       {
         $match: {
           "league.id": { $in: [39, 140] },
-          "fixture.status.short": { $in: ["FT", "AET", "PEN"] },
+          "fixture.status.short": {
+            $in: [
+              "1H",
+              "HT",
+              "2H",
+              "ET",
+              "BT",
+              "P",
+              "SUSP",
+              "INT",
+              "LIVE",
+              "FT",
+              "AET",
+              "PEN",
+            ],
+          },
         },
       },
       {

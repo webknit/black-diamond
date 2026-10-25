@@ -1,9 +1,9 @@
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { getCompletedFixturesWithoutStatsSnapshots } from "@black-diamond/database/fixtures";
+import { getFixturesWithoutStatsSnapshots } from "@black-diamond/database/fixtures";
 import { syncFixtureStatsSnapshot } from "./syncFixtureStatsSnapshot.js";
 
 export async function backfillFixtureStatsSnapshots(): Promise<number> {
-  const fixtures = await getCompletedFixturesWithoutStatsSnapshots(
+  const fixtures = await getFixturesWithoutStatsSnapshots(
     selectedLeagues.map((league) => league.id),
   );
 

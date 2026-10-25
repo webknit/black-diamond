@@ -1,9 +1,22 @@
 import type { Fixture } from "@black-diamond/core/fixture";
 import { getDatabase } from "../../mongodb.js";
 
-const completedFixtureStatuses = ["FT", "AET", "PEN"];
+const fixtureStatusesEligibleForSnapshotBackfill = [
+  "1H",
+  "HT",
+  "2H",
+  "ET",
+  "BT",
+  "P",
+  "SUSP",
+  "INT",
+  "LIVE",
+  "FT",
+  "AET",
+  "PEN",
+];
 
-export async function getCompletedFixturesWithoutStatsSnapshots(
+export async function getFixturesWithoutStatsSnapshots(
   leagueIds: number[],
 ): Promise<Fixture[]> {
   if (leagueIds.length === 0) return [];
@@ -16,7 +29,9 @@ export async function getCompletedFixturesWithoutStatsSnapshots(
       {
         $match: {
           "league.id": { $in: leagueIds },
-          "fixture.status.short": { $in: completedFixtureStatuses },
+          "fixture.status.short": {
+            $in: fixtureStatusesEligibleForSnapshotBackfill,
+          },
         },
       },
       {
