@@ -12,6 +12,7 @@
     "start": "pnpm run sync",
     "sync": "node --env-file-if-exists=.env --import tsx src/index.ts",
     "sync:indexes": "node --env-file-if-exists=.env --import tsx src/index.ts indexes",
+    "sync:all": "node --env-file-if-exists=.env --import tsx src/index.ts all",
     "sync:daily": "node --env-file-if-exists=.env --import tsx src/index.ts daily",
     "sync:hourly": "node --env-file-if-exists=.env --import tsx src/index.ts hourly",
     "sync:live": "node --env-file-if-exists=.env --import tsx src/index.ts live",

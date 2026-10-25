@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   ensureDatabaseIndexes: vi.fn(),
   runDailySync: vi.fn(),
+  runFullSync: vi.fn(),
   runHourlySync: vi.fn(),
   runLiveSync: vi.fn(),
   runThreeHourlySync: vi.fn(),
@@ -21,8 +22,10 @@ vi.mock("@black-diamond/database/syncRunStates", () => ({
   markSyncRunCompleted: mocks.markSyncRunCompleted,
   markSyncRunFailed: mocks.markSyncRunFailed,
   markSyncRunStarted: mocks.markSyncRunStarted,
+  scheduledSyncRunNames: ["daily", "hourly", "live", "three-hourly", "weekly"],
 }));
 vi.mock("./runs/dailySync.js", () => ({ runDailySync: mocks.runDailySync }));
+vi.mock("./runs/fullSync.js", () => ({ runFullSync: mocks.runFullSync }));
 vi.mock("./runs/hourlySync.js", () => ({ runHourlySync: mocks.runHourlySync }));
 vi.mock("./runs/liveSync.js", () => ({ runLiveSync: mocks.runLiveSync }));
 vi.mock("./runs/threeHourlySync.js", () => ({
@@ -52,6 +55,7 @@ describe("selected sync run", () => {
   });
 
   it("maps each Railway command name to its sync run", () => {
+    expect(getSyncRun("all").label).toBe("full sync");
     expect(getSyncRun("indexes").label).toBe("ensure database indexes");
     expect(getSyncRun("hourly").label).toBe("hourly sync");
     expect(getSyncRun("live").label).toBe("live sync");
@@ -64,6 +68,13 @@ describe("selected sync run", () => {
 
     expect(mocks.ensureDatabaseIndexes).toHaveBeenCalledOnce();
     expect(mocks.runDailySync).not.toHaveBeenCalled();
+  });
+
+  it("runs the one-off full sync without recording a scheduled run", async () => {
+    await runSelectedSync("all");
+
+    expect(mocks.runFullSync).toHaveBeenCalledOnce();
+    expect(mocks.markSyncRunStarted).not.toHaveBeenCalled();
   });
 
   it("rejects an unknown or missing sync run", () => {

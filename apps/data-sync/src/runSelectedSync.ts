@@ -4,9 +4,11 @@ import {
   markSyncRunCompleted,
   markSyncRunFailed,
   markSyncRunStarted,
+  scheduledSyncRunNames,
   type ScheduledSyncRunName,
 } from "@black-diamond/database/syncRunStates";
 import { runDailySync } from "./runs/dailySync.js";
+import { runFullSync } from "./runs/fullSync.js";
 import { runHourlySync } from "./runs/hourlySync.js";
 import { runLiveSync } from "./runs/liveSync.js";
 import { runThreeHourlySync } from "./runs/threeHourlySync.js";
@@ -14,6 +16,7 @@ import { runWeeklySync } from "./runs/weeklySync.js";
 import { logSyncStep } from "./utils/logging/logSyncStep.js";
 
 const syncRuns = {
+  all: { label: "full sync", run: runFullSync },
   indexes: { label: "ensure database indexes", run: ensureDatabaseIndexes },
   daily: {
     label: "daily sync",
@@ -33,7 +36,7 @@ const recoveryIntervals: Partial<Record<ScheduledSyncRunName, number>> = {
 };
 
 function isScheduledSyncRun(name: SyncRunName): name is ScheduledSyncRunName {
-  return name !== "indexes";
+  return scheduledSyncRunNames.includes(name as ScheduledSyncRunName);
 }
 
 export function isSyncOverdue(
