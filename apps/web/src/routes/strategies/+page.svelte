@@ -1,7 +1,17 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { navigating } from '$app/state';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	let selectedStrategyId = $state('bothTeamsAboveLeagueAverage');
+	let selectedStrategy = $derived(data.strategies.find((strategy) => strategy.id === selectedStrategyId));
+	let showTeamFilterExplorer = $derived(selectedStrategyId === 'teamFilterExplorer');
+	let isWeekLoading = $derived(navigating.to?.url.pathname === '/strategies');
+
+	$effect(() => {
+		if (data.selectedWeek !== 'all') selectedStrategyId = 'teamFilterExplorer';
+	});
 
 	function formatPercentage(value: number) {
 		return `${value.toFixed(1)}%`;
@@ -15,15 +25,17 @@
 		}).format(value);
 	}
 
-	function formatKickoff(timestamp: number) {
-		return new Intl.DateTimeFormat('en-GB', {
-			weekday: 'short',
-			day: 'numeric',
-			month: 'short',
-			hour: '2-digit',
-			minute: '2-digit',
-			timeZone: 'Europe/London'
-		}).format(new Date(timestamp * 1000));
+	function formatWeek(weekStart: string) {
+		const start = new Date(`${weekStart}T12:00:00.000Z`);
+		const end = new Date(start);
+		end.setUTCDate(end.getUTCDate() + 6);
+		const formatter = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/London' });
+		return `${formatter.format(start)} – ${formatter.format(end)}`;
+	}
+
+	function selectHistoricalWeek(event: Event) {
+		const week = (event.currentTarget as HTMLSelectElement).value;
+		void goto(week === 'all' ? '/strategies' : `/strategies?week=${encodeURIComponent(week)}`);
 	}
 </script>
 
@@ -41,77 +53,93 @@
 			</p>
 		</header>
 
-		<section class="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:mb-6">
-			<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Active strategy</p>
-			<h2 class="mt-1 text-base font-semibold text-slate-950">Over 2.5 goals · both teams above league average</h2>
-			<p class="mt-1 text-xs leading-5 text-slate-600">
-				Both teams’ season Over 2.5 rate must be higher than their league’s current season rate, with reference odds of at least {data.minimumOver2_5ReferenceOdd.toFixed(2)}.
-			</p>
-		</section>
+		<div class="mb-4 flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm sm:mb-6" role="tablist" aria-label="Betting strategies">
+			{#each data.strategies as strategy (strategy.id)}
+				<button
+					type="button"
+					role="tab"
+					aria-selected={selectedStrategyId === strategy.id}
+					class="shrink-0 rounded-lg px-3 py-2 text-left text-xs font-medium transition sm:text-sm"
+					class:bg-slate-950={selectedStrategyId === strategy.id}
+					class:text-white={selectedStrategyId === strategy.id}
+					class:text-slate-600={selectedStrategyId !== strategy.id}
+					onclick={() => (selectedStrategyId = strategy.id)}
+				>
+					{strategy.title}
+				</button>
+			{/each}
+			<button
+				type="button"
+				role="tab"
+				aria-selected={showTeamFilterExplorer}
+				class="shrink-0 rounded-lg px-3 py-2 text-left text-xs font-medium transition sm:text-sm"
+				class:bg-slate-950={showTeamFilterExplorer}
+				class:text-white={showTeamFilterExplorer}
+				class:text-slate-600={!showTeamFilterExplorer}
+				onclick={() => (selectedStrategyId = 'teamFilterExplorer')}
+			>
+				Over 2.5 strategy explorer
+			</button>
+		</div>
 
-		<section class="mb-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:mb-6">
-			<div class="flex flex-wrap items-baseline justify-between gap-2">
-				<div>
-					<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Current-season performance</p>
-					<p class="mt-1 text-xs leading-5 text-slate-600">Flat £1 stakes. Only fixtures with a stored pre-match Over 2.5 price of {data.minimumOver2_5ReferenceOdd.toFixed(2)} or more are included.</p>
+		{#if showTeamFilterExplorer}
+			<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+				<div class="flex flex-wrap items-end justify-between gap-3">
+					<div>
+						<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Over 2.5 strategy explorer</p>
+						<h2 class="mt-1 text-base font-semibold text-slate-950">Scoring and defensive filters</h2>
+						<p class="mt-1 text-xs leading-5 text-slate-600">All 31 variations use flat £1 stakes and stored pre-match Over 2.5 odds of {data.minimumOver2_5ReferenceOdd.toFixed(2)} or more. Rows are ranked by profit.</p>
+					</div>
+					<div>
+						<label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500" for="strategy-week">Historical week</label>
+						<select id="strategy-week" value={data.selectedWeek} onchange={selectHistoricalWeek} disabled={isWeekLoading} class="mt-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-800 disabled:cursor-wait disabled:opacity-60">
+							<option value="all">All weeks</option>
+							{#each data.availableWeeks as week}
+								<option value={week}>{formatWeek(week)}</option>
+							{/each}
+						</select>
+					</div>
 				</div>
-			</div>
-			<div class="mt-3 grid grid-cols-2 divide-x divide-y divide-slate-200 rounded-lg border border-slate-200 bg-slate-50 text-center sm:grid-cols-4 sm:divide-y-0">
-				<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Bets</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{data.performance.bets}</p></div>
-				<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Wins / losses</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{data.performance.wins} / {data.performance.losses}</p></div>
-				<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Profit / loss</p><p class="mt-1 text-sm font-semibold tabular-nums" class:text-emerald-700={data.performance.profit > 0} class:text-rose-700={data.performance.profit < 0} class:text-slate-900={data.performance.profit === 0}>{formatCurrency(data.performance.profit)}</p></div>
-				<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">ROI</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{data.performance.returnOnInvestment === null ? '—' : formatPercentage(data.performance.returnOnInvestment)}</p></div>
-			</div>
-			{#if data.performance.bets === 0}
-				<p class="mt-3 text-xs text-slate-600">
-					No historical fixture met every condition. {data.performance.fixturesWithEligibleOdds} completed fixtures have a stored pre-match Over 2.5 price of {data.minimumOver2_5ReferenceOdd.toFixed(2)} or more.
-				</p>
-			{/if}
-		</section>
-
-		{#if data.candidates.length === 0}
-			<section class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-				<h2 class="text-lg font-semibold text-slate-950">No matching fixtures in the next seven days</h2>
-				<p class="mt-2 text-sm text-slate-600">
-					{data.upcomingFixturesWithSnapshot} upcoming fixtures have a pre-match snapshot, but none currently match this strategy.
-				</p>
+				{#if isWeekLoading}
+					<section class="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-6 py-14 text-center" role="status">
+						<span class="mx-auto block size-6 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span>
+						<p class="mt-3 text-sm font-medium text-slate-600">Loading strategy results…</p>
+					</section>
+				{:else}
+					<div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
+						<table class="w-full min-w-[760px] text-left text-xs">
+						<thead class="border-b border-slate-200 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500">
+							<tr><th class="px-3 py-2">Variation</th><th class="px-3 py-2 text-right">Bets</th><th class="px-3 py-2 text-right">W / L</th><th class="px-3 py-2 text-right">P / L</th><th class="px-3 py-2 text-right">ROI</th></tr>
+						</thead>
+						<tbody class="divide-y divide-slate-100">
+							{#each data.teamFilterResults as result (result.id)}
+								<tr class="text-slate-700">
+									<td class="px-3 py-2"><p class="font-medium text-slate-950">{result.title}</p><p class="mt-0.5 text-[11px] text-slate-500">{result.description}</p></td>
+									<td class="px-3 py-2 text-right tabular-nums">{result.bets}</td>
+									<td class="px-3 py-2 text-right tabular-nums">{result.wins} / {result.losses}</td>
+									<td class="px-3 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={result.profit > 0} class:text-rose-700={result.profit < 0}>{formatCurrency(result.profit)}</td>
+									<td class="px-3 py-2 text-right tabular-nums">{result.returnOnInvestment === null ? '—' : formatPercentage(result.returnOnInvestment)}</td>
+								</tr>
+							{/each}
+						</tbody>
+						</table>
+					</div>
+				{/if}
 			</section>
-		{:else}
-			<div class="space-y-3">
-				{#each data.candidates as candidate (candidate.fixtureId)}
-					<article class="rounded-xl border border-emerald-200 bg-white p-4 shadow-sm">
-						<div class="flex flex-wrap items-start justify-between gap-2">
-							<div>
-								<p class="text-[10px] font-bold uppercase tracking-wide text-emerald-700">Matches strategy</p>
-								<h2 class="mt-1 text-base font-semibold text-slate-950">
-									{candidate.homeTeam} <span class="font-normal text-slate-500">v</span> {candidate.awayTeam}
-								</h2>
-								<p class="mt-1 text-xs text-slate-600">
-									{formatKickoff(candidate.timestamp)} · {candidate.league.country} · {candidate.league.name}
-								</p>
-							</div>
-							<span class="rounded-full bg-emerald-100 px-2 py-1 text-[10px] font-bold text-emerald-800">Over 2.5 candidate</span>
-						</div>
-						<div class="mt-4 grid grid-cols-2 divide-x divide-y divide-slate-200 rounded-lg border border-slate-200 bg-slate-50 text-center sm:grid-cols-4 sm:divide-y-0">
-							<div class="px-2 py-2">
-								<p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">League O2.5</p>
-								<p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{formatPercentage(candidate.leagueOver2_5Percentage)}</p>
-							</div>
-							<div class="px-2 py-2">
-								<p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Home all O2.5</p>
-								<p class="mt-1 text-sm font-semibold tabular-nums text-emerald-700">{formatPercentage(candidate.homeOver2_5Percentage)}</p>
-							</div>
-							<div class="px-2 py-2">
-								<p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Away all O2.5</p>
-								<p class="mt-1 text-sm font-semibold tabular-nums text-emerald-700">{formatPercentage(candidate.awayOver2_5Percentage)}</p>
-							</div>
-							<div class="px-2 py-2">
-								<p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Reference O2.5 odds</p>
-								<p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{candidate.referenceOdd.toFixed(2)}</p>
-							</div>
-						</div>
-					</article>
-				{/each}
+		{:else if selectedStrategy}
+			{@const strategy = selectedStrategy}
+			<div role="tabpanel">
+				<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+					<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Strategy</p>
+					<h2 class="mt-1 text-base font-semibold text-slate-950">{strategy.title}</h2>
+					<p class="mt-1 text-xs leading-5 text-slate-600">{strategy.description} Reference odds must be at least {data.minimumOver2_5ReferenceOdd.toFixed(2)}.</p>
+					<div class="mt-4 grid grid-cols-2 divide-x divide-y divide-slate-200 rounded-lg border border-slate-200 bg-slate-50 text-center sm:grid-cols-4 sm:divide-y-0">
+						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Bets</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{strategy.performance.bets}</p></div>
+						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Wins / losses</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{strategy.performance.wins} / {strategy.performance.losses}</p></div>
+						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Profit / loss</p><p class="mt-1 text-sm font-semibold tabular-nums" class:text-emerald-700={strategy.performance.profit > 0} class:text-rose-700={strategy.performance.profit < 0} class:text-slate-900={strategy.performance.profit === 0}>{formatCurrency(strategy.performance.profit)}</p></div>
+						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">ROI</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{strategy.performance.returnOnInvestment === null ? '—' : formatPercentage(strategy.performance.returnOnInvestment)}</p></div>
+					</div>
+				</section>
 			</div>
 		{/if}
 	</div>

@@ -19,6 +19,7 @@ export async function getFinishedFixturesForAnalysis(leagueIds: number[]) {
           "fixture.status.short": { $in: ["FT", "AET", "PEN"] },
         },
       },
+      { $sort: { "fixture.timestamp": 1 } },
       {
         $lookup: {
           from: "fixtureStatsSnapshots",
@@ -33,7 +34,6 @@ export async function getFinishedFixturesForAnalysis(leagueIds: number[]) {
         },
       },
       { $project: { matchingSnapshots: 0 } },
-      { $sort: { "fixture.timestamp": 1 } },
-    ])
+    ], { allowDiskUse: true })
     .toArray();
 }

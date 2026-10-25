@@ -7,6 +7,12 @@
 		return value === null ? '—' : `${value.toFixed(1)}%`;
 	}
 
+	function formatDifference(value: number | null) {
+		if (value === null) return '—';
+
+		return `${value >= 0 ? '+' : ''}${value.toFixed(1)}pp`;
+	}
+
 	function formatDate(date: string) {
 		return new Intl.DateTimeFormat('en-GB', {
 			day: '2-digit',
@@ -14,6 +20,15 @@
 			year: 'numeric',
 			timeZone: 'Europe/London'
 		}).format(new Date(date));
+	}
+
+	function getPageHref(page: number) {
+		const searchParams = new URLSearchParams();
+
+		if (data.selectedLeagueId) searchParams.set('league', String(data.selectedLeagueId));
+		searchParams.set('page', String(page));
+
+		return `?${searchParams}`;
 	}
 </script>
 
@@ -69,6 +84,79 @@
 			</div>
 		</section>
 
+		{#if data.leaguePatterns.length > 0}
+			<section class="mb-4 sm:mb-6">
+				<div class="mb-2">
+					<h2 class="text-base font-semibold text-slate-950">League patterns</h2>
+					<p class="mt-0.5 text-xs text-slate-600">How Over 2.5 performs overall, and when both teams were above their league average before kickoff.</p>
+				</div>
+				<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+					<table class="min-w-[780px] w-full text-left text-xs">
+						<thead class="border-b border-slate-200 bg-slate-50 text-[9px] font-bold uppercase tracking-wide text-slate-500">
+							<tr>
+								<th scope="col" class="sticky left-0 z-20 min-w-44 border-r border-slate-200 bg-slate-50 px-2 py-2">League</th>
+								<th scope="col" class="px-2 py-2 text-right">Fixtures</th>
+								<th scope="col" class="px-2 py-2 text-right">Overall O2.5</th>
+								<th scope="col" class="px-2 py-2 text-right">Both above<br />fixtures</th>
+								<th scope="col" class="px-2 py-2 text-right">Both above<br />O2.5</th>
+								<th scope="col" class="px-2 py-2 text-right">Difference</th>
+							</tr>
+						</thead>
+						<tbody class="divide-y divide-slate-100">
+							{#each data.leaguePatterns as pattern (pattern.league.id)}
+								<tr class="group hover:bg-slate-50">
+									<th scope="row" class="sticky left-0 z-10 min-w-44 border-r border-slate-100 bg-white px-2 py-2 font-medium text-slate-900 group-hover:bg-slate-50">
+										<p class="truncate">{pattern.league.name}</p>
+										<p class="mt-0.5 truncate text-[10px] font-normal text-slate-500">{pattern.league.country}</p>
+									</th>
+									<td class="px-2 py-2 text-right tabular-nums text-slate-700">{pattern.fixtures}</td>
+									<td class="px-2 py-2 text-right font-semibold tabular-nums text-slate-900">{formatPercentage(pattern.over2_5Percentage)}</td>
+									<td class="px-2 py-2 text-right tabular-nums text-slate-700">{pattern.bothTeamsAboveLeagueAverageFixtures}</td>
+									<td class="px-2 py-2 text-right font-semibold tabular-nums text-slate-900">{formatPercentage(pattern.bothTeamsAboveLeagueAveragePercentage)}</td>
+									<td class="px-2 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={pattern.bothTeamsAboveLeagueAverageDifference !== null && pattern.bothTeamsAboveLeagueAverageDifference > 0} class:text-rose-700={pattern.bothTeamsAboveLeagueAverageDifference !== null && pattern.bothTeamsAboveLeagueAverageDifference < 0} class:text-slate-400={pattern.bothTeamsAboveLeagueAverageDifference === null}>{formatDifference(pattern.bothTeamsAboveLeagueAverageDifference)}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</section>
+
+			<section class="mb-4 grid gap-4 lg:grid-cols-2 sm:mb-6">
+				{#each [
+					{ title: 'Home team O2.5 before match', rows: data.homeOver2_5Bands },
+					{ title: 'Away team O2.5 before match', rows: data.awayOver2_5Bands }
+				] as breakdown (breakdown.title)}
+					<div>
+						<h2 class="mb-2 text-base font-semibold text-slate-950">{breakdown.title}</h2>
+						<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
+							<table class="min-w-[480px] w-full text-left text-xs">
+								<thead class="border-b border-slate-200 bg-slate-50 text-[9px] font-bold uppercase tracking-wide text-slate-500">
+									<tr>
+										<th scope="col" class="px-2 py-2">Pre-match rate</th>
+										<th scope="col" class="px-2 py-2 text-right">Fixtures</th>
+										<th scope="col" class="px-2 py-2 text-right">O2.5</th>
+										<th scope="col" class="px-2 py-2 text-right">League avg.</th>
+										<th scope="col" class="px-2 py-2 text-right">Difference</th>
+									</tr>
+								</thead>
+								<tbody class="divide-y divide-slate-100">
+									{#each breakdown.rows as row (row.label)}
+										<tr>
+											<th scope="row" class="px-2 py-2 font-medium text-slate-900">{row.label}</th>
+											<td class="px-2 py-2 text-right tabular-nums text-slate-700">{row.fixtures}</td>
+											<td class="px-2 py-2 text-right font-semibold tabular-nums text-slate-900">{formatPercentage(row.over2_5Percentage)}</td>
+											<td class="px-2 py-2 text-right tabular-nums text-slate-700">{formatPercentage(row.leagueOver2_5Percentage)}</td>
+											<td class="px-2 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={row.difference > 0} class:text-rose-700={row.difference < 0}>{formatDifference(row.difference)}</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				{/each}
+			</section>
+		{/if}
+
 		{#if data.analyses.length === 0}
 			<section class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
 				<h2 class="text-lg font-semibold text-slate-950">No analysed fixtures yet</h2>
@@ -77,6 +165,10 @@
 				</p>
 			</section>
 		{:else}
+			<h2 class="mb-2 text-base font-semibold text-slate-950">Fixture evidence</h2>
+			<p class="mb-2 text-xs text-slate-600 sm:mb-3">
+				Showing {data.pagination.firstResult}–{data.pagination.lastResult} of {data.pagination.totalResults} fixtures
+			</p>
 			<div class="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
 				<table class="min-w-[1020px] w-full text-left text-xs">
 					<thead class="border-b border-slate-200 bg-slate-50 text-[9px] font-bold uppercase tracking-wide text-slate-500">
@@ -114,6 +206,25 @@
 					</tbody>
 				</table>
 			</div>
+			{#if data.pagination.totalPages > 1}
+				<nav class="mt-3 flex items-center justify-between gap-3 text-xs" aria-label="Analysis pages">
+					{#if data.pagination.currentPage > 1}
+						<a class="rounded-md border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50" href={getPageHref(data.pagination.currentPage - 1)}>
+							Newer fixtures
+						</a>
+					{:else}
+						<span></span>
+					{/if}
+					<span class="text-slate-500">Page {data.pagination.currentPage} of {data.pagination.totalPages}</span>
+					{#if data.pagination.currentPage < data.pagination.totalPages}
+						<a class="rounded-md border border-slate-300 bg-white px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50" href={getPageHref(data.pagination.currentPage + 1)}>
+							Older fixtures
+						</a>
+					{:else}
+						<span></span>
+					{/if}
+				</nav>
+			{/if}
 		{/if}
 	</div>
 </main>

@@ -32,6 +32,7 @@ describe("getFinishedFixturesForAnalysis", () => {
           "fixture.status.short": { $in: ["FT", "AET", "PEN"] },
         },
       },
+      { $sort: { "fixture.timestamp": 1 } },
       {
         $lookup: {
           from: "fixtureStatsSnapshots",
@@ -46,7 +47,6 @@ describe("getFinishedFixturesForAnalysis", () => {
         },
       },
       { $project: { matchingSnapshots: 0 } },
-      { $sort: { "fixture.timestamp": 1 } },
-    ]);
+    ], { allowDiskUse: true });
   });
 });
