@@ -49,7 +49,6 @@
 			<span>{goals.length} {goals.length === 1 ? 'goal' : 'goals'}</span>
 			{#if yellowCards > 0}<span>· 🟨 {yellowCards}</span>{/if}
 			{#if redCards > 0}<span>· 🟥 {redCards}</span>{/if}
-			<span class="text-sm leading-none text-slate-400" aria-hidden="true">›</span>
 		</button>
 	</div>
 {/if}
