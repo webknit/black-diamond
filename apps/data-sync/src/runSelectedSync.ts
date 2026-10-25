@@ -7,6 +7,7 @@ import { runWeeklySync } from "./runs/weeklySync.js";
 import { logSyncStep } from "./utils/logging/logSyncStep.js";
 
 const syncRuns = {
+  indexes: { label: "ensure database indexes", run: ensureDatabaseIndexes },
   daily: { label: "daily sync", run: runDailySync },
   hourly: { label: "hourly sync", run: runHourlySync },
   live: { label: "live sync", run: runLiveSync },
@@ -26,6 +27,5 @@ export function getSyncRun(name?: string) {
 export async function runSelectedSync(name: string | undefined) {
   const syncRun = getSyncRun(name);
 
-  await logSyncStep("ensure database indexes", ensureDatabaseIndexes);
   await logSyncStep(syncRun.label, syncRun.run);
 }

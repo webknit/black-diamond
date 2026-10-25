@@ -25,10 +25,10 @@ import { getSyncRun, runSelectedSync } from "./runSelectedSync.js";
 describe("selected sync run", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("runs only the requested sync after database setup", async () => {
+  it("runs only the requested sync", async () => {
     await runSelectedSync("daily");
 
-    expect(mocks.ensureDatabaseIndexes).toHaveBeenCalledBefore(mocks.runDailySync);
+    expect(mocks.ensureDatabaseIndexes).not.toHaveBeenCalled();
     expect(mocks.runDailySync).toHaveBeenCalledOnce();
     expect(mocks.runHourlySync).not.toHaveBeenCalled();
     expect(mocks.runLiveSync).not.toHaveBeenCalled();
@@ -37,10 +37,18 @@ describe("selected sync run", () => {
   });
 
   it("maps each Railway command name to its sync run", () => {
+    expect(getSyncRun("indexes").label).toBe("ensure database indexes");
     expect(getSyncRun("hourly").label).toBe("hourly sync");
     expect(getSyncRun("live").label).toBe("live sync");
     expect(getSyncRun("three-hourly").label).toBe("three-hourly sync");
     expect(getSyncRun("weekly").label).toBe("weekly sync");
+  });
+
+  it("runs database index setup only when explicitly requested", async () => {
+    await runSelectedSync("indexes");
+
+    expect(mocks.ensureDatabaseIndexes).toHaveBeenCalledOnce();
+    expect(mocks.runDailySync).not.toHaveBeenCalled();
   });
 
   it("rejects an unknown or missing sync run", () => {
