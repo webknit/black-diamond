@@ -104,5 +104,4 @@ export const selectedLeagues = [
   { id: 860, name: "Arab Cup", country: "World" },
   { id: 525, name: "UEFA Champions League Women", country: "World" },
   { id: 743, name: "UEFA Championship - Women", country: "World" },
-  { id: 698, name: "FA Women's Cup", country: "England" },
 ] as const;
