@@ -14,8 +14,6 @@ import { runHourlySync } from "./runs/hourlySync.js";
 import { runLiveSync } from "./runs/liveSync.js";
 import { runThreeHourlySync } from "./runs/threeHourlySync.js";
 import { runWeeklySync } from "./runs/weeklySync.js";
-import { backfillLeagueStats } from "./sync/leagueStats/backfillLeagueStats.js";
-import { syncLeagueStats } from "./sync/leagueStats/syncLeagueStats.js";
 import { logSyncStep } from "./utils/logging/logSyncStep.js";
 
 const syncRuns = {
@@ -28,8 +26,6 @@ const syncRuns = {
   },
   hourly: { label: "hourly sync", run: runHourlySync },
   live: { label: "live sync", run: runLiveSync },
-  "league-stats": { label: "sync league stats", run: syncLeagueStats },
-  "league-stats-backfill": { label: "backfill league stats", run: backfillLeagueStats },
   "three-hourly": { label: "three-hourly sync", run: runThreeHourlySync },
   weekly: { label: "weekly sync", run: runWeeklySync },
 } as const;

@@ -8,21 +8,14 @@
     "@black-diamond/database": "workspace:*"
   },
   "scripts": {
-    "dev": "node --env-file-if-exists=.env --import tsx --watch src/index.ts daily",
-    "start": "pnpm run sync",
-    "sync": "node --env-file-if-exists=.env --import tsx src/index.ts",
     "sync:indexes": "node --env-file-if-exists=.env --import tsx src/index.ts indexes",
     "sync:all": "node --env-file-if-exists=.env --import tsx src/index.ts all",
     "backfill": "node --env-file-if-exists=.env --import tsx src/index.ts backfill",
     "sync:daily": "node --env-file-if-exists=.env --import tsx src/index.ts daily",
     "sync:hourly": "node --env-file-if-exists=.env --import tsx src/index.ts hourly",
     "sync:live": "node --env-file-if-exists=.env --import tsx src/index.ts live",
-    "sync:league-stats": "node --env-file-if-exists=.env --import tsx src/index.ts league-stats",
-    "backfill:league-stats": "node --env-file-if-exists=.env --import tsx src/index.ts league-stats-backfill",
     "sync:three-hourly": "node --env-file-if-exists=.env --import tsx src/index.ts three-hourly",
     "sync:weekly": "node --env-file-if-exists=.env --import tsx src/index.ts weekly",
-    "check:database": "node --env-file=.env --import tsx src/checkDatabaseConnection.ts",
-    "ensure:database-indexes": "node --env-file=.env --import tsx src/ensureDatabaseIndexes.ts",
     "check": "tsc --noEmit",
     "test": "vitest run"
   },
