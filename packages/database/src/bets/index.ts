@@ -5,6 +5,7 @@ export {
   getBetPeriodSummary,
   getBetByIdAndAccountId,
   getBetsByAccountId,
+  getBetsForFixturesByAccountId,
   getBetsPage,
 } from "./operations/getBetsByAccountId.js";
 export { countPendingBetsByAccountId } from "./operations/countPendingBetsByAccountId.js";

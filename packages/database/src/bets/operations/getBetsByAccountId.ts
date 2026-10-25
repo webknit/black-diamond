@@ -10,6 +10,19 @@ export async function getBetsByAccountId(accountId: string) {
     .toArray();
 }
 
+export async function getBetsForFixturesByAccountId(accountId: string, fixtureIds: number[]) {
+  if (fixtureIds.length === 0) return [];
+
+  const database = await getDatabase();
+  return database
+    .collection<Bet>("bets")
+    .find(
+      { accountId, "selections.fixture.id": { $in: fixtureIds } },
+      { projection: { _id: 0 } },
+    )
+    .toArray();
+}
+
 export async function getBetsPage(
   accountId: string,
   page: number,

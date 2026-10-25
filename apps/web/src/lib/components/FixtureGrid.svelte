@@ -5,12 +5,14 @@
 	let {
 		fixtures,
 		hasFixtures,
+		noLeaguesSelected = false,
 		isLoading = false,
 		placedSelectionKeys = [],
 		onSelectOdd
 	}: {
 		fixtures: FixtureCardData[];
 		hasFixtures: boolean;
+		noLeaguesSelected?: boolean;
 		isLoading?: boolean;
 		placedSelectionKeys?: string[];
 		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
@@ -29,8 +31,13 @@
 	</section>
 {:else if fixtures.length === 0}
 	<section class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-		<h2 class="text-lg font-semibold text-slate-950">No leagues selected</h2>
-		<p class="mt-2 text-sm text-slate-600">Select at least one league to show its fixtures.</p>
+		{#if noLeaguesSelected}
+			<h2 class="text-lg font-semibold text-slate-950">No leagues selected</h2>
+			<p class="mt-2 text-sm text-slate-600">Select at least one league to show its fixtures.</p>
+		{:else}
+			<h2 class="text-lg font-semibold text-slate-950">No fixtures match your filters</h2>
+			<p class="mt-2 text-sm text-slate-600">Try changing the date, league, or finished-match filter.</p>
+		{/if}
 	</section>
 {:else}
 	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 min-[1100px]:!grid-cols-3 min-[1536px]:grid-cols-5 2xl:gap-5">

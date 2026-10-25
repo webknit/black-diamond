@@ -7,13 +7,15 @@ import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSna
 import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
 import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { insufficientBalanceErrorCode, placeBet } from '@black-diamond/database/bets';
-import { getBetsByAccountId } from '@black-diamond/database/bets';
+import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
 import type { BetSelection } from '@black-diamond/core/bet';
 import { selectedLeagues } from '@black-diamond/core/selectedLeagues';
 import { getBetSelection } from '#lib/server/bets/getBetSelection.js';
 import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 
 const ukTimeZone = 'Europe/London';
+const fixturePageSize = 10;
+const maximumFixtureLimit = 1000;
 const selectedLeagueOrder = new Map<number, number>(
 	selectedLeagues.map((league, index) => [league.id, index])
 );
@@ -25,6 +27,25 @@ function getUtcDateKey(date: Date): string {
 function isDateKey(value: string | null): value is string {
 	if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
 	return getUtcDateKey(new Date(`${value}T00:00:00.000Z`)) === value;
+}
+
+function getLeagueIds(value: string | null): number[] | null {
+	if (value === null) return null;
+	if (value === 'none') return [];
+
+	return [...new Set(
+		value
+			.split(',')
+			.map(Number)
+			.filter((leagueId) => Number.isSafeInteger(leagueId) && leagueId > 0)
+	)];
+}
+
+function getFixtureLimit(value: string | null): number {
+	const limit = Number(value ?? fixturePageSize);
+	return Number.isSafeInteger(limit) && limit > 0
+		? Math.min(limit, maximumFixtureLimit)
+		: fixturePageSize;
 }
 
 function getOverallTotal(total: number, home: number, away: number): number {
@@ -63,38 +84,70 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const todayUk = getUkDateKey(now);
 	const requestedDate = url.searchParams.get('date');
 	const selectedDate = isDateKey(requestedDate) ? requestedDate : todayUk;
+	const fixtureLimit = getFixtureLimit(url.searchParams.get('limit'));
+	const selectedLeagueIds = getLeagueIds(url.searchParams.get('leagues'));
+	const showFinishedQuery = url.searchParams.get('ft');
+	const showFinished = showFinishedQuery === null
+		? selectedDate < todayUk
+		: showFinishedQuery === '1';
 	const selectedDateAtUtc = new Date(`${selectedDate}T00:00:00.000Z`);
-
-	// The wider UTC window includes every instant in the selected UK calendar day,
-	// including the hour that moves when British Summer Time starts or ends.
-	const fixtures = await getFixtureSummariesBetweenDates(
-		getUtcDateKey(new Date(selectedDateAtUtc.getTime() - 24 * 60 * 60 * 1000)),
-		getUtcDateKey(new Date(selectedDateAtUtc.getTime() + 48 * 60 * 60 * 1000))
-	);
-	const todayFixtures = fixtures
+	const selectedStart = getUtcDateKey(new Date(selectedDateAtUtc.getTime() - 24 * 60 * 60 * 1000));
+	const selectedEnd = getUtcDateKey(new Date(selectedDateAtUtc.getTime() + 48 * 60 * 60 * 1000));
+	const todayAtUtc = new Date(`${todayUk}T00:00:00.000Z`);
+	const todayStart = getUtcDateKey(new Date(todayAtUtc.getTime() - 24 * 60 * 60 * 1000));
+	const todayEnd = getUtcDateKey(new Date(todayAtUtc.getTime() + 48 * 60 * 60 * 1000));
+	const [allSelectedFixtures, fetchedTodayFixtures] = await Promise.all([
+		getFixtureSummariesBetweenDates(selectedStart, selectedEnd),
+		selectedDate !== todayUk
+			? getFixtureSummariesBetweenDates(todayStart, todayEnd)
+			: Promise.resolve(null)
+	]);
+	const selectedDayFixtures = allSelectedFixtures
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedDate)
 		.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const todaysFixtureSummaries =
 		selectedDate === todayUk
-			? todayFixtures
-			: (await getFixtureSummariesBetweenDates(
-					getUtcDateKey(new Date(new Date(`${todayUk}T00:00:00.000Z`).getTime() - 24 * 60 * 60 * 1000)),
-					getUtcDateKey(new Date(new Date(`${todayUk}T00:00:00.000Z`).getTime() + 48 * 60 * 60 * 1000))
-				))
+			? selectedDayFixtures
+			: (fetchedTodayFixtures ?? [])
 					.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
 					.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
-	const fixtureIds = todayFixtures.map((fixture) => fixture.fixture.id);
-	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents] = await Promise.all([
+	const leagues = [...new Map(selectedDayFixtures.map((fixture) => [
+		fixture.league.id,
+		{
+			id: fixture.league.id,
+			name: fixture.league.name,
+			country: fixture.league.country || 'Other',
+			order: selectedLeagueOrder.get(fixture.league.id) ?? Number.MAX_SAFE_INTEGER
+		}
+	])).values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
+	const matchingFixtures = selectedDayFixtures.filter(
+		(fixture) =>
+			fixture.fixture.status.short !== 'PST' &&
+			(showFinished || !['FT', 'AET', 'PEN'].includes(fixture.fixture.status.short)) &&
+			(selectedLeagueIds === null || selectedLeagueIds.includes(fixture.league.id))
+	);
+	const fixturesForPage = matchingFixtures.slice(0, fixtureLimit);
+	const fixtureIds = fixturesForPage.map((fixture) => fixture.fixture.id);
+	const marketFixtureIds = fixturesForPage
+		.filter((fixture) => !['FT', 'AET', 'PEN'].includes(fixture.fixture.status.short))
+		.map((fixture) => fixture.fixture.id);
+	const relevantFixtureIds = [...new Set([
+		...fixtureIds,
+		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
+	])];
+	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, bets] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
-		getFixtureCardOdds(fixtureIds),
-		getPredictionsForFixtures(fixtureIds),
-		getFixtureEventsForFixtures(fixtureIds)
+		getFixtureCardOdds(marketFixtureIds),
+		getPredictionsForFixtures(marketFixtureIds),
+		getFixtureEventsForFixtures(fixtureIds),
+		locals.accountId
+			? getBetsForFixturesByAccountId(locals.accountId, relevantFixtureIds)
+			: Promise.resolve([])
 	]);
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
 	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
 	const eventsByFixtureId = new Map(fixtureEvents.map((fixtureEvent) => [fixtureEvent.fixtureId, fixtureEvent.events]));
-	const bets = locals.accountId ? await getBetsByAccountId(locals.accountId) : [];
 	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
 					`${selection.fixture.id}|${selection.market.name.toLowerCase()}|${selection.market.selection.toLowerCase()}`
@@ -134,9 +187,15 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	return {
 		date: selectedDate,
 		todayDate: todayUk,
+		appliedLeagueIds: selectedLeagueIds,
+		appliedShowFinished: showFinished,
+		fixtureLimit,
+		totalFixtureCount: matchingFixtures.length,
+		hasFixtures: selectedDayFixtures.length > 0,
+		leagues,
 		placedBetSelectionKeys,
 		todaysBets,
-		fixtures: todayFixtures.filter((fixture) => fixture.fixture.status.short !== 'PST').map((fixture) => {
+		fixtures: fixturesForPage.map((fixture) => {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
 			const prediction = predictionsByFixtureId.get(fixture.fixture.id);

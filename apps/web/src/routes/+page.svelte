@@ -7,7 +7,6 @@
 	import BetSlip from '#lib/components/BetSlip.svelte';
 	import type { BetSlipSelection } from '#lib/components/BetSlip.svelte';
 	import LeagueFilter from '#lib/components/LeagueFilter.svelte';
-	import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 	import type { PageProps } from './$types';
 	import type { FixtureCardData, FixtureOddSelection } from '#lib/types/fixtureCard.js';
 
@@ -20,21 +19,7 @@
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
 	let todaysBetsExpanded = $state(true);
 
-	const leagues = $derived(
-		[
-			...new Map(
-				data.fixtures.map((fixture) => [
-					fixture.leagueId,
-					{
-						id: fixture.leagueId,
-						name: fixture.leagueName,
-						country: fixture.leagueCountry || 'Other',
-						order: fixture.leagueOrder
-					}
-				])
-			).values()
-		].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name))
-	);
+	const leagues = $derived(data.leagues);
 	const leaguesByCountry = $derived(
 		Object.entries(
 			leagues.reduce<Record<string, typeof leagues>>((groups, league) => {
@@ -48,13 +33,14 @@
 				leagues: countryLeagues
 			}))
 	);
-	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
-	const filteredFixtures = $derived(
-		data.fixtures.filter(
-			(fixture) =>
-				(selectedLeagueIds === null || selectedLeagueIds.includes(fixture.leagueId)) &&
-				(showFinished || !completedStatuses.has(fixture.status.short))
-		)
+	const filteredFixtures = $derived(data.fixtures);
+	const filterResultIsCurrent = $derived(
+		data.appliedShowFinished === showFinished &&
+		(data.appliedLeagueIds === null
+			? selectedLeagueIds === null
+			: selectedLeagueIds !== null &&
+				[...data.appliedLeagueIds].sort((a, b) => a - b).join(',') ===
+					[...selectedLeagueIds].sort((a, b) => a - b).join(','))
 	);
 	const fixtureFilterKey = $derived(
 		`${showFinished}:${selectedLeagueIds === null ? 'all' : selectedLeagueIds.join(',')}`
@@ -87,7 +73,7 @@
 	}
 
 	function getDefaultShowFinished(date = data.date): boolean {
-		return date < getUkDateKey(new Date());
+		return date < data.todayDate;
 	}
 
 	function getShowFinishedFromQuery(): boolean {
@@ -126,6 +112,7 @@
 		const url = new URL(page.url.href);
 		url.searchParams.delete('leagues');
 		url.searchParams.delete('ft');
+		url.searchParams.delete('limit');
 
 		if (nextLeagueIds !== null) {
 			url.searchParams.set(
@@ -154,6 +141,17 @@
 	function setSelectedLeagueIds(nextLeagueIds: number[] | null) {
 		selectedLeagueIds = nextLeagueIds;
 		void updateFilterQuery(nextLeagueIds, showFinished);
+	}
+
+	async function loadMoreFixtures() {
+		const url = new URL(page.url.href);
+		url.searchParams.set('limit', String(data.fixtureLimit + 10));
+		isLoading = true;
+		try {
+			await goto(`${url.pathname}${url.search}`, { reset: false });
+		} finally {
+			isLoading = false;
+		}
 	}
 
 	function toggleLeague(leagueId: number, checked: boolean) {
@@ -195,12 +193,9 @@
 		try {
 			const url = new URL(page.url.href);
 			url.searchParams.set('date', input.value);
-		url.searchParams.delete('ft');
-		if (getDefaultShowFinished(input.value)) {
-			showFinished = true;
-		} else if (showFinished) {
-			url.searchParams.set('ft', '1');
-		}
+			url.searchParams.delete('ft');
+			url.searchParams.delete('limit');
+			showFinished = getDefaultShowFinished(input.value);
 			await goto(`${url.pathname}${url.search}`);
 		} finally {
 			isLoading = false;
@@ -242,13 +237,13 @@
 					Black Diamond · Matchday
 				</p>
 				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
-					Fixtures <span class="text-slate-500">({filteredFixtures.length})</span>
+					Fixtures <span class="text-slate-500">({data.totalFixtureCount})</span>
 				</h1>
 				<p class="mt-1 mb-3 text-sm text-slate-600">{data.today} · All times UK</p>
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
 			</div>
 
-			{#if data.fixtures.length > 0}
+			{#if leagues.length > 0}
 				<div class="flex shrink-0 flex-wrap items-end gap-3">
 					<FixtureStatusFilter {showFinished} onChange={setShowFinished} />
 					<LeagueFilter
@@ -377,11 +372,26 @@
 				{#key fixtureFilterKey}
 					<FixtureGrid
 						fixtures={filteredFixtures}
-						hasFixtures={data.fixtures.length > 0}
-						{isLoading}
+						hasFixtures={data.hasFixtures}
+						noLeaguesSelected={data.appliedLeagueIds?.length === 0}
+						isLoading={isLoading || !filterResultIsCurrent}
 						placedSelectionKeys={data.placedBetSelectionKeys}
 						onSelectOdd={chooseOdd}
 					/>
+					{#if filterResultIsCurrent && filteredFixtures.length < data.totalFixtureCount}
+						<div class="mt-5 text-center">
+							<p class="mb-2 text-xs tabular-nums text-slate-500">
+								Showing {filteredFixtures.length} of {data.totalFixtureCount} fixtures
+							</p>
+							<button
+								type="button"
+								class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+								onclick={loadMoreFixtures}
+							>
+								Load {Math.min(10, data.totalFixtureCount - filteredFixtures.length)} more
+							</button>
+						</div>
+					{/if}
 				{/key}
 			</div>
 		</div>
