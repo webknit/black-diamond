@@ -30,6 +30,18 @@ export function getDatabase(): Promise<Db> {
   return databasePromise;
 }
 
+export async function closeDatabase(): Promise<void> {
+  const database = await databasePromise;
+
+  if (!database) return;
+
+  try {
+    await database.client.close();
+  } finally {
+    databasePromise = undefined;
+  }
+}
+
 export async function withDatabaseTransaction<T>(
   operation: (database: Db, session: ClientSession) => Promise<T>,
 ): Promise<T> {

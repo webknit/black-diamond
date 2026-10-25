@@ -1,3 +1,8 @@
+import { closeDatabase } from "@black-diamond/database/mongodb";
 import { runSelectedSync } from "./runSelectedSync.js";
 
-await runSelectedSync(process.argv[2]);
+try {
+  await runSelectedSync(process.argv[2]);
+} finally {
+  await closeDatabase();
+}

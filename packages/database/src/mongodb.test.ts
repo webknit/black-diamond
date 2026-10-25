@@ -8,11 +8,12 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("mongodb", () => ({ MongoClient: mocks.MongoClient }));
 
-import { configureDatabase, getDatabase } from "./mongodb.js";
+import { closeDatabase, configureDatabase, getDatabase } from "./mongodb.js";
 
 describe("database configuration", () => {
   it("uses an explicitly configured connection instead of the host process environment", async () => {
-    const database = { collection: vi.fn() };
+    const close = vi.fn();
+    const database = { collection: vi.fn(), client: { close } };
     mocks.MongoClient.mockImplementation(function MongoClient() {
       return { connect: mocks.connect, db: mocks.db };
     });
@@ -26,5 +27,8 @@ describe("database configuration", () => {
     ).not.toThrow();
     expect(mocks.MongoClient).toHaveBeenCalledWith("mongodb://example.test");
     expect(mocks.db).toHaveBeenCalledWith("black-diamond");
+
+    await closeDatabase();
+    expect(close).toHaveBeenCalledOnce();
   });
 });
