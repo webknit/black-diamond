@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { LeagueStandings } from '@black-diamond/core/leagueStandings';
+	import Modal from './modal/Modal.svelte';
 
 	let {
 		leagueId,
@@ -19,7 +20,6 @@
 	let isLoading = $state(false);
 	let errorMessage = $state<string | null>(null);
 	let loadedKey = $state<string | null>(null);
-
 	$effect(() => {
 		if (!isOpen) return;
 
@@ -46,8 +46,7 @@
 </script>
 
 {#if isOpen}
-	<div class="fixed inset-0 z-40 bg-slate-950/30" role="presentation" onclick={() => (isOpen = false)}></div>
-	<dialog open class="fixed inset-x-2 top-2 bottom-2 z-50 mx-auto flex max-w-3xl flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl sm:inset-x-3 sm:top-1/2 sm:bottom-auto sm:max-h-[75vh] sm:-translate-y-1/2 sm:p-4" aria-label={`${leagueName} league table`}>
+	<Modal bind:isOpen label={`${leagueName} league table`}>
 		<header class="shrink-0 flex items-start justify-between gap-3 border-b border-slate-100 pb-2 sm:pb-3">
 			<div>
 				<p class="text-sm font-semibold text-slate-950">{standings?.league.name ?? leagueName}</p>
@@ -111,5 +110,5 @@
 				{/each}
 			{/if}
 		</div>
-	</dialog>
+	</Modal>
 {/if}

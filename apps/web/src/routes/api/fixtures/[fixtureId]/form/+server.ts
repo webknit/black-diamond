@@ -1,5 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import { getFixtureById, getRecentTeamFixturesBefore } from '@black-diamond/database/fixtures';
+import { getFixtureStatsSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 
 const validVenues = new Set(['home', 'away', 'overall']);
 
@@ -24,10 +25,13 @@ export async function GET({ params, url }: { params: { fixtureId: string }; url:
 		fixture.fixture.timestamp,
 		venue as 'home' | 'away' | 'overall',
 	);
+	const snapshots = await getFixtureStatsSnapshots(fixtures.map((item) => item.fixture.id));
+	const snapshotsByFixtureId = new Map(snapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 
 	return json({
 		fixtures: fixtures.map((item) => {
 			const isHome = item.teams.home.id === teamId;
+			const snapshot = snapshotsByFixtureId.get(item.fixture.id);
 			const goalsFor = isHome ? item.goals.home : item.goals.away;
 			const goalsAgainst = isHome ? item.goals.away : item.goals.home;
 			return {
@@ -38,6 +42,12 @@ export async function GET({ params, url }: { params: { fixtureId: string }; url:
 				venue: isHome ? 'Home' : 'Away',
 				homeGoals: item.goals.home,
 				awayGoals: item.goals.away,
+				leaguePosition: isHome
+					? snapshot?.home.leaguePosition ?? null
+					: snapshot?.away.leaguePosition ?? null,
+				leagueTeams: isHome
+					? snapshot?.home.leagueTeams ?? null
+					: snapshot?.away.leagueTeams ?? null,
 				outcome: goalsFor! > goalsAgainst! ? 'W' : goalsFor === goalsAgainst ? 'D' : 'L'
 			};
 		})

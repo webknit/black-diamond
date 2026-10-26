@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { FixtureInjury } from '@black-diamond/core/fixtureInjuries';
 	import type { FixtureTeamLineup } from '@black-diamond/core/fixtureLineups';
+	import Modal from './modal/Modal.svelte';
 
 	let {
 		injuries,
@@ -50,12 +51,7 @@
 {/if}
 
 {#if isOpen}
-	<div class="fixed inset-0 z-40 bg-slate-950/30" role="presentation" onclick={() => (isOpen = false)}></div>
-	<dialog
-		open
-		aria-label="Team news"
-		class="fixed left-1/2 top-1/2 z-50 m-0 flex h-[min(32rem,calc(100dvh-1rem))] w-[calc(100%-1rem)] max-w-2xl -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl sm:h-[min(38rem,80vh)] sm:p-4"
-	>
+	<Modal bind:isOpen label="Team news">
 		<header class="relative shrink-0 border-b border-slate-100 pb-3 text-center">
 			<h2 class="text-sm font-semibold text-slate-900">Team news</h2>
 			<button type="button" class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close team news" onclick={() => (isOpen = false)}>✕</button>
@@ -107,5 +103,5 @@
 				</section>
 			{/each}
 		</div>
-	</dialog>
+	</Modal>
 {/if}

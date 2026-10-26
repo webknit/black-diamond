@@ -75,8 +75,8 @@
 				{/if}
 			</div>
 
-			<div class="mt-1 flex items-center gap-2">
-				<button type="button" class="w-10 shrink-0 cursor-pointer text-left text-[9px] text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500" onclick={() => onOpenTeamForm(panel.teamId, panel.label === 'Home' ? 'home' : 'away')}>{panel.label}</button>
+			<button type="button" class="mt-1 flex w-full items-center gap-2 text-left" onclick={() => onOpenTeamForm(panel.teamId, panel.label === 'Home' ? 'home' : 'away')} aria-label={`Open ${panel.label.toLowerCase()} recent fixtures for this team`}>
+				<span class="w-10 shrink-0 text-[9px] text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500">{panel.label}</span>
 				<div
 					class="flex items-center gap-0.5"
 					aria-label={`Recent ${panel.label.toLowerCase()} form ${panel.form || 'unavailable'}`}
@@ -102,7 +102,7 @@
 						</span>
 					{/each}
 				</div>
-			</div>
+			</button>
 
 			<div class="mt-1 grid grid-cols-[2.5rem_1fr] items-center text-[8px] tabular-nums">
 				<span class="text-slate-400">{panel.label === 'Home' ? 'H' : 'A'}</span>
@@ -113,8 +113,8 @@
 				</div>
 			</div>
 
-			<div class="mt-1 flex items-center gap-2">
-				<button type="button" class="w-10 shrink-0 cursor-pointer text-left text-[9px] text-slate-400 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500" onclick={() => onOpenTeamForm(panel.teamId, 'overall')}>Overall</button>
+			<button type="button" class="mt-1 flex w-full items-center gap-2 text-left" onclick={() => onOpenTeamForm(panel.teamId, 'overall')} aria-label="Open overall recent fixtures for this team">
+				<span class="w-10 shrink-0 text-[9px] text-slate-400 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500">Overall</span>
 				<div
 					class="flex items-center gap-0.5"
 					aria-label={`Recent overall form ${panel.overallForm || 'unavailable'}`}
@@ -140,7 +140,7 @@
 						</span>
 					{/each}
 				</div>
-			</div>
+			</button>
 
 			<div class="mt-1 grid grid-cols-[2.5rem_1fr] items-center text-[8px] tabular-nums">
 				<span class="text-slate-400">Overall</span>

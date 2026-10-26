@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import Modal from './modal/Modal.svelte';
 
 	type FormScope = 'home' | 'away' | 'overall';
 	type FormFixture = {
@@ -10,25 +11,30 @@
 		venue: 'Home' | 'Away';
 		homeGoals: number;
 		awayGoals: number;
+		leaguePosition: number | null;
+		leagueTeams: number | null;
 		outcome: 'W' | 'D' | 'L';
 	};
 
 	let {
+		requestId,
 		fixtureId,
 		teamId,
 		teamName,
 		scope,
 		onClose
 	}: {
+		requestId: number;
 		fixtureId: number;
 		teamId: number;
 		teamName: string;
 		scope: FormScope;
-		onClose: () => void;
+		onClose: (requestId: number) => void;
 	} = $props();
 	let fixtures = $state<FormFixture[]>([]);
 	let loading = $state(true);
 	let failed = $state(false);
+	let isOpen = $state(true);
 
 	const scopeLabel = $derived(scope === 'overall' ? 'Overall' : scope === 'home' ? 'Home' : 'Away');
 
@@ -57,16 +63,11 @@
 	});
 </script>
 
-<div class="fixed inset-0 z-40 bg-slate-950/30" role="presentation" onclick={onClose}></div>
-<dialog
-	open
-	aria-label={`${teamName} recent ${scopeLabel.toLowerCase()} fixtures`}
-	class="fixed left-1/2 top-1/2 z-50 m-0 flex max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl sm:max-h-[32rem] sm:p-4"
->
+<Modal bind:isOpen label={`${teamName} recent ${scopeLabel.toLowerCase()} fixtures`} onClose={() => onClose(requestId)}>
 	<header class="relative shrink-0 border-b border-slate-100 pb-3 text-center">
 		<h2 class="text-sm font-semibold text-slate-900">{teamName}</h2>
 		<p class="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Last 5 · {scopeLabel}</p>
-		<button type="button" class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close recent fixtures" onclick={onClose}>✕</button>
+		<button type="button" class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close recent fixtures" onclick={() => (isOpen = false)}>✕</button>
 	</header>
 
 	{#if loading}
@@ -92,7 +93,10 @@
 					>{fixture.outcome}</span>
 					<img class="size-5 object-contain" src={fixture.opponentLogo} alt="" />
 					<div class="min-w-0">
-						<p class="truncate font-medium text-slate-900">{fixture.opponent}</p>
+						<p class="truncate font-medium text-slate-900">
+							{fixture.opponent}
+							{#if fixture.leaguePosition !== null && fixture.leagueTeams !== null}<span class="ml-1 text-[10px] font-normal text-slate-400">(<span class="text-slate-500">{fixture.leaguePosition}</span>/{fixture.leagueTeams})</span>{/if}
+						</p>
 						<p class="mt-0.5 text-[10px] text-slate-500">{fixture.venue} · {formatDate(fixture.timestamp)}</p>
 					</div>
 					<p class="font-semibold tabular-nums text-slate-900">{fixture.homeGoals} – {fixture.awayGoals}</p>
@@ -100,4 +104,4 @@
 			{/each}
 		</ol>
 	{/if}
-</dialog>
+</Modal>

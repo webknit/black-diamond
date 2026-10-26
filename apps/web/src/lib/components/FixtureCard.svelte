@@ -21,7 +21,8 @@
 	const liveStatuses = new Set(['1H', '2H', 'ET', 'P', 'LIVE', 'HT', 'BT']);
 	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
 	let leagueStandingsOpen = $state(false);
-	let formSelection = $state<{ teamId: number; teamName: string; scope: 'home' | 'away' | 'overall' } | null>(null);
+	let formRequestId = 0;
+	let formSelection = $state<{ requestId: number; teamId: number; teamName: string; scope: 'home' | 'away' | 'overall' } | null>(null);
 
 	function openLeagueStandings() {
 		leagueStandingsOpen = true;
@@ -29,10 +30,15 @@
 
 	function openTeamForm(teamId: number, scope: 'home' | 'away' | 'overall') {
 		formSelection = {
+			requestId: ++formRequestId,
 			teamId,
 			teamName: teamId === fixture.homeTeamId ? fixture.homeTeamName : fixture.awayTeamName,
 			scope
 		};
+	}
+
+	function closeTeamForm(requestId: number) {
+		if (formSelection?.requestId === requestId) formSelection = null;
 	}
 
 	function formatKickoff(timestamp: number) {
@@ -207,12 +213,15 @@
 		bind:isOpen={leagueStandingsOpen}
 	/>
 	{#if formSelection}
-		<FixtureFormModal
-			fixtureId={fixture.id}
-			teamId={formSelection.teamId}
-			teamName={formSelection.teamName}
-			scope={formSelection.scope}
-			onClose={() => (formSelection = null)}
-		/>
+		{#key formSelection.requestId}
+			<FixtureFormModal
+				requestId={formSelection.requestId}
+				fixtureId={fixture.id}
+				teamId={formSelection.teamId}
+				teamName={formSelection.teamName}
+				scope={formSelection.scope}
+				onClose={closeTeamForm}
+			/>
+		{/key}
 	{/if}
 </article>
