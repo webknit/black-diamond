@@ -89,7 +89,7 @@
 			</div>
 			<div class="mt-3 flex items-center justify-between gap-3">
 				<p class="text-xs text-slate-500">{events.length} recorded events</p>
-			<button type="button" class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close match events" onclick={() => (isOpen = false)}>✕</button>
+			<button type="button" data-modal-close class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close match events">✕</button>
 			</div>
 			{#if statistics}
 				<div class="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 gap-y-1.5 rounded-lg bg-slate-50 px-3 py-3 text-center text-[11px] tabular-nums">

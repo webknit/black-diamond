@@ -52,7 +52,7 @@
 				<p class="text-sm font-semibold text-slate-950">{standings?.league.name ?? leagueName}</p>
 				<p class="mt-0.5 text-xs text-slate-500">{standings?.league.country ?? ''} · {season} season</p>
 			</div>
-			<button type="button" class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close league table" onclick={() => (isOpen = false)}>✕</button>
+			<button type="button" data-modal-close class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close league table">✕</button>
 		</header>
 
 		<div class="min-h-0 flex-1 overflow-y-auto pt-3">

@@ -54,7 +54,7 @@
 	<Modal bind:isOpen label="Team news">
 		<header class="relative shrink-0 border-b border-slate-100 pb-3 text-center">
 			<h2 class="text-sm font-semibold text-slate-900">Team news</h2>
-			<button type="button" class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close team news" onclick={() => (isOpen = false)}>✕</button>
+			<button type="button" data-modal-close class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close team news">✕</button>
 		</header>
 
 		<div class="grid min-h-0 flex-1 grid-cols-2 divide-x divide-slate-100 overflow-y-auto">

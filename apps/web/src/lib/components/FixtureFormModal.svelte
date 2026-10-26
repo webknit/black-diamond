@@ -67,7 +67,7 @@
 	<header class="relative shrink-0 border-b border-slate-100 pb-3 text-center">
 		<h2 class="text-sm font-semibold text-slate-900">{teamName}</h2>
 		<p class="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">Last 5 · {scopeLabel}</p>
-		<button type="button" class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close recent fixtures" onclick={() => (isOpen = false)}>✕</button>
+		<button type="button" data-modal-close class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close recent fixtures">✕</button>
 	</header>
 
 	{#if loading}
