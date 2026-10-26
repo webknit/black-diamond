@@ -55,7 +55,7 @@
 
 {#if isOpen}
 	<div class="fixed inset-0 z-40 bg-slate-950/30" role="presentation" onclick={() => (isOpen = false)}></div>
-	<dialog open class="fixed inset-x-2 top-2 bottom-2 z-50 mx-auto flex max-w-lg flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:max-h-[75vh] sm:w-[28rem] sm:-translate-y-1/2 sm:p-4" aria-label="Match events">
+	<dialog open class="fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-1rem)] w-[calc(100%-1rem)] max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl sm:max-h-[75vh] sm:w-[28rem] sm:p-4" aria-label="Match events">
 		<header class="shrink-0 border-b border-slate-100 pb-2 sm:pb-3">
 			<div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 text-center">
 				<div class="min-w-0">
