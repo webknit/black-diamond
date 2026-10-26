@@ -55,7 +55,7 @@
 			<button type="button" data-modal-close class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close league table">✕</button>
 		</header>
 
-		<div class="min-h-0 flex-1 overflow-y-auto pt-3">
+		<div class="max-h-[calc(80dvh-4.5rem)] overflow-y-auto pt-3">
 			{#if isLoading}
 				<div class="flex items-center justify-center py-12 text-sm text-slate-500">
 					<span class="mr-2 size-4 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-600"></span>

@@ -71,7 +71,7 @@
 	</header>
 
 	{#if loading}
-		<div class="flex flex-1 flex-col items-center justify-center" role="status">
+		<div class="flex min-h-32 flex-col items-center justify-center" role="status">
 			<span class="size-5 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span>
 			<p class="mt-3 text-xs text-slate-500">Loading recent fixtures…</p>
 		</div>
@@ -80,7 +80,7 @@
 	{:else if fixtures.length === 0}
 		<p class="py-8 text-center text-xs text-slate-500">No earlier completed fixtures found.</p>
 	{:else}
-		<ol class="min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto">
+		<ol class="max-h-[calc(80dvh-5rem)] divide-y divide-slate-100 overflow-y-auto">
 			{#each fixtures as fixture (fixture.id)}
 				<li class="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-center gap-2 py-2.5 text-xs">
 					<span class="flex size-5 items-center justify-center rounded text-[10px] font-bold"

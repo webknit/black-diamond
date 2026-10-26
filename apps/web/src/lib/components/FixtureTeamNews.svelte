@@ -57,7 +57,7 @@
 			<button type="button" data-modal-close class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close team news">✕</button>
 		</header>
 
-		<div class="grid min-h-0 flex-1 grid-cols-2 divide-x divide-slate-100 overflow-y-auto">
+		<div class="grid max-h-[calc(80dvh-4.5rem)] grid-cols-2 divide-x divide-slate-100 overflow-y-auto">
 			{#each [
 				{ team: homeTeam, lineup: homeLineup, injuries: homeInjuries, alignment: 'text-left' },
 				{ team: awayTeam, lineup: awayLineup, injuries: awayInjuries, alignment: 'text-right' }

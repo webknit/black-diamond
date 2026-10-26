@@ -117,7 +117,7 @@
 				</div>
 			{/if}
 		</header>
-		<ol class="mt-2 min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto sm:mt-3">
+		<ol class="mt-2 max-h-[calc(80dvh-12rem)] divide-y divide-slate-100 overflow-y-auto sm:mt-3">
 			{#each events as event, index (`${event.time.elapsed}-${event.type}-${event.player.id}-${index}`)}
 				<li class="grid grid-cols-[minmax(0,1fr)_3.5rem_minmax(0,1fr)] items-center gap-2 py-2 text-xs">
 					<div class="min-w-0 text-left">
