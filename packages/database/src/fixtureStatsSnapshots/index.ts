@@ -6,7 +6,3 @@ export {
   getFinishedFixturesWithStatsSnapshots,
   type FinishedFixtureWithStatsSnapshot,
 } from "./operations/getFinishedFixturesWithStatsSnapshots.js";
-export {
-  getFinishedFixturesForAnalysis,
-  type FinishedFixtureForAnalysis,
-} from "./operations/getFinishedFixturesForAnalysis.js";
