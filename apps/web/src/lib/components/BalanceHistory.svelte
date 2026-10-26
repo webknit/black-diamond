@@ -4,9 +4,12 @@
 
 	type BetSummary = {
 		id: string;
+		stake: number;
+		placedAt: string;
+		settledAt: string | null;
 		selections: { homeTeamName: string; awayTeamName: string; market: string }[];
 	};
-	type Point = { key: string; label: string; balance: number | null };
+	type Point = { key: string; label: string; balance: number | null; asOf: string | null };
 	type PlottedPoint = Point & { x: number; y: number };
 
 	let {
@@ -35,6 +38,17 @@
 	function getBucketKey(date: Date, view: 'week' | 'year'): string {
 		const dateKey = getUkDateKey(date);
 		return view === 'week' ? dateKey : dateKey.slice(0, 7);
+	}
+
+	function getBankrollAt(balance: number, asOf: string): number {
+		const asOfTimestamp = new Date(asOf).getTime();
+		const outstandingStake = bets.reduce((total, bet) => {
+			const wasPlaced = new Date(bet.placedAt).getTime() <= asOfTimestamp;
+			const wasUnsettled = bet.settledAt === null || new Date(bet.settledAt).getTime() > asOfTimestamp;
+			return wasPlaced && wasUnsettled ? total + bet.stake : total;
+		}, 0);
+
+		return balance + outstandingStake;
 	}
 
 	function buildPoints(view: 'week' | 'year'): Point[] {
@@ -75,7 +89,8 @@
 			const currentKey = view === 'week' ? today : today.slice(0, 7);
 			return buckets.map((bucket) => ({
 				...bucket,
-				balance: bucket.key === currentKey ? currentBalance : null
+				balance: bucket.key === currentKey ? getBankrollAt(currentBalance, new Date().toISOString()) : null,
+				asOf: bucket.key === currentKey ? new Date().toISOString() : null
 			}));
 		}
 
@@ -85,6 +100,7 @@
 			(transaction) => getBucketKey(new Date(transaction.occurredAt), view) < buckets[0].key
 		);
 		let previousBalance = precedingTransactions.at(-1)?.balanceAfter ?? null;
+		let previousBalanceAt = precedingTransactions.at(-1)?.occurredAt ?? null;
 
 		return buckets.map((bucket) => {
 			if (bucket.key >= firstBucket) {
@@ -93,10 +109,19 @@
 						getBucketKey(new Date(transaction.occurredAt), view) === bucket.key
 				);
 				if (bucketTransactions.length > 0) {
-					previousBalance = bucketTransactions.at(-1)?.balanceAfter ?? previousBalance;
+					const latestTransaction = bucketTransactions.at(-1)!;
+					previousBalance = latestTransaction.balanceAfter;
+					previousBalanceAt = latestTransaction.occurredAt;
 				}
 			}
-			return { ...bucket, balance: previousBalance };
+			return {
+				...bucket,
+				balance:
+					previousBalance === null || previousBalanceAt === null
+						? null
+						: getBankrollAt(previousBalance, previousBalanceAt),
+				asOf: previousBalanceAt
+			};
 		});
 	}
 
@@ -160,7 +185,7 @@
 	<div class="flex flex-wrap items-center justify-between gap-3">
 		<div>
 			<h2 class="text-sm font-semibold text-slate-950">Balance history</h2>
-			<p class="mt-0.5 text-xs text-slate-500">Closing balance · UK time</p>
+			<p class="mt-0.5 text-xs text-slate-500">Bankroll, including outstanding stakes · UK time</p>
 		</div>
 		<div class="inline-flex rounded-lg bg-slate-100 p-1" aria-label="Graph period">
 			<button

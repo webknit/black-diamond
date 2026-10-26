@@ -1,4 +1,5 @@
 import { getFixtureStatsSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
+import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
 import { getLeagueStats } from '@black-diamond/database/leagueStats';
 import {
 	getOver2_5ReferenceOdd,
@@ -27,29 +28,36 @@ function getMinimumOdds(value: string | null) {
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	// Reuse the homepage loader so cards, prices, prediction data and bet actions
-	// behave identically in both places. BOTD only needs upcoming fixtures.
+	// behave identically in both places. BOTD includes completed fixtures too, so
+	// a past day can be reviewed against the selected strategy.
 	const fixtureUrl = new URL(url);
 	fixtureUrl.searchParams.set('limit', '1000');
-	fixtureUrl.searchParams.set('ft', '0');
+	fixtureUrl.searchParams.set('ft', '1');
 	fixtureUrl.searchParams.delete('leagues');
 	const fixturePage = await loadFixturePage({ url: fixtureUrl, locals });
 	const selectedStrategyId = getSelectedStrategyId(url.searchParams.get('strategy'));
 	const minimumOdds = getMinimumOdds(url.searchParams.get('minOdds'));
 	const selectedStrategy = allStrategies.find((strategy) => strategy.id === selectedStrategyId)!;
-	const fixtureIds = fixturePage.fixtures
-		.filter((fixture) => fixture.status.short === 'NS')
-		.map((fixture) => fixture.id);
+	const fixtureIds = fixturePage.fixtures.map((fixture) => fixture.id);
 	const leagueIds = [...new Set(fixturePage.fixtures.map((fixture) => fixture.leagueId))];
-	const [snapshots, leagueStats] = await Promise.all([
+	const [snapshots, leagueStats, storedOdds] = await Promise.all([
 		getFixtureStatsSnapshots(fixtureIds),
-		getLeagueStats(leagueIds)
+		getLeagueStats(leagueIds),
+		getFixtureCardOdds(fixtureIds)
 	]);
 	const snapshotByFixtureId = new Map(snapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const leagueStatsByLeagueId = new Map(leagueStats.map((stats) => [stats.league.id, stats]));
+	const storedOddsByFixtureId = new Map(storedOdds.map((odds) => [odds.fixtureId, odds]));
 	const teamFilterVariation = teamFilterVariations.find((strategy) => strategy.id === selectedStrategyId);
 
-	const fixtures = fixturePage.fixtures.filter((fixture) => {
-		if (fixture.status.short !== 'NS') return false;
+	const fixturesWithStoredOdds = fixturePage.fixtures.map((fixture) => {
+		const storedFixtureOdds = storedOddsByFixtureId.get(fixture.id);
+		return {
+			...fixture,
+			odds: fixture.odds ?? (storedFixtureOdds ? { odds: storedFixtureOdds.odds } : null)
+		};
+	});
+	const fixtures = fixturesWithStoredOdds.filter((fixture) => {
 		const snapshot = snapshotByFixtureId.get(fixture.id);
 		if (!snapshot) return false;
 		const referenceOdd = getOver2_5ReferenceOdd(fixture.odds?.odds ?? []);

@@ -45,6 +45,9 @@ export async function load({ locals, url }: { locals: App.Locals; url: URL }) {
 		historyTransactions,
 		bets: bets.map((bet) => ({
 			id: bet.id,
+			stake: bet.stake,
+			placedAt: bet.placedAt,
+			settledAt: bet.settledAt,
 			selections: bet.selections.map((selection) => ({
 				homeTeamName: selection.fixture.homeTeamName,
 				awayTeamName: selection.fixture.awayTeamName,

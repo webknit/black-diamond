@@ -63,7 +63,7 @@
 									<th class="px-4 py-3 font-semibold">Date</th>
 									<th class="px-4 py-3 font-semibold">Activity</th>
 									<th class="px-4 py-3 text-right font-semibold">Change</th>
-									<th class="px-4 py-3 text-right font-semibold">Balance</th>
+									<th class="px-4 py-3 text-right font-semibold">Available cash</th>
 								</tr>
 							</thead>
 							<tbody class="divide-y divide-slate-100">

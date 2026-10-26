@@ -15,6 +15,9 @@
 	const contributedCapital = $derived(
 		data.account ? data.account.startingBalance + data.account.totalDeposits : 0
 	);
+	const bankroll = $derived(
+		data.account ? data.account.currentBalance + data.pendingBetSummary.totalStake : 0
+	);
 	const profitLossPercentage = $derived(
 		contributedCapital !== 0
 			? (profitLoss / contributedCapital) * 100
@@ -33,9 +36,9 @@
 			<p class="mt-1 text-sm text-slate-600">{data.account.email}</p>
 
 			<section class="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-				<p class="text-xs font-semibold uppercase tracking-wide text-slate-500">💰 Balance</p>
+				<p class="text-xs font-semibold uppercase tracking-wide text-slate-500">💰 Bankroll</p>
 				<p class="mt-1 text-3xl font-semibold tabular-nums tracking-tight text-slate-950">
-					{formatCurrency(data.account.currentBalance, data.account.currency)}
+					{formatCurrency(bankroll, data.account.currency)}
 				</p>
 				<p class="mt-3 text-sm font-semibold" class:text-emerald-700={profitLoss >= 0} class:text-rose-700={profitLoss < 0}>
 					📈 Profit / loss: {formatCurrency(profitLoss, data.account.currency)}

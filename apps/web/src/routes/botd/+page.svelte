@@ -63,7 +63,7 @@
 
 <svelte:head>
 	<title>Black Diamond · Bet of the day</title>
-	<meta name="description" content="Upcoming fixtures matching your selected betting strategy." />
+	<meta name="description" content="Fixtures matching your selected betting strategy." />
 </svelte:head>
 
 <main class="min-h-screen bg-slate-100">
@@ -72,7 +72,7 @@
 			<div>
 				<p class="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">Black Diamond · Picks</p>
 				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Bet of the day</h1>
-				<p class="mt-1 text-sm text-slate-600">{data.totalFixtureCount} upcoming {data.totalFixtureCount === 1 ? 'fixture' : 'fixtures'} match this strategy.</p>
+				<p class="mt-1 text-sm text-slate-600">{data.totalFixtureCount} {data.totalFixtureCount === 1 ? 'fixture' : 'fixtures'} match this strategy.</p>
 			</div>
 			<div class="flex flex-wrap items-end gap-3">
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
