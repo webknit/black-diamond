@@ -33,4 +33,24 @@ describe("syncUpcomingFixtureOdds", () => {
     expect(mocks.syncFixtureOdds).toHaveBeenCalledTimes(1);
     expect(mocks.syncFixtureOdds).toHaveBeenCalledWith(1);
   });
+
+  it("stops the current run when the provider rejects an odds request", async () => {
+    const now = new Date("2026-10-25T12:00:00.000Z");
+    mocks.getFixturesBetweenDates.mockResolvedValue([
+      fixture(1, now.getTime() / 1000 + 60, "NS"),
+      fixture(2, now.getTime() / 1000 + 120, "NS"),
+    ]);
+    mocks.syncFixtureOdds.mockRejectedValueOnce(new Error("Rate limited"));
+    const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    await syncUpcomingFixtureOdds(now);
+
+    expect(mocks.syncFixtureOdds).toHaveBeenCalledTimes(1);
+    expect(error).toHaveBeenCalledWith(
+      "[data-sync] Stopped odds sync after fixture 1 failed. The next scheduled run will retry.",
+      expect.any(Error),
+    );
+
+    error.mockRestore();
+  });
 });

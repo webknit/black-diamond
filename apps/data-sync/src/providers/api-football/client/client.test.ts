@@ -5,7 +5,7 @@ describe("createApiFootballClient", () => {
   it("sends a GET request with only the API-Football key header", async () => {
     const fetch = vi.fn().mockResolvedValue({
       ok: true,
-      json: async () => ({ response: [] }),
+      text: async () => JSON.stringify({ response: [] }),
     });
     const rateLimiter = { waitForTurn: vi.fn() };
     const client = createApiFootballClient({
@@ -38,7 +38,7 @@ describe("createApiFootballClient", () => {
     const fetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 401,
-      json: async () => body,
+      text: async () => JSON.stringify(body),
     });
     const client = createApiFootballClient({
       apiKey: "test-key",
@@ -50,5 +50,39 @@ describe("createApiFootballClient", () => {
       status: 401,
       body,
     });
+  });
+
+  it("reports a non-JSON response without leaking the whole response body", async () => {
+    const fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 429,
+      text: async () => "<html>Too many requests</html>",
+    });
+    const client = createApiFootballClient({
+      apiKey: "test-key",
+      fetch: fetch as unknown as typeof globalThis.fetch,
+    });
+
+    await expect(client.get("/odds")).rejects.toMatchObject({
+      name: "ApiFootballHttpError",
+      status: 429,
+      body: "<html>Too many requests</html>",
+    });
+  });
+
+  it("identifies a successful HTTP response that contains HTML instead of JSON", async () => {
+    const fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      text: async () => "<html>Blocked</html>",
+    });
+    const client = createApiFootballClient({
+      apiKey: "test-key",
+      fetch: fetch as unknown as typeof globalThis.fetch,
+    });
+
+    await expect(client.get("/odds")).rejects.toThrow(
+      "API-Football returned a non-JSON response with HTTP 200: <html>Blocked</html>",
+    );
   });
 });

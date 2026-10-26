@@ -11,6 +11,17 @@ export async function syncUpcomingFixtureOdds(now = new Date()) {
       continue;
     }
 
-    await syncFixtureOdds(fixture.fixture.id);
+    try {
+      await syncFixtureOdds(fixture.fixture.id);
+    } catch (error) {
+      console.error(
+        `[data-sync] Stopped odds sync after fixture ${fixture.fixture.id} failed. The next scheduled run will retry.`,
+        error,
+      );
+
+      // A provider-level error (rate limit, proxy page, temporary outage) is unlikely
+      // to succeed for the remaining fixtures in this same run.
+      return;
+    }
   }
 }

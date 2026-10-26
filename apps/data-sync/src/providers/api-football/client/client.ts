@@ -41,10 +41,19 @@ export function createApiFootballClient({
       },
     });
 
-    const body: unknown = await response.json();
+    const responseText = await response.text();
+    const body = parseResponseBody(responseText);
 
     if (!response.ok) {
+      if (body === undefined) {
+        throw createApiFootballNonJsonHttpError(response.status, responseText);
+      }
+
       throw createApiFootballHttpError(response.status, body);
+    }
+
+    if (body === undefined) {
+      throw createApiFootballInvalidResponseError(response.status, responseText);
     }
 
     return body as ResponseBody;
@@ -70,4 +79,52 @@ function createApiFootballHttpError(
       body,
     },
   );
+}
+
+function createApiFootballInvalidResponseError(
+  status: number,
+  responseText: string,
+): ApiFootballHttpError {
+  return Object.assign(
+    new Error(
+      `API-Football returned a non-JSON response with HTTP ${status}: ${getResponseExcerpt(responseText)}`,
+    ),
+    {
+      name: "ApiFootballInvalidResponseError",
+      status,
+      body: responseText,
+    },
+  );
+}
+
+function createApiFootballNonJsonHttpError(
+  status: number,
+  responseText: string,
+): ApiFootballHttpError {
+  const excerpt = getResponseExcerpt(responseText);
+
+  return Object.assign(
+    new Error(
+      `API-Football request failed with HTTP ${status} and a non-JSON response: ${excerpt}`,
+    ),
+    {
+      name: "ApiFootballHttpError",
+      status,
+      body: excerpt,
+    },
+  );
+}
+
+function parseResponseBody(responseText: string): unknown | undefined {
+  if (!responseText.trim()) return undefined;
+
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    return undefined;
+  }
+}
+
+function getResponseExcerpt(responseText: string): string {
+  return responseText.replace(/\s+/g, " ").trim().slice(0, 200);
 }
