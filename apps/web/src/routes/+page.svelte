@@ -12,6 +12,7 @@
 
 	let { data }: PageProps = $props();
 	let isLoading = $state(false);
+	let isLoadingMore = $state(false);
 	let selectedLeagueIds = $state<number[] | null>(getLeagueIdsFromQuery(page.url.searchParams.get('leagues')));
 	let leagueFilterOpen = $state(false);
 	let showFinished = $state(getShowFinishedFromQuery());
@@ -146,11 +147,13 @@
 	async function loadMoreFixtures() {
 		const url = new URL(page.url.href);
 		url.searchParams.set('limit', String(data.fixtureLimit + 10));
-		isLoading = true;
+		isLoadingMore = true;
 		try {
+			// The existing cards stay mounted. The keyed fixture grid adds only the
+			// next page of cards when the new data arrives.
 			await goto(`${url.pathname}${url.search}`, { reset: false });
 		} finally {
-			isLoading = false;
+			isLoadingMore = false;
 		}
 	}
 
@@ -385,10 +388,13 @@
 							</p>
 							<button
 								type="button"
-								class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+								class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
 								onclick={loadMoreFixtures}
+								disabled={isLoadingMore}
 							>
-								Load {Math.min(10, data.totalFixtureCount - filteredFixtures.length)} more
+								{isLoadingMore
+									? 'Loading more…'
+									: `Load ${Math.min(10, data.totalFixtureCount - filteredFixtures.length)} more`}
 							</button>
 						</div>
 					{/if}
