@@ -17,6 +17,12 @@
 
 	function portal(node: HTMLElement) {
 		document.body.append(node);
+
+		return {
+			destroy() {
+				node.remove();
+			}
+		};
 	}
 
 	function notifyClosed() {
@@ -65,7 +71,7 @@
 		onclose={notifyClosed}
 		oncancel={(event) => { event.preventDefault(); close(); }}
 		onclick={closeFromDialogClick}
-		class="fixed inset-0 z-50 m-auto flex max-h-[80dvh] w-[calc(100dvw-1rem)] max-w-[calc(100dvw-1rem)] flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl backdrop:bg-slate-950/30 sm:max-w-2xl sm:p-4"
+		class="fixed inset-0 z-50 m-auto flex max-h-[80dvh] w-[calc(100dvw-1rem)] max-w-[calc(100dvw-1rem)] flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl backdrop:bg-slate-950/30 [&:not([open])]:hidden sm:max-w-2xl sm:p-4"
 	>
 		{@render children()}
 	</dialog>
