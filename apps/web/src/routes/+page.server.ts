@@ -114,7 +114,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			: (fetchedTodayFixtures ?? [])
 					.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
 					.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
-	const leagues = [...new Map(selectedDayFixtures.map((fixture) => [
+	const filterableFixtures = selectedDayFixtures.filter(
+		(fixture) =>
+			fixture.fixture.status.short !== 'PST' &&
+			(showFinished || !['FT', 'AET', 'PEN'].includes(fixture.fixture.status.short))
+	);
+	const leagues = [...new Map(filterableFixtures.map((fixture) => [
 		fixture.league.id,
 		{
 			id: fixture.league.id,
@@ -123,11 +128,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			order: selectedLeagueOrder.get(fixture.league.id) ?? Number.MAX_SAFE_INTEGER
 		}
 	])).values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
-	const matchingFixtures = selectedDayFixtures.filter(
-		(fixture) =>
-			fixture.fixture.status.short !== 'PST' &&
-			(showFinished || !['FT', 'AET', 'PEN'].includes(fixture.fixture.status.short)) &&
-			(selectedLeagueIds === null || selectedLeagueIds.includes(fixture.league.id))
+	const matchingFixtures = filterableFixtures.filter(
+		(fixture) => selectedLeagueIds === null || selectedLeagueIds.includes(fixture.league.id)
 	);
 	const fixturesForPage = matchingFixtures.slice(0, fixtureLimit);
 	const fixtureIds = fixturesForPage.map((fixture) => fixture.fixture.id);
