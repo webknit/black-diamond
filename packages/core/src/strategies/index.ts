@@ -1,10 +1,7 @@
 import type { FixtureOdds } from "../types/fixtureOdds.js";
 import type { FixtureStatsSnapshot } from "../types/fixtureStatsSnapshot.js";
 export {
-  strategyDetails,
   teamFilterVariations,
-  type StrategyDetails,
-  type StrategyId,
   type TeamFilterVariation,
 } from "./strategies.js";
 import type { TeamFilterVariation } from "./strategies.js";
@@ -17,9 +14,6 @@ export function getOver2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number 
   return Number.isFinite(odd) && odd > 1 ? odd : null;
 }
 
-export function matchesOver2_5LeagueAverageStrategy(snapshot: FixtureStatsSnapshot, leagueOver2_5Percentage: number | null) {
-  return leagueOver2_5Percentage !== null && snapshot.home.summary.over2_5.percentage > leagueOver2_5Percentage && snapshot.away.summary.over2_5.percentage > leagueOver2_5Percentage;
-}
 function average(goals: number, played: number) { return played === 0 ? null : goals / played; }
 export function matchesVenueScoringStrategy(snapshot: FixtureStatsSnapshot, minimumGoalsPerFixture = 1.5) {
   const home = snapshot.home.fixtures.home;

@@ -9,9 +9,7 @@ import {
 } from "@black-diamond/core/time";
 import {
   getOver2_5ReferenceOdd,
-  matchesOver2_5LeagueAverageStrategy,
   matchesTeamFilterVariation,
-  strategyDetails,
   teamFilterVariations,
 } from "@black-diamond/core/strategies";
 import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
@@ -25,7 +23,6 @@ import { upsertStrategyPerformances } from "@black-diamond/database/strategyPerf
 const minimumOver2_5ReferenceOdd = 1.7;
 const strategyVersion = 1;
 const strategyIds = [
-  ...strategyDetails.map((strategy) => strategy.id),
   ...teamFilterVariations.map((strategy) => strategy.id),
 ];
 
@@ -89,14 +86,8 @@ async function createStrategyPerformances(
   );
   const odds = await getFixtureOddsForFixtures(fixtures.map((fixture) => fixture.fixture.id));
   const oddsByFixtureId = new Map(odds.map((fixtureOdds) => [fixtureOdds.fixtureId, fixtureOdds]));
-  let priorFixtures = 0;
-  let priorOver2_5 = 0;
-
   for (const fixture of fixtures) {
-    const leagueOver2_5Percentage = priorFixtures === 0 ? null : (priorOver2_5 / priorFixtures) * 100;
     const won = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home + fixture.goals.away > 2;
-    priorFixtures++;
-    priorOver2_5 += Number(won);
 
     const snapshot = fixture.fixtureStatsSnapshot;
     const storedOdds = oddsByFixtureId.get(fixture.fixture.id);
@@ -114,7 +105,6 @@ async function createStrategyPerformances(
       addResult(getPeriodTotals(performance.months, month), won, referenceOdd);
     };
 
-    record(strategyDetails[0].id, matchesOver2_5LeagueAverageStrategy(snapshot, leagueOver2_5Percentage));
     for (const variation of teamFilterVariations) {
       record(variation.id, matchesTeamFilterVariation(snapshot, variation));
     }

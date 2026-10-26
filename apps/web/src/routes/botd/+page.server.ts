@@ -1,11 +1,8 @@
 import { getFixtureStatsSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
-import { getLeagueStats } from '@black-diamond/database/leagueStats';
 import {
 	getOver2_5ReferenceOdd,
-	matchesOver2_5LeagueAverageStrategy,
 	matchesTeamFilterVariation,
-	strategyDetails,
 	teamFilterVariations
 } from '@black-diamond/core/strategies';
 import { actions, load as loadFixturePage } from '../+page.server.js';
@@ -14,7 +11,7 @@ export { actions };
 
 const defaultStrategyId = 'score1.5-eitherTeam-last5';
 const defaultMinimumOdds = 1.7;
-const allStrategies = [...strategyDetails, ...teamFilterVariations];
+const allStrategies = teamFilterVariations;
 
 function getSelectedStrategyId(value: string | null) {
 	return allStrategies.some((strategy) => strategy.id === value) ? value! : defaultStrategyId;
@@ -39,14 +36,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const minimumOdds = getMinimumOdds(url.searchParams.get('minOdds'));
 	const selectedStrategy = allStrategies.find((strategy) => strategy.id === selectedStrategyId)!;
 	const fixtureIds = fixturePage.fixtures.map((fixture) => fixture.id);
-	const leagueIds = [...new Set(fixturePage.fixtures.map((fixture) => fixture.leagueId))];
-	const [snapshots, leagueStats, storedOdds] = await Promise.all([
+	const [snapshots, storedOdds] = await Promise.all([
 		getFixtureStatsSnapshots(fixtureIds),
-		getLeagueStats(leagueIds),
 		getFixtureCardOdds(fixtureIds)
 	]);
 	const snapshotByFixtureId = new Map(snapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
-	const leagueStatsByLeagueId = new Map(leagueStats.map((stats) => [stats.league.id, stats]));
 	const storedOddsByFixtureId = new Map(storedOdds.map((odds) => [odds.fixtureId, odds]));
 	const teamFilterVariation = teamFilterVariations.find((strategy) => strategy.id === selectedStrategyId);
 
@@ -63,12 +57,6 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		const referenceOdd = getOver2_5ReferenceOdd(fixture.odds?.odds ?? []);
 		if (minimumOdds > 0 && (referenceOdd === null || referenceOdd < minimumOdds)) return false;
 
-		if (selectedStrategyId === 'bothTeamsAboveLeagueAverage') {
-			return matchesOver2_5LeagueAverageStrategy(
-				snapshot,
-				leagueStatsByLeagueId.get(fixture.leagueId)?.over2_5.percentage ?? null
-			);
-		}
 		return teamFilterVariation ? matchesTeamFilterVariation(snapshot, teamFilterVariation) : false;
 	});
 

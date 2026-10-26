@@ -4,14 +4,7 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let selectedStrategyId = $state('bothTeamsAboveLeagueAverage');
-	let selectedStrategy = $derived(data.strategies.find((strategy) => strategy.id === selectedStrategyId));
-	let showTeamFilterExplorer = $derived(selectedStrategyId === 'teamFilterExplorer');
 	let isWeekLoading = $derived(navigating.to?.url.pathname === '/strategies');
-
-	$effect(() => {
-		if (data.selectedWeek !== 'all') selectedStrategyId = 'teamFilterExplorer';
-	});
 
 	function formatPercentage(value: number) {
 		return `${value.toFixed(1)}%`;
@@ -53,37 +46,7 @@
 			</p>
 		</header>
 
-		<div class="mb-4 flex gap-1 overflow-x-auto rounded-xl border border-slate-200 bg-white p-1 shadow-sm sm:mb-6" role="tablist" aria-label="Betting strategies">
-			{#each data.strategies as strategy (strategy.id)}
-				<button
-					type="button"
-					role="tab"
-					aria-selected={selectedStrategyId === strategy.id}
-					class="shrink-0 rounded-lg px-3 py-2 text-left text-xs font-medium transition sm:text-sm"
-					class:bg-slate-950={selectedStrategyId === strategy.id}
-					class:text-white={selectedStrategyId === strategy.id}
-					class:text-slate-600={selectedStrategyId !== strategy.id}
-					onclick={() => (selectedStrategyId = strategy.id)}
-				>
-					{strategy.title}
-				</button>
-			{/each}
-			<button
-				type="button"
-				role="tab"
-				aria-selected={showTeamFilterExplorer}
-				class="shrink-0 rounded-lg px-3 py-2 text-left text-xs font-medium transition sm:text-sm"
-				class:bg-slate-950={showTeamFilterExplorer}
-				class:text-white={showTeamFilterExplorer}
-				class:text-slate-600={!showTeamFilterExplorer}
-				onclick={() => (selectedStrategyId = 'teamFilterExplorer')}
-			>
-				Over 2.5 strategy explorer
-			</button>
-		</div>
-
-		{#if showTeamFilterExplorer}
-			<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+		<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
 				<div class="flex flex-wrap items-end justify-between gap-3">
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Over 2.5 strategy explorer</p>
@@ -125,22 +88,6 @@
 						</table>
 					</div>
 				{/if}
-			</section>
-		{:else if selectedStrategy}
-			{@const strategy = selectedStrategy}
-			<div role="tabpanel">
-				<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-					<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Strategy</p>
-					<h2 class="mt-1 text-base font-semibold text-slate-950">{strategy.title}</h2>
-					<p class="mt-1 text-xs leading-5 text-slate-600">{strategy.description} Reference odds must be at least {data.minimumOver2_5ReferenceOdd.toFixed(2)}.</p>
-					<div class="mt-4 grid grid-cols-2 divide-x divide-y divide-slate-200 rounded-lg border border-slate-200 bg-slate-50 text-center sm:grid-cols-4 sm:divide-y-0">
-						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Bets</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{strategy.performance.bets}</p></div>
-						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Wins / losses</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{strategy.performance.wins} / {strategy.performance.losses}</p></div>
-						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">Profit / loss</p><p class="mt-1 text-sm font-semibold tabular-nums" class:text-emerald-700={strategy.performance.profit > 0} class:text-rose-700={strategy.performance.profit < 0} class:text-slate-900={strategy.performance.profit === 0}>{formatCurrency(strategy.performance.profit)}</p></div>
-						<div class="px-2 py-2"><p class="text-[9px] font-bold uppercase tracking-wide text-slate-500">ROI</p><p class="mt-1 text-sm font-semibold tabular-nums text-slate-900">{strategy.performance.returnOnInvestment === null ? '—' : formatPercentage(strategy.performance.returnOnInvestment)}</p></div>
-					</div>
-				</section>
-			</div>
-		{/if}
+		</section>
 	</div>
 </main>

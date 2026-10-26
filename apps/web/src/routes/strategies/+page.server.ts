@@ -1,5 +1,5 @@
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
-import { strategyDetails, teamFilterVariations } from '@black-diamond/core/strategies';
+import { teamFilterVariations } from '@black-diamond/core/strategies';
 import { getStrategyPerformances } from '@black-diamond/database/strategyPerformances';
 
 const minimumOver2_5ReferenceOdd = 1.7;
@@ -68,7 +68,6 @@ export async function load({ url }: { url: URL }) {
 					right.profit - left.profit ||
 					(right.returnOnInvestment ?? Number.NEGATIVE_INFINITY) -
 						(left.returnOnInvestment ?? Number.NEGATIVE_INFINITY)
-			),
-		strategies: strategyDetails.map((strategy) => ({ ...strategy, performance: performance(strategy.id) }))
+			)
 	};
 }

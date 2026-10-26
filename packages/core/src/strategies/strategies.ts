@@ -1,20 +1,3 @@
-export type StrategyId = "bothTeamsAboveLeagueAverage";
-
-export type StrategyDetails = {
-  id: StrategyId;
-  title: string;
-  description: string;
-};
-
-export const strategyDetails: StrategyDetails[] = [
-  {
-    id: "bothTeamsAboveLeagueAverage",
-    title: "Over 2.5 goals · both teams above league average",
-    description:
-      "Both teams’ season Over 2.5 rate must be higher than their league’s current season rate.",
-  },
-];
-
 export type TeamFilterVariation = {
   id: string;
   title: string;
