@@ -16,7 +16,7 @@ export async function syncFixtureLineups(fixtureIds: number[]): Promise<number> 
         teamId: lineup.team.id,
         formation: lineup.formation,
         coach: lineup.coach ? { name: lineup.coach.name } : null,
-        startXI: lineup.startXI.map(({ player }) => ({
+        startXI: (lineup.startXI ?? []).map(({ player }) => ({
           id: player.id,
           name: player.name,
           number: player.number,

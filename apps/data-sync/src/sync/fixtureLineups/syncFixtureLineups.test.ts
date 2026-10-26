@@ -36,4 +36,16 @@ describe("syncFixtureLineups", () => {
       }],
     }));
   });
+
+  it("stores an empty starting XI when the provider has not announced it yet", async () => {
+    mocks.get.mockResolvedValue({
+      response: [{ team: { id: 1 }, formation: null, coach: null }],
+    });
+
+    await syncFixtureLineups([100]);
+
+    expect(mocks.upsertFixtureLineups).toHaveBeenCalledWith(expect.objectContaining({
+      lineups: [expect.objectContaining({ teamId: 1, startXI: [] })],
+    }));
+  });
 });

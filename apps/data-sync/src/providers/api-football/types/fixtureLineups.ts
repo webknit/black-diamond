@@ -3,7 +3,7 @@ export type ApiFootballFixtureLineupsResponse = {
     team: { id: number };
     formation: string | null;
     coach: { name: string } | null;
-    startXI: Array<{
+    startXI?: Array<{
       player: {
         id: number;
         name: string;
