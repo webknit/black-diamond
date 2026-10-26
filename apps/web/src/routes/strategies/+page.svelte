@@ -88,7 +88,7 @@
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Over 2.5 strategy explorer</p>
 						<h2 class="mt-1 text-base font-semibold text-slate-950">Scoring and defensive filters</h2>
-						<p class="mt-1 text-xs leading-5 text-slate-600">All 31 variations use flat £1 stakes and stored pre-match Over 2.5 odds of {data.minimumOver2_5ReferenceOdd.toFixed(2)} or more. Rows are ranked by profit.</p>
+						<p class="mt-1 text-xs leading-5 text-slate-600">All 30 last-five venue variations use flat £1 stakes and stored pre-match Over 2.5 odds of {data.minimumOver2_5ReferenceOdd.toFixed(2)} or more. The smaller figures show the equivalent season-wide filter. Rows are ranked by last-five profit.</p>
 					</div>
 					<div>
 						<label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500" for="strategy-week">Historical week</label>
@@ -109,16 +109,16 @@
 					<div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
 						<table class="w-full min-w-[760px] text-left text-xs">
 						<thead class="border-b border-slate-200 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500">
-							<tr><th class="px-3 py-2">Variation</th><th class="px-3 py-2 text-right">Bets</th><th class="px-3 py-2 text-right">W / L</th><th class="px-3 py-2 text-right">P / L</th><th class="px-3 py-2 text-right">ROI</th></tr>
+							<tr><th class="px-3 py-2">Last-five variation</th><th class="px-3 py-2 text-right">Bets</th><th class="px-3 py-2 text-right">W / L</th><th class="px-3 py-2 text-right">P / L</th><th class="px-3 py-2 text-right">ROI</th></tr>
 						</thead>
 						<tbody class="divide-y divide-slate-100">
 							{#each data.teamFilterResults as result (result.id)}
 								<tr class="text-slate-700">
 									<td class="px-3 py-2"><p class="font-medium text-slate-950">{result.title}</p><p class="mt-0.5 text-[11px] text-slate-500">{result.description}</p></td>
-									<td class="px-3 py-2 text-right tabular-nums">{result.bets}</td>
-									<td class="px-3 py-2 text-right tabular-nums">{result.wins} / {result.losses}</td>
-									<td class="px-3 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={result.profit > 0} class:text-rose-700={result.profit < 0}>{formatCurrency(result.profit)}</td>
-									<td class="px-3 py-2 text-right tabular-nums">{result.returnOnInvestment === null ? '—' : formatPercentage(result.returnOnInvestment)}</td>
+									<td class="px-3 py-2 text-right tabular-nums"><p>{result.bets}</p><p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.bets}</p></td>
+									<td class="px-3 py-2 text-right tabular-nums"><p>{result.wins} / {result.losses}</p><p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.wins} / {result.seasonPerformance.losses}</p></td>
+									<td class="px-3 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={result.profit > 0} class:text-rose-700={result.profit < 0}><p>{formatCurrency(result.profit)}</p><p class="mt-0.5 text-[10px] font-medium text-slate-400">Season: {formatCurrency(result.seasonPerformance.profit)}</p></td>
+									<td class="px-3 py-2 text-right tabular-nums"><p>{result.returnOnInvestment === null ? '—' : formatPercentage(result.returnOnInvestment)}</p><p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.returnOnInvestment === null ? '—' : formatPercentage(result.seasonPerformance.returnOnInvestment)}</p></td>
 								</tr>
 							{/each}
 						</tbody>

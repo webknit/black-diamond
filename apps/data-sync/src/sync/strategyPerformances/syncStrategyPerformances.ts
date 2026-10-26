@@ -11,7 +11,6 @@ import {
   getOver2_5ReferenceOdd,
   matchesOver2_5LeagueAverageStrategy,
   matchesTeamFilterVariation,
-  matchesVenueScoringStrategy,
   strategyDetails,
   teamFilterVariations,
 } from "@black-diamond/core/strategies";
@@ -116,7 +115,6 @@ async function createStrategyPerformances(
     };
 
     record(strategyDetails[0].id, matchesOver2_5LeagueAverageStrategy(snapshot, leagueOver2_5Percentage));
-    record(strategyDetails[1].id, matchesVenueScoringStrategy(snapshot));
     for (const variation of teamFilterVariations) {
       record(variation.id, matchesTeamFilterVariation(snapshot, variation));
     }

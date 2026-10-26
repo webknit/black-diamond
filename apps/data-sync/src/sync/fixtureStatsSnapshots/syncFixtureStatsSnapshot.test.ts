@@ -53,6 +53,7 @@ describe("syncFixtureStatsSnapshot", () => {
           formAway: "D",
           cleanSheets: { home: 1, away: 0, total: 1 },
           failedToScore: { home: 0, away: 0, total: 0 },
+          last5Venue: expect.objectContaining({ played: 1, goalsFor: 2, goalsAgainst: 0 }),
           summary: expect.objectContaining({ wins: { count: 1, percentage: 50 } }),
           last5: expect.objectContaining({
             played: 2,

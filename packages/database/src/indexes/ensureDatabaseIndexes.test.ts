@@ -12,7 +12,7 @@ vi.mock("../mongodb.js", () => ({ getDatabase: mocks.getDatabase }));
 import { ensureDatabaseIndexes } from "./ensureDatabaseIndexes.js";
 
 describe("ensureDatabaseIndexes", () => {
-  it("creates the fixture analysis and round snapshot indexes", async () => {
+  it("creates the fixture, strategy performance, and round snapshot indexes", async () => {
     mocks.getDatabase.mockResolvedValue({ collection: mocks.collection });
     mocks.collection.mockReturnValue({ createIndex: mocks.createIndex, dropIndex: mocks.dropIndex });
 
@@ -41,8 +41,8 @@ describe("ensureDatabaseIndexes", () => {
       { name: "unique_league_season_round", unique: true },
     );
     expect(mocks.createIndex).toHaveBeenCalledWith(
-      { fixtureId: 1, strategyId: 1, strategyVersion: 1 },
-      { name: "unique_fixture_strategy_version", unique: true },
+      { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
+      { name: "unique_strategy_league_season", unique: true },
     );
   });
 });

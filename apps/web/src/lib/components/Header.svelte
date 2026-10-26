@@ -33,13 +33,13 @@
 		<a class="text-xl font-semibold tracking-tight text-slate-950" href="/">♦ Black Diamond</a>
 
 		<nav class="mt-4 flex items-center gap-5" aria-label="Main navigation">
-			{#if page.url.pathname === '/analysis'}
+			{#if page.url.pathname === '/botd'}
 				<span aria-current="page" class="inline-flex items-center text-xs font-bold leading-none text-slate-950">
-					Analysis
+					BOTD
 				</span>
 			{:else}
-				<a class="inline-flex items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950" href="/analysis">
-					Analysis
+				<a class="inline-flex items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950" href="/botd">
+					BOTD
 				</a>
 			{/if}
 			{#if page.url.pathname === '/strategies'}

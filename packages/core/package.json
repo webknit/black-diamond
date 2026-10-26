@@ -43,9 +43,6 @@
     "./bet": {
       "types": "./src/types/bet.ts"
     },
-    "./strategyResult": {
-      "types": "./src/types/strategyResult.ts"
-    },
     "./strategyPerformance": {
       "types": "./src/types/strategyPerformance.ts"
     },

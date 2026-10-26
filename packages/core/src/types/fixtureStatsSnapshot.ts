@@ -22,6 +22,9 @@ export type FixtureStatsSnapshotTeam = {
   formHome: string;
   formAway: string;
   fixtures: { home: FixtureStatsRecord; away: FixtureStatsRecord; total: FixtureStatsRecord };
+  // For a home team this is its last five home matches; for an away team, its
+  // last five away matches. It keeps recent-form strategy filters venue-specific.
+  last5Venue: FixtureStatsRecord;
   cleanSheets: { home: number; away: number; total: number };
   failedToScore: { home: number; away: number; total: number };
   summary: FixtureStatsGoalSummary;

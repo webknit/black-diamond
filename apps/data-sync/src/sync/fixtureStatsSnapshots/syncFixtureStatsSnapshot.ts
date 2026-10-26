@@ -53,7 +53,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
       )
       .map(([teamId], index) => [teamId, index + 1]),
   );
-  const build = (team: typeof fixture.teams.home) => {
+  const build = (team: typeof fixture.teams.home, venue: "home" | "away") => {
     const all = prior.filter(
       (item) =>
         item.teams.home.id === team.id || item.teams.away.id === team.id,
@@ -149,6 +149,11 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
           .sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
           .slice(-5),
       );
+    const last5Venue = record(
+      [...(venue === "home" ? home : away)]
+        .sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
+        .slice(-5),
+    );
     return {
       team: { id: team.id, name: team.name, logo: team.logo },
       leaguePosition: leaguePositions.get(team.id) ?? null,
@@ -158,6 +163,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
       formHome: form(home),
       formAway: form(away),
       fixtures: { home: h, away: a, total },
+      last5Venue,
       cleanSheets: { home: h.cs, away: a.cs, total: total.cs },
       failedToScore: { home: h.fts, away: a.fts, total: total.fts },
       summary: total.summary,
@@ -168,7 +174,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
     fixtureId: fixture.fixture.id,
     fixtureDateAtSnapshot: fixture.fixture.date,
     snapshotCapturedAt: new Date().toISOString(),
-    home: build(fixture.teams.home),
-    away: build(fixture.teams.away),
+    home: build(fixture.teams.home, "home"),
+    away: build(fixture.teams.away, "away"),
   });
 }

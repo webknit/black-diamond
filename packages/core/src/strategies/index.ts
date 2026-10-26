@@ -9,7 +9,9 @@ export {
 } from "./strategies.js";
 import type { TeamFilterVariation } from "./strategies.js";
 
-export function getOver2_5ReferenceOdd(odds: FixtureOdds["odds"]): number | null {
+type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
+
+export function getOver2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
   const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
   const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "over 2.5")?.odd);
   return Number.isFinite(odd) && odd > 1 ? odd : null;
@@ -30,8 +32,9 @@ function isExcluded(values: Array<number | null>, threshold: number, mode: TeamF
   return mode === "eitherTeam" ? below.some(Boolean) : below.every(Boolean);
 }
 export function matchesTeamFilterVariation(snapshot: FixtureStatsSnapshot, variation: TeamFilterVariation) {
-  const home = snapshot.home.fixtures.home;
-  const away = snapshot.away.fixtures.away;
+  const home = variation.sample === "last5" ? snapshot.home.last5Venue : snapshot.home.fixtures.home;
+  const away = variation.sample === "last5" ? snapshot.away.last5Venue : snapshot.away.fixtures.away;
+  if (!home || !away) return false;
   const scoring = [average(home.goalsFor, home.played), average(away.goalsFor, away.played)];
   const defensive = [average(home.goalsAgainst, home.played), average(away.goalsAgainst, away.played)];
   return !((variation.scoringThreshold !== undefined && isExcluded(scoring, variation.scoringThreshold, variation.exclusionMode)) || (variation.defensiveThreshold !== undefined && isExcluded(defensive, variation.defensiveThreshold, variation.exclusionMode)));

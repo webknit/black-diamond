@@ -1,6 +1,4 @@
-export type StrategyId =
-  | "bothTeamsAboveLeagueAverage"
-  | "neitherTeamLowScoring";
+export type StrategyId = "bothTeamsAboveLeagueAverage";
 
 export type StrategyDetails = {
   id: StrategyId;
@@ -15,12 +13,6 @@ export const strategyDetails: StrategyDetails[] = [
     description:
       "Both teams’ season Over 2.5 rate must be higher than their league’s current season rate.",
   },
-  {
-    id: "neitherTeamLowScoring",
-    title: "Over 2.5 goals · neither team low scoring",
-    description:
-      "Home team must average at least 1.5 goals scored at home, and away team at least 1.5 goals scored away, using pre-match stats.",
-  },
 ];
 
 export type TeamFilterVariation = {
@@ -30,6 +22,7 @@ export type TeamFilterVariation = {
   scoringThreshold?: number;
   defensiveThreshold?: number;
   exclusionMode: "eitherTeam" | "bothTeams";
+  sample: "last5" | "season";
 };
 
 function modeLabel(mode: TeamFilterVariation["exclusionMode"]) {
@@ -40,6 +33,7 @@ function createVariation(
   scoringThreshold: number | undefined,
   defensiveThreshold: number | undefined,
   exclusionMode: TeamFilterVariation["exclusionMode"],
+  sample: TeamFilterVariation["sample"],
 ): TeamFilterVariation {
   const filterId = [
     scoringThreshold === undefined ? null : `score${scoringThreshold}`,
@@ -50,13 +44,15 @@ function createVariation(
     defensiveThreshold === undefined ? null : `${modeLabel(exclusionMode)}: concede >= ${defensiveThreshold}`,
   ].filter((filter): filter is string => filter !== null);
 
+  const sampleLabel = sample === "last5" ? "last 5 venue matches" : "season venue matches";
   return {
-    id: `${filterId}-${exclusionMode}`,
-    title: requirements.join(" · "),
-    description: `Relevant venue averages must meet: ${requirements.join("; ")}.`,
+    id: `${filterId}-${exclusionMode}-${sample}`,
+    title: sample === "last5" ? requirements.join(" · ") : `${requirements.join(" · ")} · season`,
+    description: `${sampleLabel} must meet: ${requirements.join("; ")}.`,
     scoringThreshold,
     defensiveThreshold,
     exclusionMode,
+    sample,
   };
 }
 
@@ -68,21 +64,40 @@ export const teamFilterVariations: TeamFilterVariation[] = [
     title: "Base · no team filters",
     description: "Every fixture with a stored pre-match Over 2.5 price above the odds floor.",
     exclusionMode: "eitherTeam",
+    sample: "season",
   },
+  // Recent form is listed first because it is the primary filter set in BOTD.
   ...thresholds.flatMap((threshold) =>
     (["eitherTeam", "bothTeams"] as const).map((mode) =>
-      createVariation(threshold, undefined, mode),
+      createVariation(threshold, undefined, mode, "last5"),
     ),
   ),
   ...thresholds.flatMap((threshold) =>
     (["eitherTeam", "bothTeams"] as const).map((mode) =>
-      createVariation(undefined, threshold, mode),
+      createVariation(undefined, threshold, mode, "last5"),
     ),
   ),
   ...thresholds.flatMap((scoring) =>
     thresholds.flatMap((defensive) =>
       (["eitherTeam", "bothTeams"] as const).map((mode) =>
-        createVariation(scoring, defensive, mode),
+        createVariation(scoring, defensive, mode, "last5"),
+      ),
+    ),
+  ),
+  ...thresholds.flatMap((threshold) =>
+    (["eitherTeam", "bothTeams"] as const).map((mode) =>
+      createVariation(threshold, undefined, mode, "season"),
+    ),
+  ),
+  ...thresholds.flatMap((threshold) =>
+    (["eitherTeam", "bothTeams"] as const).map((mode) =>
+      createVariation(undefined, threshold, mode, "season"),
+    ),
+  ),
+  ...thresholds.flatMap((scoring) =>
+    thresholds.flatMap((defensive) =>
+      (["eitherTeam", "bothTeams"] as const).map((mode) =>
+        createVariation(scoring, defensive, mode, "season"),
       ),
     ),
   ),
