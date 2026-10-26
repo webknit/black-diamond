@@ -267,7 +267,7 @@
 		</header>
 
 		<div
-			class={`grid items-start gap-6 ${showTodaysBets ? 'min-[1100px]:grid-cols-[20rem_minmax(0,1fr)]' : ''}`}
+			class={`grid items-start gap-6 ${showTodaysBets ? 'min-[1100px]:grid-cols-[14rem_minmax(0,1fr)]' : ''}`}
 		>
 			{#if showTodaysBets}
 				<aside class="min-[1100px]:order-1 min-[1100px]:sticky min-[1100px]:top-4">

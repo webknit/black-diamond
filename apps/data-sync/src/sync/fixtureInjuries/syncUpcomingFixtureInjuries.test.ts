@@ -41,6 +41,10 @@ describe("syncUpcomingFixtureInjuries", () => {
         fixture: { id: 1 },
         player: { id: 10, name: "A. Player", photo: null, type: "Missing Fixture", reason: "Injured" },
         team: { id: 100, name: "Home", logo: null },
+      }, {
+        fixture: { id: 1 },
+        player: { id: 10, name: "A. Player", photo: null, type: "Missing Fixture", reason: "Injured" },
+        team: { id: 100, name: "Home", logo: null },
       }],
     });
 

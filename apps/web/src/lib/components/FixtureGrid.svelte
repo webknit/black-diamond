@@ -40,7 +40,7 @@
 		{/if}
 	</section>
 {:else}
-	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 min-[1100px]:!grid-cols-3 min-[1536px]:grid-cols-5 2xl:gap-5">
+	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 min-[1300px]:!grid-cols-3 min-[1536px]:grid-cols-5 2xl:gap-5">
 		{#each fixtures as fixture (fixture.id)}
 			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} />
 		{/each}

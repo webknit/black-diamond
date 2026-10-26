@@ -17,9 +17,11 @@ function groupFixtureIds(fixtureIds: number[]): number[][] {
 
 export async function syncUpcomingFixtureInjuries(now = new Date()): Promise<number> {
   const fixtures = await getFixturesBetweenDates(getUtcDateString(now), getUtcDateString(now, daysAhead + 1));
-  const fixtureIds = fixtures
-    .filter((fixture) => fixture.fixture.status.short === "NS" && fixture.fixture.timestamp * 1000 > now.getTime())
-    .map((fixture) => fixture.fixture.id);
+  const fixtureIds = [...new Set(
+    fixtures
+      .filter((fixture) => fixture.fixture.status.short === "NS" && fixture.fixture.timestamp * 1000 > now.getTime())
+      .map((fixture) => fixture.fixture.id),
+  )];
   const apiFootball = getApiFootballClient();
   const injuriesByFixtureId = new Map<number, FixtureInjury[]>(fixtureIds.map((fixtureId) => [fixtureId, []]));
 
@@ -32,7 +34,14 @@ export async function syncUpcomingFixtureInjuries(now = new Date()): Promise<num
       const fixtureInjuries = injuriesByFixtureId.get(injury.fixture.id);
       if (!fixtureInjuries) continue;
 
-      fixtureInjuries.push({ player: injury.player, team: injury.team });
+      const isAlreadyRecorded = fixtureInjuries.some(
+        (existingInjury) =>
+          existingInjury.player.id === injury.player.id && existingInjury.team.id === injury.team.id,
+      );
+
+      if (!isAlreadyRecorded) {
+        fixtureInjuries.push({ player: injury.player, team: injury.team });
+      }
     }
   }
 

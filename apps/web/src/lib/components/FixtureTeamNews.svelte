@@ -16,10 +16,20 @@
 	let isOpen = $state(false);
 
 	const reportedInjuries = $derived(injuries ?? []);
-	const homeInjuries = $derived(reportedInjuries.filter((injury) => injury.team.id === homeTeam.id));
-	const awayInjuries = $derived(reportedInjuries.filter((injury) => injury.team.id === awayTeam.id));
+	const uniqueInjuries = $derived(
+		reportedInjuries.filter(
+			(injury, index) =>
+				reportedInjuries.findIndex(
+					(candidate) =>
+						candidate.team.id === injury.team.id && candidate.player.id === injury.player.id
+				) === index
+		)
+	);
+	const homeInjuries = $derived(uniqueInjuries.filter((injury) => injury.team.id === homeTeam.id));
+	const awayInjuries = $derived(uniqueInjuries.filter((injury) => injury.team.id === awayTeam.id));
 	const homeLineup = $derived(lineups?.find((lineup) => lineup.teamId === homeTeam.id) ?? null);
 	const awayLineup = $derived(lineups?.find((lineup) => lineup.teamId === awayTeam.id) ?? null);
+	const hasAnnouncedLineup = $derived(lineups?.some((lineup) => lineup.startXI.length > 0) ?? false);
 
 	function injuryDescription(injury: FixtureInjury) {
 		return injury.player.reason ?? injury.player.type;
@@ -34,7 +44,7 @@
 			onclick={() => (isOpen = true)}
 		>
 			<span>Team news</span>
-			{#if reportedInjuries.length > 0}<span>· {reportedInjuries.length} absent</span>{/if}
+			{#if uniqueInjuries.length > 0 && !hasAnnouncedLineup}<span>· 🏥 {uniqueInjuries.length}</span>{/if}
 		</button>
 	</div>
 {/if}
@@ -83,7 +93,7 @@
 								<p class="mt-1 text-[10px] text-slate-400">None reported</p>
 							{:else}
 								<ul class="mt-2 space-y-1.5">
-									{#each side.injuries as injury (injury.player.id)}
+									{#each side.injuries as injury (`${injury.team.id}-${injury.player.id}`)}
 										<li class="rounded-md bg-amber-50 px-2 py-1.5">
 											<p class="break-words text-[11px] font-semibold text-slate-900">{injury.player.name}</p>
 											<p class="mt-0.5 break-words text-[10px] text-slate-500">{injuryDescription(injury)}</p>
