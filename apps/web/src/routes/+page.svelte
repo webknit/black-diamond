@@ -236,10 +236,7 @@
 	<div class="mx-auto max-w-[1800px] px-4 py-6 sm:px-6 sm:py-8">
 		<header class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
 			<div class="min-w-0">
-				<p class="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700">
-					Black Diamond · Matchday
-				</p>
-				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
+				<h1 class="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
 					Fixtures <span class="text-slate-500">({data.totalFixtureCount})</span>
 				</h1>
 				<p class="mt-1 mb-3 text-sm text-slate-600">{data.today} · All times UK</p>
