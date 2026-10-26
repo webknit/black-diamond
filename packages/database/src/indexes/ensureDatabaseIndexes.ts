@@ -72,6 +72,18 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   await database.collection("fixtureStatsSnapshots").createIndex(
     { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
   );
+  await database.collection("strategyResults").createIndex(
+    { fixtureId: 1, strategyId: 1, strategyVersion: 1 },
+    { name: "unique_fixture_strategy_version", unique: true },
+  );
+  await database.collection("strategyPerformances").createIndex(
+    { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
+    { name: "unique_strategy_league_season", unique: true },
+  );
+  await database.collection("strategyResults").createIndex(
+    { strategyVersion: 1, eligible: 1, fixtureTimestamp: 1, strategyId: 1 },
+    { name: "strategy_version_eligibility_timestamp" },
+  );
   await database.collection("fullSeasonFixtureSyncStates").createIndex(
     { leagueId: 1, season: 1 },
     { name: "unique_league_season", unique: true },

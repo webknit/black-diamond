@@ -43,6 +43,20 @@
     "./bet": {
       "types": "./src/types/bet.ts"
     },
+    "./strategyResult": {
+      "types": "./src/types/strategyResult.ts"
+    },
+    "./strategyPerformance": {
+      "types": "./src/types/strategyPerformance.ts"
+    },
+    "./strategies": {
+      "types": "./src/strategies/index.ts",
+      "default": "./src/strategies/index.ts"
+    },
+    "./time": {
+      "types": "./src/time/index.ts",
+      "default": "./src/time/index.ts"
+    },
     "./selectedLeagues": {
       "types": "./src/config/selectedLeagues.ts",
       "default": "./src/config/selectedLeagues.ts"

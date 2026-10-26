@@ -4,6 +4,7 @@ const mocks = vi.hoisted(() => ({
   backfillFixtureOdds: vi.fn(),
   logSyncStep: vi.fn(),
   runFixtureStatsSnapshotBackfill: vi.fn(),
+  syncStrategyPerformances: vi.fn(),
 }));
 
 vi.mock("../sync/fixtureOdds/backfillFixtureOdds.js", () => ({
@@ -13,19 +14,26 @@ vi.mock("../utils/logging/logSyncStep.js", () => ({ logSyncStep: mocks.logSyncSt
 vi.mock("./backfillFixtureStatsSnapshots.js", () => ({
   runFixtureStatsSnapshotBackfill: mocks.runFixtureStatsSnapshotBackfill,
 }));
+vi.mock("../sync/strategyPerformances/syncStrategyPerformances.js", () => ({
+  syncStrategyPerformances: mocks.syncStrategyPerformances,
+}));
 
 import { runBackfill } from "./backfill.js";
 
 describe("backfill run", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("rebuilds season snapshots before filling recent missing pre-match odds", async () => {
+  it("rebuilds snapshots and odds before backfilling strategy performances", async () => {
     await runBackfill();
 
     expect(mocks.runFixtureStatsSnapshotBackfill).toHaveBeenCalledBefore(mocks.logSyncStep);
     expect(mocks.logSyncStep).toHaveBeenCalledWith(
       "backfill recent missing pre-match odds",
       mocks.backfillFixtureOdds,
+    );
+    expect(mocks.logSyncStep).toHaveBeenCalledWith(
+      "backfill strategy performances",
+      mocks.syncStrategyPerformances,
     );
   });
 });

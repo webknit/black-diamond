@@ -40,5 +40,9 @@ describe("ensureDatabaseIndexes", () => {
       { "league.id": 1, "league.season": 1, round: 1 },
       { name: "unique_league_season_round", unique: true },
     );
+    expect(mocks.createIndex).toHaveBeenCalledWith(
+      { fixtureId: 1, strategyId: 1, strategyVersion: 1 },
+      { name: "unique_fixture_strategy_version", unique: true },
+    );
   });
 });

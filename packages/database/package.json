@@ -64,6 +64,14 @@
       "types": "./src/fixtureStatsSnapshots/index.ts",
       "default": "./src/fixtureStatsSnapshots/index.ts"
     },
+    "./strategyResults": {
+      "types": "./src/strategyResults/index.ts",
+      "default": "./src/strategyResults/index.ts"
+    },
+    "./strategyPerformances": {
+      "types": "./src/strategyPerformances/index.ts",
+      "default": "./src/strategyPerformances/index.ts"
+    },
     "./leagues": {
       "types": "./src/leagues/index.ts",
       "default": "./src/leagues/index.ts"
