@@ -30,10 +30,9 @@
 	<div class="mt-2 text-center">
 		<button
 			type="button"
-			class="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-slate-600 transition hover:border-sky-300 hover:bg-sky-50 hover:text-slate-900 active:scale-[0.98]"
+			class="cursor-pointer text-[10px] text-slate-500 underline decoration-slate-300 underline-offset-2 transition hover:text-emerald-700 hover:decoration-emerald-500"
 			onclick={() => (isOpen = true)}
 		>
-			<span aria-hidden="true">♟</span>
 			<span>Team news</span>
 			{#if reportedInjuries.length > 0}<span>· {reportedInjuries.length} absent</span>{/if}
 		</button>

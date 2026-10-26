@@ -40,6 +40,14 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { "league.id": 1, "league.season": 1, "fixture.timestamp": 1 },
     { name: "league_season_timestamp" },
   );
+  await database.collection("fixtures").createIndex(
+    { "league.id": 1, "league.season": 1, "teams.home.id": 1, "fixture.status.short": 1, "fixture.timestamp": -1 },
+    { name: "league_season_home_team_form" },
+  );
+  await database.collection("fixtures").createIndex(
+    { "league.id": 1, "league.season": 1, "teams.away.id": 1, "fixture.status.short": 1, "fixture.timestamp": -1 },
+    { name: "league_season_away_team_form" },
+  );
   await database.collection("leagueStandings").createIndex(
     { "league.id": 1, "league.season": 1 },
     { name: "unique_league_season", unique: true },

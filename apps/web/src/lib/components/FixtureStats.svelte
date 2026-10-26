@@ -5,12 +5,14 @@
 		stats,
 		homeTeamId,
 		awayTeamId,
-		onOpenLeagueStandings
+		onOpenLeagueStandings,
+		onOpenTeamForm
 	}: {
 		stats: FixtureStatsData;
 		homeTeamId: number;
 		awayTeamId: number;
 		onOpenLeagueStandings: (teamId: number) => void;
+		onOpenTeamForm: (teamId: number, scope: 'home' | 'away' | 'overall') => void;
 	} = $props();
 
 	function outcomes(form: string) {
@@ -61,11 +63,11 @@
 				{#if panel.team.leaguePosition !== null}
 					<button
 						type="button"
-						class="cursor-pointer text-[10px] text-slate-500 hover:text-emerald-700"
+						class="cursor-pointer text-[10px] text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500"
 						onclick={() => onOpenLeagueStandings(panel.teamId)}
 						aria-label={`Open league table for ${panel.label.toLowerCase()} team`}
 					>
-						<strong class="font-bold text-slate-700">{panel.team.leaguePosition}</strong>/{panel.team.leagueTeams}
+						<span class="text-slate-700">{panel.team.leaguePosition}</span>/{panel.team.leagueTeams}
 						· {panel.team.fixtures.total.played} played
 					</button>
 				{:else}
@@ -74,7 +76,7 @@
 			</div>
 
 			<div class="mt-1 flex items-center gap-2">
-				<span class="w-10 shrink-0 text-[9px] text-slate-500">{panel.label}</span>
+				<button type="button" class="w-10 shrink-0 cursor-pointer text-left text-[9px] text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500" onclick={() => onOpenTeamForm(panel.teamId, panel.label === 'Home' ? 'home' : 'away')}>{panel.label}</button>
 				<div
 					class="flex items-center gap-0.5"
 					aria-label={`Recent ${panel.label.toLowerCase()} form ${panel.form || 'unavailable'}`}
@@ -112,7 +114,7 @@
 			</div>
 
 			<div class="mt-1 flex items-center gap-2">
-				<span class="w-10 shrink-0 text-[9px] text-slate-400">Overall</span>
+				<button type="button" class="w-10 shrink-0 cursor-pointer text-left text-[9px] text-slate-400 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500" onclick={() => onOpenTeamForm(panel.teamId, 'overall')}>Overall</button>
 				<div
 					class="flex items-center gap-0.5"
 					aria-label={`Recent overall form ${panel.overallForm || 'unavailable'}`}

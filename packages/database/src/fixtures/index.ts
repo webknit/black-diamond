@@ -4,6 +4,7 @@ export { getFixtureById } from "./operations/getFixtureById.js";
 export { getFixtureScoresByIds } from "./operations/getFixtureScoresByIds.js";
 export { getFixtureSummariesBetweenDates } from "./operations/getFixtureSummariesBetweenDates.js";
 export { getFixturesBefore } from "./operations/getFixturesBefore.js";
+export { getRecentTeamFixturesBefore } from "./operations/getRecentTeamFixturesBefore.js";
 export { getFixturesAwaitingResult } from "./operations/getFixturesAwaitingResult.js";
 export { getFixturesForLineupSync } from "./operations/getFixturesForLineupSync.js";
 export { getRecentlyFinishedFixtures } from "./operations/getRecentlyFinishedFixtures.js";

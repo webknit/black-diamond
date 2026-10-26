@@ -180,6 +180,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 				market: selection.market.selection
 			}];
 		});
+		selections.sort((left, right) => left.timestamp - right.timestamp);
 		return selections.length > 0
 			? [{
 					id: bet.id,
@@ -191,7 +192,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 					selections
 				}]
 			: [];
-	});
+	}).sort(
+		(left, right) =>
+			left.selections[0].timestamp - right.selections[0].timestamp ||
+			left.id.localeCompare(right.id)
+	);
 
 	return {
 		date: selectedDate,

@@ -3,6 +3,7 @@
 	import FixtureStats from './FixtureStats.svelte';
 	import FixtureEvents from './FixtureEvents.svelte';
 	import FixtureTeamNews from './FixtureTeamNews.svelte';
+	import FixtureFormModal from './FixtureFormModal.svelte';
 	import LeagueStandingsModal from './LeagueStandingsModal.svelte';
 	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
@@ -20,9 +21,18 @@
 	const liveStatuses = new Set(['1H', '2H', 'ET', 'P', 'LIVE', 'HT', 'BT']);
 	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
 	let leagueStandingsOpen = $state(false);
+	let formSelection = $state<{ teamId: number; teamName: string; scope: 'home' | 'away' | 'overall' } | null>(null);
 
 	function openLeagueStandings() {
 		leagueStandingsOpen = true;
+	}
+
+	function openTeamForm(teamId: number, scope: 'home' | 'away' | 'overall') {
+		formSelection = {
+			teamId,
+			teamName: teamId === fixture.homeTeamId ? fixture.homeTeamName : fixture.awayTeamName,
+			scope
+		};
 	}
 
 	function formatKickoff(timestamp: number) {
@@ -163,6 +173,7 @@
 					homeTeamId={fixture.homeTeamId}
 					awayTeamId={fixture.awayTeamId}
 					onOpenLeagueStandings={openLeagueStandings}
+					onOpenTeamForm={openTeamForm}
 				/>
 			{:else}
 				<p class="text-center text-[10px] text-slate-500">
@@ -195,4 +206,13 @@
 		highlightedTeamIds={[fixture.homeTeamId, fixture.awayTeamId]}
 		bind:isOpen={leagueStandingsOpen}
 	/>
+	{#if formSelection}
+		<FixtureFormModal
+			fixtureId={fixture.id}
+			teamId={formSelection.teamId}
+			teamName={formSelection.teamName}
+			scope={formSelection.scope}
+			onClose={() => (formSelection = null)}
+		/>
+	{/if}
 </article>
