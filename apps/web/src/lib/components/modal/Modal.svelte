@@ -15,6 +15,10 @@
 
 	let dialogElement = $state<HTMLDialogElement>();
 
+	function portal(node: HTMLElement) {
+		document.body.append(node);
+	}
+
 	function notifyClosed() {
 		isOpen = false;
 		onClose?.();
@@ -25,20 +29,13 @@
 		else notifyClosed();
 	}
 
-	function closeOnBackdrop(event: MouseEvent) {
-		if (event.target === dialogElement) close();
-	}
-
 	function openDialog() {
 		if (!isOpen || !dialogElement || dialogElement.open || !dialogElement.isConnected) return;
+		dialogElement.showModal();
+	}
 
-		try {
-			dialogElement.showModal();
-		} catch {
-			// A browser can reject a top-layer transition during a rapid tap. Keeping
-			// the attribute as a fallback still renders the dialog rather than losing it.
-			dialogElement.setAttribute('open', '');
-		}
+	function closeOnBackdrop(event: MouseEvent) {
+		if (event.target === dialogElement) close();
 	}
 
 	onMount(openDialog);
@@ -60,9 +57,10 @@
 {#if isOpen}
 	<dialog
 		bind:this={dialogElement}
+		use:portal
 		aria-label={label}
 		onclose={notifyClosed}
-		oncancel={close}
+		oncancel={(event) => { event.preventDefault(); close(); }}
 		onclick={closeOnBackdrop}
 		class="fixed left-1/2 top-1/2 z-50 m-0 flex max-h-[80dvh] w-[calc(100dvw-1rem)] max-w-[calc(100dvw-1rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl backdrop:bg-slate-950/30 sm:max-w-2xl sm:p-4"
 	>
