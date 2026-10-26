@@ -55,8 +55,8 @@
 
 {#if isOpen}
 	<div class="fixed inset-0 z-40 bg-slate-950/30" role="presentation" onclick={() => (isOpen = false)}></div>
-	<dialog open class="fixed inset-x-3 top-1/2 z-50 mx-auto max-h-[75vh] max-w-lg -translate-y-1/2 overflow-y-auto rounded-xl border-0 bg-white p-4 shadow-2xl sm:w-[28rem]" aria-label="Match events">
-		<header class="border-b border-slate-100 pb-3">
+	<dialog open class="fixed inset-x-2 top-2 bottom-2 z-50 mx-auto flex max-w-lg flex-col overflow-hidden rounded-xl border-0 bg-white p-3 shadow-2xl sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:max-h-[75vh] sm:w-[28rem] sm:-translate-y-1/2 sm:p-4" aria-label="Match events">
+		<header class="shrink-0 border-b border-slate-100 pb-2 sm:pb-3">
 			<div class="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3 text-center">
 				<div class="min-w-0">
 					<img class="mx-auto size-9 object-contain" src={homeTeam.logo} alt="" />
@@ -78,14 +78,14 @@
 			<button type="button" class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close match events" onclick={() => (isOpen = false)}>✕</button>
 			</div>
 		</header>
-		<ol class="mt-3 divide-y divide-slate-100">
+		<ol class="mt-2 min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto sm:mt-3">
 			{#each events as event, index (`${event.time.elapsed}-${event.type}-${event.player.id}-${index}`)}
 				<li class="grid grid-cols-[minmax(0,1fr)_3.5rem_minmax(0,1fr)] items-center gap-2 py-2 text-xs">
 					<div class="min-w-0 text-left">
 						{#if event.team.id === homeTeam.id}
 							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail}</p>
 							{#if event.assist.name}
-								<p class="mt-0.5 whitespace-nowrap text-[10px] text-slate-500">Assist: {event.assist.name}</p>
+								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
 							{/if}
 						{/if}
 					</div>
@@ -97,7 +97,7 @@
 						{#if event.team.id === awayTeam.id}
 							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail}</p>
 							{#if event.assist.name}
-								<p class="mt-0.5 whitespace-nowrap text-[10px] text-slate-500">Assist: {event.assist.name}</p>
+								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
 							{/if}
 						{/if}
 					</div>

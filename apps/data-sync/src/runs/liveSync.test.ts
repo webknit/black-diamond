@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 	  syncFixturesInProgress: vi.fn(),
 	  syncFixtureEvents: vi.fn(),
 	  syncBetResults: vi.fn(),
+	  getRecentlyFinishedFixtures: vi.fn(),
+	  getFixtureEventsForFixtures: vi.fn(),
 }));
 
 vi.mock("../sync/fixtures/syncFixturesInProgress.js", () => ({
@@ -13,6 +15,8 @@ vi.mock("../sync/fixtureEvents/syncFixtureEvents.js", () => ({
   syncFixtureEvents: mocks.syncFixtureEvents,
 }));
 vi.mock("../sync/bets/syncBetResults.js", () => ({ syncBetResults: mocks.syncBetResults }));
+vi.mock("@black-diamond/database/fixtures", () => ({ getRecentlyFinishedFixtures: mocks.getRecentlyFinishedFixtures }));
+vi.mock("@black-diamond/database/fixtureEvents", () => ({ getFixtureEventsForFixtures: mocks.getFixtureEventsForFixtures }));
 
 import { runLiveSync } from "./liveSync.js";
 
@@ -21,6 +25,8 @@ describe("live sync run", () => {
 
   it("refreshes fixtures that are in progress", async () => {
 		mocks.syncFixturesInProgress.mockResolvedValue([{ fixture: { id: 10 } }]);
+		mocks.getRecentlyFinishedFixtures.mockResolvedValue([]);
+		mocks.getFixtureEventsForFixtures.mockResolvedValue([]);
     await runLiveSync();
 
     expect(mocks.syncFixturesInProgress).toHaveBeenCalledOnce();
