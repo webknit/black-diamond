@@ -64,6 +64,14 @@
       "types": "./src/fixtureStatistics/index.ts",
       "default": "./src/fixtureStatistics/index.ts"
     },
+    "./fixtureInjuries": {
+      "types": "./src/fixtureInjuries/index.ts",
+      "default": "./src/fixtureInjuries/index.ts"
+    },
+    "./fixtureLineups": {
+      "types": "./src/fixtureLineups/index.ts",
+      "default": "./src/fixtureLineups/index.ts"
+    },
     "./fixtureStatsSnapshots": {
       "types": "./src/fixtureStatsSnapshots/index.ts",
       "default": "./src/fixtureStatsSnapshots/index.ts"

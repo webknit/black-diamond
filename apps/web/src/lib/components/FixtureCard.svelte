@@ -2,6 +2,7 @@
 	import FixtureOdds from './FixtureOdds.svelte';
 	import FixtureStats from './FixtureStats.svelte';
 	import FixtureEvents from './FixtureEvents.svelte';
+	import FixtureTeamNews from './FixtureTeamNews.svelte';
 	import LeagueStandingsModal from './LeagueStandingsModal.svelte';
 	import type { FixtureCardData, FixtureOddSelection } from '../types/fixtureCard';
 
@@ -118,6 +119,12 @@
 					homeGoals={fixture.homeGoals}
 					awayGoals={fixture.awayGoals}
 					status={formatStatus()}
+				/>
+				<FixtureTeamNews
+					injuries={fixture.injuries}
+					lineups={fixture.lineups}
+					homeTeam={{ id: fixture.homeTeamId, name: fixture.homeTeamName }}
+					awayTeam={{ id: fixture.awayTeamId, name: fixture.awayTeamName }}
 				/>
 			</div>
 

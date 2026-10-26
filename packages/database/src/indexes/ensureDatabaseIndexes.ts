@@ -72,6 +72,12 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   await database.collection("fixtureStatistics").createIndex(
     { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
   );
+  await database.collection("fixtureInjuries").createIndex(
+    { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
+  );
+  await database.collection("fixtureLineups").createIndex(
+    { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
+  );
   await database.collection("fixtureStatsSnapshots").createIndex(
     { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
   );

@@ -6,6 +6,8 @@ import { getFixtureCardOdds, getFixtureOddsForFixtures } from '@black-diamond/da
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
 import { getFixtureStatisticsForFixtures } from '@black-diamond/database/fixtureStatistics';
+import { getFixtureInjuriesForFixtures } from '@black-diamond/database/fixtureInjuries';
+import { getFixtureLineupsForFixtures } from '@black-diamond/database/fixtureLineups';
 import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { insufficientBalanceErrorCode, placeBet } from '@black-diamond/database/bets';
 import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
@@ -136,12 +138,14 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		...fixtureIds,
 		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
 	])];
-	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, fixtureStatistics, bets] = await Promise.all([
+	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, fixtureStatistics, fixtureInjuries, fixtureLineups, bets] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
 		getFixtureCardOdds(fixtureIds),
 		getPredictionsForFixtures(marketFixtureIds),
 		getFixtureEventsForFixtures(fixtureIds),
 		getFixtureStatisticsForFixtures(fixtureIds),
+		getFixtureInjuriesForFixtures(fixtureIds),
+		getFixtureLineupsForFixtures(fixtureIds),
 		locals.accountId
 			? getBetsForFixturesByAccountId(locals.accountId, relevantFixtureIds)
 			: Promise.resolve([])
@@ -151,6 +155,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
 	const eventsByFixtureId = new Map(fixtureEvents.map((fixtureEvent) => [fixtureEvent.fixtureId, fixtureEvent.events]));
 	const statisticsByFixtureId = new Map(fixtureStatistics.map((statistics) => [statistics.fixtureId, statistics]));
+	const injuriesByFixtureId = new Map(fixtureInjuries.map((injuries) => [injuries.fixtureId, injuries.injuries]));
+	const lineupsByFixtureId = new Map(fixtureLineups.map((lineups) => [lineups.fixtureId, lineups.lineups]));
 	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
 					`${selection.fixture.id}|${selection.market.name.toLowerCase()}|${selection.market.selection.toLowerCase()}`
@@ -203,6 +209,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
 			const prediction = predictionsByFixtureId.get(fixture.fixture.id);
 			const fixtureStatistics = statisticsByFixtureId.get(fixture.fixture.id);
+			const injuries = injuriesByFixtureId.get(fixture.fixture.id);
+			const lineups = lineupsByFixtureId.get(fixture.fixture.id);
 
 			return {
 				id: fixture.fixture.id,
@@ -338,7 +346,9 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 								possession: fixtureStatistics.away.possession
 							}
 						}
-					: null
+					: null,
+				injuries: injuries ?? null,
+				lineups: lineups ?? null
 			};
 		}),
 		today: new Intl.DateTimeFormat('en-GB', {

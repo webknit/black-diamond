@@ -25,6 +25,12 @@
     "./fixtureStatistics": {
       "types": "./src/types/fixtureStatistics.ts"
     },
+    "./fixtureInjuries": {
+      "types": "./src/types/fixtureInjuries.ts"
+    },
+    "./fixtureLineups": {
+      "types": "./src/types/fixtureLineups.ts"
+    },
     "./fixtureStatsSnapshot": {
       "types": "./src/types/fixtureStatsSnapshot.ts"
     },

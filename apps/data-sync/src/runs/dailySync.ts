@@ -8,6 +8,7 @@ import { syncUpcomingPredictions } from "../sync/predictions/syncUpcomingPredict
 import { syncFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots.js";
 import { syncBetResults } from "../sync/bets/syncBetResults.js";
 import { syncStrategyPerformances } from "../sync/strategyPerformances/syncStrategyPerformances.js";
+import { syncUpcomingFixtureInjuries } from "../sync/fixtureInjuries/syncUpcomingFixtureInjuries.js";
 import { getFixtureRecoveryDateRange } from "../sync/fixtures/syncCurrentSeasonFixtures.js";
 import { logSyncStep } from "../utils/logging/logSyncStep.js";
 
@@ -21,6 +22,7 @@ export async function runDailySync(lastCompletedAt?: Date) {
   await logSyncStep("sync fixture stats snapshots", syncFixtureStatsSnapshots);
   await logSyncStep("sync team stats for today's fixtures", syncTeamStatsForTodaysFixtures);
   await logSyncStep("sync upcoming predictions", syncUpcomingPredictions);
+  await logSyncStep("sync upcoming fixture injuries", syncUpcomingFixtureInjuries);
   await logSyncStep("sync league stats", syncLeagueStats);
   await logSyncStep("sync standings", syncStandings);
   await logSyncStep("sync strategy performances", syncStrategyPerformances);

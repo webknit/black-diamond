@@ -60,7 +60,7 @@
 	<div class="mt-2 border-t border-slate-100 pt-2 text-center">
 		<button type="button" class="inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-slate-900 active:scale-[0.98]" onclick={() => (isOpen = true)}>
 			<span aria-hidden="true">⚽</span>
-			<span>{goals.length} {goals.length === 1 ? 'goal' : 'goals'}</span>
+			<span>{goals.length}</span>
 			{#if yellowCards > 0}<span>· 🟨 {yellowCards}</span>{/if}
 			{#if redCards > 0}<span>· 🟥 {redCards}</span>{/if}
 		</button>
