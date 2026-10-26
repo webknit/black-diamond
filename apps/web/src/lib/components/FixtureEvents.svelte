@@ -25,8 +25,8 @@
 	let isOpen = $state(false);
 
 	const goals = $derived(events.filter((event) => event.type === 'Goal'));
-	const yellowCards = $derived(events.filter((event) => event.detail.includes('Yellow')).length);
-	const redCards = $derived(events.filter((event) => event.detail.includes('Red')).length);
+	const yellowCards = $derived(events.filter((event) => event.detail?.includes('Yellow')).length);
+	const redCards = $derived(events.filter((event) => event.detail?.includes('Red')).length);
 
 	function eventMinute(event: FixtureEvent) {
 		return `${event.time.elapsed ?? '–'}′${event.time.extra ? `+${event.time.extra}` : ''}`;
@@ -34,7 +34,7 @@
 
 	function eventIcon(event: FixtureEvent) {
 		if (event.type === 'Goal') return '⚽';
-		if (event.type === 'Card') return event.detail.includes('Red') ? '🟥' : '🟨';
+		if (event.type === 'Card') return event.detail?.includes('Red') ? '🟥' : '🟨';
 		if (event.type === 'subst') return '⇄';
 		if (event.type === 'Var') return 'VAR';
 		return '•';
@@ -83,7 +83,7 @@
 				<li class="grid grid-cols-[minmax(0,1fr)_3.5rem_minmax(0,1fr)] items-center gap-2 py-2 text-xs">
 					<div class="min-w-0 text-left">
 						{#if event.team.id === homeTeam.id}
-							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail}</p>
+							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail ?? event.type}</p>
 							{#if event.assist.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
 							{/if}
@@ -95,7 +95,7 @@
 					</div>
 					<div class="min-w-0 text-right">
 						{#if event.team.id === awayTeam.id}
-							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail}</p>
+							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail ?? event.type}</p>
 							{#if event.assist.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
 							{/if}

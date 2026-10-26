@@ -4,7 +4,7 @@ export type FixtureEvent = {
   player: { id: number | null; name: string | null };
   assist: { id: number | null; name: string | null };
   type: string;
-  detail: string;
+  detail: string | null;
   comments: string | null;
 };
 
