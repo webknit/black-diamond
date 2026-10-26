@@ -7,6 +7,35 @@
 	let accountMenuOpen = $state(false);
 	let accountMenu = $state<HTMLElement>();
 
+	function formatBalance(balance: number, currency: string) {
+		return new Intl.NumberFormat('en-GB', {
+			style: 'currency',
+			currency,
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2
+		}).format(balance);
+	}
+
+	function amountOrZero(amount: number | undefined) {
+		return typeof amount === 'number' && Number.isFinite(amount) ? amount : 0;
+	}
+
+	function getHeaderAmounts(account: {
+		currentBalance?: number;
+		outstandingBetStake?: number;
+		currency?: string;
+	} | null | undefined) {
+		const outstandingBetStake = amountOrZero(account?.outstandingBetStake);
+
+		return {
+			bankroll: amountOrZero(account?.currentBalance) + outstandingBetStake,
+			outstandingBetStake,
+			currency: account?.currency ?? 'GBP'
+		};
+	}
+
+	const headerAmounts = $derived(getHeaderAmounts(page.data.account));
+
 	onMount(() => {
 		function closeOnOutsideClick(event: PointerEvent) {
 			if (!(event.target instanceof Node)) return;
@@ -30,7 +59,18 @@
 
 <header class="border-b border-slate-200 bg-white">
 	<div class="mx-auto max-w-7xl px-6 py-5">
-		<a class="text-xl font-semibold tracking-tight text-slate-950" href="/">♦ Black Diamond</a>
+		<div class="flex items-center justify-between gap-3">
+			<a class="text-xl font-semibold tracking-tight text-slate-950" href="/">♦ Black Diamond</a>
+			{#if page.data?.account}
+				<a
+					class="flex flex-col items-end gap-0.5 text-[10px] font-medium leading-none text-slate-600 transition-colors hover:text-slate-950"
+					href="/account"
+				>
+					<span class="tabular-nums">💰 {formatBalance(headerAmounts.bankroll, headerAmounts.currency)}</span>
+					<!-- <span class="tabular-nums text-slate-500 text-xxs">{formatBalance(headerAmounts.outstandingBetStake, headerAmounts.currency)} in-play</span> -->
+				</a>
+			{/if}
+		</div>
 
 		<nav class="mt-4 flex items-center gap-5" aria-label="Main navigation">
 			{#if page.url.pathname === '/botd'}
@@ -98,7 +138,8 @@
 				{/if}
 			</div>
 			{#if page.data.account}
-				<div bind:this={accountMenu} class="relative ml-auto flex items-center">
+				<div class="ml-auto flex items-center gap-4">
+					<div bind:this={accountMenu} class="relative flex items-center">
 					<button type="button" aria-expanded={accountMenuOpen} aria-haspopup="true" class="inline-flex items-center gap-1 border-0 bg-transparent p-0 text-xs font-medium leading-none text-slate-700" class:font-bold={page.url.pathname.startsWith('/account')} class:text-slate-950={page.url.pathname.startsWith('/account')} onclick={() => (accountMenuOpen = !accountMenuOpen)}>
 						Account
 						<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="m5 7.5 5 5 5-5" /></svg>
@@ -114,6 +155,7 @@
 							</form>
 						</div>
 					{/if}
+				</div>
 				</div>
 			{:else if page.url.pathname === '/login'}
 				<span aria-current="page" class="ml-auto inline-flex items-center text-xs font-bold leading-none text-slate-950">
