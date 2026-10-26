@@ -112,6 +112,7 @@
 				</p>
 				<FixtureEvents
 					events={fixture.events}
+					statistics={fixture.statistics}
 					homeTeam={{ id: fixture.homeTeamId, name: fixture.homeTeamName, logo: fixture.homeTeamLogo }}
 					awayTeam={{ id: fixture.awayTeamId, name: fixture.awayTeamName, logo: fixture.awayTeamLogo }}
 					homeGoals={fixture.homeGoals}

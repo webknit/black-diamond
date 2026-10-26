@@ -5,6 +5,7 @@ import { getFixtureById, getFixtureSummariesBetweenDates } from '@black-diamond/
 import { getFixtureCardOdds, getFixtureOddsForFixtures } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
+import { getFixtureStatisticsForFixtures } from '@black-diamond/database/fixtureStatistics';
 import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { insufficientBalanceErrorCode, placeBet } from '@black-diamond/database/bets';
 import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
@@ -135,11 +136,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		...fixtureIds,
 		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
 	])];
-	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, bets] = await Promise.all([
+	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, fixtureStatistics, bets] = await Promise.all([
 		getFixtureCardSnapshots(fixtureIds),
 		getFixtureCardOdds(fixtureIds),
 		getPredictionsForFixtures(marketFixtureIds),
 		getFixtureEventsForFixtures(fixtureIds),
+		getFixtureStatisticsForFixtures(fixtureIds),
 		locals.accountId
 			? getBetsForFixturesByAccountId(locals.accountId, relevantFixtureIds)
 			: Promise.resolve([])
@@ -148,6 +150,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
 	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
 	const eventsByFixtureId = new Map(fixtureEvents.map((fixtureEvent) => [fixtureEvent.fixtureId, fixtureEvent.events]));
+	const statisticsByFixtureId = new Map(fixtureStatistics.map((statistics) => [statistics.fixtureId, statistics]));
 	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
 					`${selection.fixture.id}|${selection.market.name.toLowerCase()}|${selection.market.selection.toLowerCase()}`
@@ -199,6 +202,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
 			const prediction = predictionsByFixtureId.get(fixture.fixture.id);
+			const fixtureStatistics = statisticsByFixtureId.get(fixture.fixture.id);
 
 			return {
 				id: fixture.fixture.id,
@@ -320,7 +324,21 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 						}
 					: null,
 				prediction: prediction ? getFixturePrediction(prediction.response) : null,
-				events: eventsByFixtureId.get(fixture.fixture.id) ?? []
+				events: eventsByFixtureId.get(fixture.fixture.id) ?? [],
+				statistics: fixtureStatistics
+					? {
+							home: {
+								shots: fixtureStatistics.home.shots,
+								shotsOnTarget: fixtureStatistics.home.shotsOnTarget,
+								possession: fixtureStatistics.home.possession
+							},
+							away: {
+								shots: fixtureStatistics.away.shots,
+								shotsOnTarget: fixtureStatistics.away.shotsOnTarget,
+								possession: fixtureStatistics.away.possession
+							}
+						}
+					: null
 			};
 		}),
 		today: new Intl.DateTimeFormat('en-GB', {

@@ -60,6 +60,10 @@
       "types": "./src/fixtureEvents/index.ts",
       "default": "./src/fixtureEvents/index.ts"
     },
+    "./fixtureStatistics": {
+      "types": "./src/fixtureStatistics/index.ts",
+      "default": "./src/fixtureStatistics/index.ts"
+    },
     "./fixtureStatsSnapshots": {
       "types": "./src/fixtureStatsSnapshots/index.ts",
       "default": "./src/fixtureStatsSnapshots/index.ts"

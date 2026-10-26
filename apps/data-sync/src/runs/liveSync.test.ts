@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 	const mocks = vi.hoisted(() => ({
 	  syncFixturesInProgress: vi.fn(),
 	  syncFixtureEvents: vi.fn(),
+	  syncFixtureStatistics: vi.fn(),
 	  syncBetResults: vi.fn(),
 	  getRecentlyFinishedFixtures: vi.fn(),
 	  getFixtureEventsForFixtures: vi.fn(),
@@ -13,6 +14,9 @@ vi.mock("../sync/fixtures/syncFixturesInProgress.js", () => ({
 }));
 vi.mock("../sync/fixtureEvents/syncFixtureEvents.js", () => ({
   syncFixtureEvents: mocks.syncFixtureEvents,
+}));
+vi.mock("../sync/fixtureStatistics/syncFixtureStatistics.js", () => ({
+  syncFixtureStatistics: mocks.syncFixtureStatistics,
 }));
 vi.mock("../sync/bets/syncBetResults.js", () => ({ syncBetResults: mocks.syncBetResults }));
 vi.mock("@black-diamond/database/fixtures", () => ({ getRecentlyFinishedFixtures: mocks.getRecentlyFinishedFixtures }));
@@ -31,6 +35,7 @@ describe("live sync run", () => {
 
     expect(mocks.syncFixturesInProgress).toHaveBeenCalledOnce();
 		expect(mocks.syncFixtureEvents).toHaveBeenCalledWith([10]);
+		expect(mocks.syncFixtureStatistics).toHaveBeenCalledWith([{ fixture: { id: 10 } }]);
     expect(mocks.syncBetResults).toHaveBeenCalledOnce();
   });
 });

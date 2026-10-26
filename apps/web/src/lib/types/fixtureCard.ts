@@ -91,5 +91,9 @@ export type FixtureCardData = {
 	odds: FixtureOddsData | null;
 	prediction: FixturePredictionData | null;
 	events: FixtureEvent[];
+	statistics: {
+		home: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
+		away: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
+	} | null;
 };
 import type { FixtureEvent } from '@black-diamond/core/fixtureEvents';

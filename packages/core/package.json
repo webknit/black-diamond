@@ -22,6 +22,9 @@
     "./fixtureEvents": {
       "types": "./src/types/fixtureEvents.ts"
     },
+    "./fixtureStatistics": {
+      "types": "./src/types/fixtureStatistics.ts"
+    },
     "./fixtureStatsSnapshot": {
       "types": "./src/types/fixtureStatsSnapshot.ts"
     },

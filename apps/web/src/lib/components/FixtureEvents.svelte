@@ -13,6 +13,7 @@
 		awayTeam,
 		homeGoals,
 		awayGoals,
+		statistics,
 		status
 	}: {
 		events: FixtureEvent[];
@@ -20,6 +21,10 @@
 		awayTeam: Team;
 		homeGoals: number | null;
 		awayGoals: number | null;
+		statistics: {
+			home: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
+			away: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
+		} | null;
 		status: string;
 	} = $props();
 	let isOpen = $state(false);
@@ -38,6 +43,15 @@
 		if (event.type === 'subst') return '⇄';
 		if (event.type === 'Var') return 'VAR';
 		return '•';
+	}
+
+	function statisticValue(value: number | null | undefined, suffix = '') {
+		return value == null ? '–' : `${value}${suffix}`;
+	}
+
+	function comparisonWidth(left: number | null | undefined, right: number | null | undefined, side: 'left' | 'right') {
+		if (left == null || right == null || left + right === 0) return '50%';
+		return `${((side === 'left' ? left : right) / (left + right)) * 100}%`;
 	}
 
 </script>
@@ -77,6 +91,31 @@
 				<p class="text-xs text-slate-500">{events.length} recorded events</p>
 			<button type="button" class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close match events" onclick={() => (isOpen = false)}>✕</button>
 			</div>
+			{#if statistics}
+				<div class="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 gap-y-1.5 rounded-lg bg-slate-50 px-3 py-3 text-center text-[11px] tabular-nums">
+					<div class="font-semibold text-slate-900">{statisticValue(statistics.home.shots)}</div>
+					<div class="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Shots</div>
+					<div class="font-semibold text-slate-900">{statisticValue(statistics.away.shots)}</div>
+					<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
+						<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.shots, statistics.away.shots, 'left')}></span>
+						<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.shots, statistics.away.shots, 'right')}></span>
+					</div>
+					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.home.shotsOnTarget)}</div>
+					<div class="mt-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">On target</div>
+					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.away.shotsOnTarget)}</div>
+					<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
+						<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.shotsOnTarget, statistics.away.shotsOnTarget, 'left')}></span>
+						<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.shotsOnTarget, statistics.away.shotsOnTarget, 'right')}></span>
+					</div>
+					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.home.possession, '%')}</div>
+					<div class="mt-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Possession</div>
+					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.away.possession, '%')}</div>
+					<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
+						<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.possession, statistics.away.possession, 'left')}></span>
+						<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.possession, statistics.away.possession, 'right')}></span>
+					</div>
+				</div>
+			{/if}
 		</header>
 		<ol class="mt-2 min-h-0 flex-1 divide-y divide-slate-100 overflow-y-auto sm:mt-3">
 			{#each events as event, index (`${event.time.elapsed}-${event.type}-${event.player.id}-${index}`)}

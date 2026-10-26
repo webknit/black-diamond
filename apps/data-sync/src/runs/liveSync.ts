@@ -1,5 +1,6 @@
 import { syncFixturesInProgress } from "../sync/fixtures/syncFixturesInProgress.js";
 import { syncFixtureEvents } from "../sync/fixtureEvents/syncFixtureEvents.js";
+import { syncFixtureStatistics } from "../sync/fixtureStatistics/syncFixtureStatistics.js";
 import { syncBetResults } from "../sync/bets/syncBetResults.js";
 import { logSyncStep } from "../utils/logging/logSyncStep.js";
 import { getRecentlyFinishedFixtures } from "@black-diamond/database/fixtures";
@@ -19,6 +20,13 @@ export async function runLiveSync() {
   ])];
   await logSyncStep("sync live fixture events", () =>
     syncFixtureEvents(eventFixtureIds),
+  );
+  const fixturesForStatistics = [...new Map([
+    ...fixtures,
+    ...recentlyFinishedFixtures,
+  ].map((fixture) => [fixture.fixture.id, fixture])).values()];
+  await logSyncStep("sync live fixture statistics", () =>
+    syncFixtureStatistics(fixturesForStatistics),
   );
   await logSyncStep("settle completed bets", syncBetResults);
 }
