@@ -4,6 +4,11 @@ export {
   teamFilterVariations,
   type TeamFilterVariation,
 } from "./strategies.js";
+export {
+  bttsStrategyVariations,
+  matchesBttsStrategyVariation,
+  type BttsStrategyVariation,
+} from "./bttsStrategies.js";
 import type { TeamFilterVariation } from "./strategies.js";
 
 type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
@@ -11,6 +16,12 @@ type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
 export function getOver2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
   const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
   const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "over 2.5")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+
+export function getBttsYesReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => item.name.trim().toLowerCase() === "both teams score");
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "yes")?.odd);
   return Number.isFinite(odd) && odd > 1 ? odd : null;
 }
 

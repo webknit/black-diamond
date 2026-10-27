@@ -4,6 +4,8 @@
 
 	let leaguesMenuOpen = $state(false);
 	let leaguesMenu = $state<HTMLElement>();
+	let strategiesMenuOpen = $state(false);
+	let strategiesMenu = $state<HTMLElement>();
 	let accountMenuOpen = $state(false);
 	let accountMenu = $state<HTMLElement>();
 
@@ -40,11 +42,12 @@
 		function closeOnOutsideClick(event: PointerEvent) {
 			if (!(event.target instanceof Node)) return;
 			if (leaguesMenu && !leaguesMenu.contains(event.target)) leaguesMenuOpen = false;
+			if (strategiesMenu && !strategiesMenu.contains(event.target)) strategiesMenuOpen = false;
 			if (accountMenu && !accountMenu.contains(event.target)) accountMenuOpen = false;
 		}
 
 		function closeOnEscape(event: KeyboardEvent) {
-			if (event.key === 'Escape') { leaguesMenuOpen = false; accountMenuOpen = false; }
+			if (event.key === 'Escape') { leaguesMenuOpen = false; strategiesMenuOpen = false; accountMenuOpen = false; }
 		}
 
 		document.addEventListener('pointerdown', closeOnOutsideClick);
@@ -82,15 +85,34 @@
 					BOTD
 				</a>
 			{/if}
-			{#if page.url.pathname === '/strategies'}
-				<span aria-current="page" class="inline-flex items-center text-xs font-bold leading-none text-slate-950">
+			<div bind:this={strategiesMenu} class="relative flex items-center">
+				<button
+					type="button"
+					aria-expanded={strategiesMenuOpen}
+					aria-haspopup="true"
+					class="inline-flex cursor-pointer appearance-none items-center gap-1 border-0 bg-transparent p-0 text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950"
+					class:font-bold={page.url.pathname.startsWith('/strategies')}
+					class:text-slate-950={page.url.pathname.startsWith('/strategies')}
+					onclick={() => (strategiesMenuOpen = !strategiesMenuOpen)}
+				>
 					Strategies
-				</span>
-			{:else}
-				<a class="inline-flex items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950" href="/strategies">
-					Strategies
-				</a>
-			{/if}
+					<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="m5 7.5 5 5 5-5" /></svg>
+				</button>
+				{#if strategiesMenuOpen}
+					<div class="absolute left-0 top-full z-20 mt-2 w-40 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+						{#if page.url.pathname === '/strategies'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Over 2.5 goals</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies" onclick={() => (strategiesMenuOpen = false)}>Over 2.5 goals</a>
+						{/if}
+						{#if page.url.pathname === '/strategies/btts'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">BTTS</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/btts" onclick={() => (strategiesMenuOpen = false)}>BTTS</a>
+						{/if}
+					</div>
+				{/if}
+			</div>
 			<div bind:this={leaguesMenu} class="relative flex items-center">
 				<button
 					type="button"
