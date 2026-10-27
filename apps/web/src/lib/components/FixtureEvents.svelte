@@ -33,6 +33,14 @@
 	const goals = $derived(events.filter((event) => event.type === 'Goal'));
 	const yellowCards = $derived(events.filter((event) => event.detail?.includes('Yellow')).length);
 	const redCards = $derived(events.filter((event) => event.detail?.includes('Red')).length);
+	const hasShots = $derived(statistics?.home.shots != null || statistics?.away.shots != null);
+	const hasShotsOnTarget = $derived(
+		statistics?.home.shotsOnTarget != null || statistics?.away.shotsOnTarget != null
+	);
+	const hasPossession = $derived(
+		statistics?.home.possession != null || statistics?.away.possession != null
+	);
+	const hasStatistics = $derived(hasShots || hasShotsOnTarget || hasPossession);
 
 	function eventMinute(event: FixtureEvent) {
 		return `${event.time.elapsed ?? '–'}′${event.time.extra ? `+${event.time.extra}` : ''}`;
@@ -91,29 +99,35 @@
 				<p class="text-xs text-slate-500">{events.length} recorded events</p>
 			<button type="button" data-modal-close class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close match events">✕</button>
 			</div>
-			{#if statistics}
+			{#if statistics && hasStatistics}
 				<div class="mt-3 grid grid-cols-[1fr_auto_1fr] items-center gap-x-3 gap-y-1.5 rounded-lg bg-slate-50 px-3 py-3 text-center text-[11px] tabular-nums">
-					<div class="font-semibold text-slate-900">{statisticValue(statistics.home.shots)}</div>
-					<div class="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Shots</div>
-					<div class="font-semibold text-slate-900">{statisticValue(statistics.away.shots)}</div>
-					<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
-						<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.shots, statistics.away.shots, 'left')}></span>
-						<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.shots, statistics.away.shots, 'right')}></span>
-					</div>
-					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.home.shotsOnTarget)}</div>
-					<div class="mt-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">On target</div>
-					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.away.shotsOnTarget)}</div>
-					<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
-						<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.shotsOnTarget, statistics.away.shotsOnTarget, 'left')}></span>
-						<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.shotsOnTarget, statistics.away.shotsOnTarget, 'right')}></span>
-					</div>
-					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.home.possession, '%')}</div>
-					<div class="mt-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Possession</div>
-					<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.away.possession, '%')}</div>
-					<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
-						<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.possession, statistics.away.possession, 'left')}></span>
-						<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.possession, statistics.away.possession, 'right')}></span>
-					</div>
+					{#if hasShots}
+						<div class="font-semibold text-slate-900">{statisticValue(statistics.home.shots)}</div>
+						<div class="text-[9px] font-semibold uppercase tracking-wide text-slate-500">Shots</div>
+						<div class="font-semibold text-slate-900">{statisticValue(statistics.away.shots)}</div>
+						<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
+							<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.shots, statistics.away.shots, 'left')}></span>
+							<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.shots, statistics.away.shots, 'right')}></span>
+						</div>
+					{/if}
+					{#if hasShotsOnTarget}
+						<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.home.shotsOnTarget)}</div>
+						<div class="mt-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">On target</div>
+						<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.away.shotsOnTarget)}</div>
+						<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
+							<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.shotsOnTarget, statistics.away.shotsOnTarget, 'left')}></span>
+							<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.shotsOnTarget, statistics.away.shotsOnTarget, 'right')}></span>
+						</div>
+					{/if}
+					{#if hasPossession}
+						<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.home.possession, '%')}</div>
+						<div class="mt-1 text-[9px] font-semibold uppercase tracking-wide text-slate-500">Possession</div>
+						<div class="mt-1 font-semibold text-slate-900">{statisticValue(statistics.away.possession, '%')}</div>
+						<div class="col-span-3 flex h-1 overflow-hidden rounded-full bg-slate-200">
+							<span class="bg-emerald-500" style:width={comparisonWidth(statistics.home.possession, statistics.away.possession, 'left')}></span>
+							<span class="bg-slate-400" style:width={comparisonWidth(statistics.home.possession, statistics.away.possession, 'right')}></span>
+						</div>
+					{/if}
 				</div>
 			{/if}
 		</header>

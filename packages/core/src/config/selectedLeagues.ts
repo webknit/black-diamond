@@ -15,6 +15,8 @@ export const selectedLeagues = [
   { id: 41, name: "League One", country: "England" },
   { id: 42, name: "League Two", country: "England" },
   { id: 43, name: "National League", country: "England" },
+  { id: 50, name: "National League - North", country: "England" },
+  { id: 51, name: "National League - South", country: "England" },
   { id: 141, name: "Segunda División", country: "Spain" },
   { id: 79, name: "2. Bundesliga", country: "Germany" },
   { id: 136, name: "Serie B", country: "Italy" },

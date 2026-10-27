@@ -78,8 +78,9 @@
 		<span class="ml-1 text-xs text-slate-500">{selectedLeagueCount}/{totalLeagueCount}</span>
 	</summary>
 	<div class="fixed inset-x-4 top-4 z-20 max-h-[calc(100dvh-2rem)] overflow-y-auto rounded-xl border border-slate-200 bg-white p-3 shadow-lg sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:max-h-[calc(100dvh-8rem)] sm:w-64">
-		<div class="mb-2">
-			<p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Include leagues</p>
+		<div class="sticky top-0 z-10 -mx-3 -mt-3 mb-2 flex items-start justify-between gap-3 border-b border-slate-100 bg-white px-3 pb-3 pt-3">
+			<div>
+				<p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Include leagues</p>
 			<div class="mt-1.5 flex items-center gap-3">
 				<button
 					type="button"
@@ -96,6 +97,15 @@
 					Select all
 				</button>
 			</div>
+			</div>
+			<button
+				type="button"
+				class="shrink-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+				onclick={() => (isOpen = false)}
+				aria-label="Close league filter"
+			>
+				✕
+			</button>
 		</div>
 		{#each groups as group, index (group.country)}
 			<section class:mt-3={index > 0}>
