@@ -31,13 +31,14 @@
 	const homeLineup = $derived(lineups?.find((lineup) => lineup.teamId === homeTeam.id) ?? null);
 	const awayLineup = $derived(lineups?.find((lineup) => lineup.teamId === awayTeam.id) ?? null);
 	const hasAnnouncedLineup = $derived(lineups?.some((lineup) => lineup.startXI.length > 0) ?? false);
+	const hasTeamNews = $derived(uniqueInjuries.length > 0 || hasAnnouncedLineup);
 
 	function injuryDescription(injury: FixtureInjury) {
 		return injury.player.reason ?? injury.player.type;
 	}
 </script>
 
-{#if injuries !== null || lineups !== null}
+{#if hasTeamNews}
 	<div class="mt-2 text-center">
 		<button
 			type="button"
