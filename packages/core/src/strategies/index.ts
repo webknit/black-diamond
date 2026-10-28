@@ -9,6 +9,29 @@ export {
   matchesBttsStrategyVariation,
   type BttsStrategyVariation,
 } from "./bttsStrategies.js";
+export {
+  bttnsStrategyVariations,
+  matchesBttnsStrategyVariation,
+  type BttnsStrategyVariation,
+} from "./bttnsStrategies.js";
+export {
+  over2_5RateStrategyVariations,
+  matchesOver2_5RateStrategyVariation,
+  type Over2_5RateStrategyVariation,
+} from "./over2_5RateStrategies.js";
+export {
+  matchesOver1_5StrategyVariation,
+  over1_5StrategyVariations,
+  type Over1_5StrategyVariation,
+} from "./over1_5Strategies.js";
+export {
+  getStrategyOddsRangeIds,
+  over1_5OddsRanges,
+  over2_5OddsRanges,
+  strategyOddsRanges,
+  type StrategyOddsFilter,
+  type StrategyOddsRangeId,
+} from "./strategyOddsRanges.js";
 import type { TeamFilterVariation } from "./strategies.js";
 
 type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
@@ -19,9 +42,21 @@ export function getOver2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number 
   return Number.isFinite(odd) && odd > 1 ? odd : null;
 }
 
+export function getOver1_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "over 1.5")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+
 export function getBttsYesReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
   const market = odds.find((item) => item.name.trim().toLowerCase() === "both teams score");
   const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "yes")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+
+export function getBttsNoReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => item.name.trim().toLowerCase() === "both teams score");
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "no")?.odd);
   return Number.isFinite(odd) && odd > 1 ? odd : null;
 }
 

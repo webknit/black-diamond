@@ -5,6 +5,12 @@ export type StrategyPerformanceTotals = {
   profit: number;
 };
 
+export type StrategyPerformanceOddsBand = {
+  seasonPerformance: StrategyPerformanceTotals;
+  weeks: Record<string, StrategyPerformanceTotals>;
+  months: Record<string, StrategyPerformanceTotals>;
+};
+
 export type StrategyPerformance = {
   strategyId: string;
   strategyVersion: number;
@@ -13,5 +19,6 @@ export type StrategyPerformance = {
   seasonPerformance: StrategyPerformanceTotals;
   weeks: Record<string, StrategyPerformanceTotals>;
   months: Record<string, StrategyPerformanceTotals>;
+  oddsBands: Record<string, StrategyPerformanceOddsBand>;
   recalculatedAt: string;
 };

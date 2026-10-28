@@ -1,8 +1,11 @@
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
-import { teamFilterVariations } from '@black-diamond/core/strategies';
+import {
+	over2_5RateStrategyVariations,
+	over2_5OddsRanges,
+	teamFilterVariations,
+	type StrategyOddsFilter
+} from '@black-diamond/core/strategies';
 import { getStrategyPerformances } from '@black-diamond/database/strategyPerformances';
-
-const minimumOver2_5ReferenceOdd = 1.7;
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -16,12 +19,18 @@ export async function load({ url }: { url: URL }) {
 		.sort((left, right) => right.localeCompare(left));
 	const requestedWeek = url.searchParams.get('week');
 	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
+	const requestedOddsRange = url.searchParams.get('odds');
+	const selectedOddsRange: StrategyOddsFilter =
+		requestedOddsRange === 'all' || over2_5OddsRanges.some((range) => range.id === requestedOddsRange)
+			? (requestedOddsRange as StrategyOddsFilter)
+			: 'all';
 	const byStrategyId = new Map<string, { bets: number; wins: number; losses: number; profit: number }>();
 
 	for (const storedPerformance of storedPerformances) {
-		const totals = selectedWeek === 'all'
-			? storedPerformance.seasonPerformance
-			: storedPerformance.weeks[selectedWeek];
+		const oddsBand = selectedOddsRange === 'all' ? null : storedPerformance.oddsBands?.[selectedOddsRange];
+		const totals = selectedOddsRange === 'all'
+			? (selectedWeek === 'all' ? storedPerformance.seasonPerformance : storedPerformance.weeks[selectedWeek])
+			: (selectedWeek === 'all' ? oddsBand?.seasonPerformance : oddsBand?.weeks[selectedWeek]);
 		if (!totals) continue;
 
 		const current = byStrategyId.get(storedPerformance.strategyId) ?? {
@@ -53,16 +62,24 @@ export async function load({ url }: { url: URL }) {
 	}
 
 	return {
-		minimumOver2_5ReferenceOdd,
 		selectedWeek,
+		selectedOddsRange,
+		oddsRanges: over2_5OddsRanges,
 		availableWeeks,
-		teamFilterResults: teamFilterVariations
-			.filter((variation) => variation.sample === 'last5')
-			.map((variation) => ({
+		teamFilterResults: [
+			...teamFilterVariations
+				.filter((variation) => variation.sample === 'last5')
+				.map((variation) => ({
 				...variation,
 				...performance(variation.id),
 				seasonPerformance: performance(variation.id.replace(/-last5$/, '-season'))
+				})),
+			...over2_5RateStrategyVariations.map((variation) => ({
+				...variation,
+				...performance(variation.id),
+				seasonPerformance: null
 			}))
+		]
 			.sort(
 				(left, right) =>
 					right.profit - left.profit ||

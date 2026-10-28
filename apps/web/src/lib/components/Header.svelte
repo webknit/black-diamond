@@ -99,16 +99,26 @@
 					<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" class="size-3"><path d="m5 7.5 5 5 5-5" /></svg>
 				</button>
 				{#if strategiesMenuOpen}
-					<div class="absolute left-0 top-full z-20 mt-2 w-40 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+					<div class="absolute left-0 top-full z-20 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
 						{#if page.url.pathname === '/strategies'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Over 2.5 goals</span>
 						{:else}
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies" onclick={() => (strategiesMenuOpen = false)}>Over 2.5 goals</a>
 						{/if}
+						{#if page.url.pathname === '/strategies/over-1-5'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Over 1.5 goals</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/over-1-5" onclick={() => (strategiesMenuOpen = false)}>Over 1.5 goals</a>
+						{/if}
 						{#if page.url.pathname === '/strategies/btts'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">BTTS</span>
 						{:else}
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/btts" onclick={() => (strategiesMenuOpen = false)}>BTTS</a>
+						{/if}
+						{#if page.url.pathname === '/strategies/bttns'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">BTNTS</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/bttns" onclick={() => (strategiesMenuOpen = false)}>BTNTS</a>
 						{/if}
 					</div>
 				{/if}

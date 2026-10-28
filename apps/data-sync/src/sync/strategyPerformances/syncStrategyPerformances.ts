@@ -9,10 +9,20 @@ import {
 } from "@black-diamond/core/time";
 import {
 	getBttsYesReferenceOdd,
+	getBttsNoReferenceOdd,
+	getStrategyOddsRangeIds,
+  getOver1_5ReferenceOdd,
   getOver2_5ReferenceOdd,
 	 matchesBttsStrategyVariation,
+	 matchesBttnsStrategyVariation,
+	 matchesOver2_5RateStrategyVariation,
+	 matchesOver1_5StrategyVariation,
   matchesTeamFilterVariation,
 	 bttsStrategyVariations,
+	 bttnsStrategyVariations,
+	 over2_5RateStrategyVariations,
+	 over1_5StrategyVariations,
+	strategyOddsRanges,
   teamFilterVariations,
 } from "@black-diamond/core/strategies";
 import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
@@ -23,14 +33,17 @@ import {
 import { getLeagueStats } from "@black-diamond/database/leagueStats";
 import { upsertStrategyPerformances } from "@black-diamond/database/strategyPerformances";
 
-const minimumOver2_5ReferenceOdd = 1.7;
 const strategyVersion = 1;
 const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
+  ...over2_5RateStrategyVariations.map((strategy) => strategy.id),
+  ...over1_5StrategyVariations.map((strategy) => strategy.id),
   ...bttsStrategyVariations.map((strategy) => strategy.id),
+  ...bttnsStrategyVariations.map((strategy) => strategy.id),
 ];
 
 const emptyTotals = (): StrategyPerformanceTotals => ({ bets: 0, wins: 0, losses: 0, profit: 0 });
+const emptyOddsBand = () => ({ seasonPerformance: emptyTotals(), weeks: {}, months: {} });
 
 function addResult(totals: StrategyPerformanceTotals, won: boolean, referenceOdd: number) {
   totals.bets++;
@@ -85,6 +98,7 @@ async function createStrategyPerformances(
       seasonPerformance: emptyTotals(),
       weeks: {},
       months: {},
+      oddsBands: Object.fromEntries(strategyOddsRanges.map((range) => [range.id, emptyOddsBand()])),
       recalculatedAt: now,
     }]),
   );
@@ -99,11 +113,18 @@ async function createStrategyPerformances(
     const week = getUkWeekStartDateKey(date);
     const month = getUkDateKey(date).slice(0, 7);
     const record = (strategyId: string, matches: boolean, won: boolean, referenceOdd: number | null) => {
-      if (!matches || referenceOdd === null || referenceOdd < minimumOver2_5ReferenceOdd) return;
+      const oddsRangeIds = referenceOdd === null ? [] : getStrategyOddsRangeIds(referenceOdd);
+      if (!matches || referenceOdd === null || oddsRangeIds.length === 0) return;
       const performance = performances.get(strategyId)!;
       addResult(performance.seasonPerformance, won, referenceOdd);
       addResult(getPeriodTotals(performance.weeks, week), won, referenceOdd);
       addResult(getPeriodTotals(performance.months, month), won, referenceOdd);
+      for (const oddsRangeId of oddsRangeIds) {
+        const oddsBand = performance.oddsBands[oddsRangeId];
+        addResult(oddsBand.seasonPerformance, won, referenceOdd);
+        addResult(getPeriodTotals(oddsBand.weeks, week), won, referenceOdd);
+        addResult(getPeriodTotals(oddsBand.months, month), won, referenceOdd);
+      }
     };
 
     const over2_5Won =
@@ -119,6 +140,28 @@ async function createStrategyPerformances(
         over2_5ReferenceOdd,
       );
     }
+    for (const variation of over2_5RateStrategyVariations) {
+      record(
+        variation.id,
+        matchesOver2_5RateStrategyVariation(snapshot, variation),
+        over2_5Won,
+        over2_5ReferenceOdd,
+      );
+    }
+
+    const over1_5Won =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home + fixture.goals.away > 1;
+    const over1_5ReferenceOdd = getOver1_5ReferenceOdd(storedOdds.odds);
+    for (const variation of over1_5StrategyVariations) {
+      record(
+        variation.id,
+        matchesOver1_5StrategyVariation(snapshot, variation),
+        over1_5Won,
+        over1_5ReferenceOdd,
+      );
+    }
 
     const bttsWon = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home > 0 && fixture.goals.away > 0;
     const bttsReferenceOdd = getBttsYesReferenceOdd(storedOdds.odds);
@@ -128,6 +171,17 @@ async function createStrategyPerformances(
         matchesBttsStrategyVariation(snapshot, variation),
         bttsWon,
         bttsReferenceOdd,
+      );
+    }
+
+    const bttnsWon = fixture.goals.home !== null && fixture.goals.away !== null && (fixture.goals.home === 0 || fixture.goals.away === 0);
+    const bttnsReferenceOdd = getBttsNoReferenceOdd(storedOdds.odds);
+    for (const variation of bttnsStrategyVariations) {
+      record(
+        variation.id,
+        matchesBttnsStrategyVariation(snapshot, variation),
+        bttnsWon,
+        bttnsReferenceOdd,
       );
     }
   }

@@ -6,10 +6,12 @@ export type BttsStrategyVariation = {
 	description: string;
 	scoringThreshold?: number;
 	defensiveThreshold?: number;
+	bttsRateThreshold?: number;
 	sample: 'last5' | 'season';
 };
 
-const thresholds = [0.7, 0.9, 1, 1.3] as const;
+const scoringThresholds = [0.7, 0.9, 1, 1.3, 1.5, 1.7] as const;
+const defensiveThresholds = [0.7, 0.9, 1, 1.3] as const;
 
 function createVariation(
 	scoringThreshold: number | undefined,
@@ -37,18 +39,29 @@ function createVariation(
 	};
 }
 
+function createBttsRateVariation(threshold: number): BttsStrategyVariation {
+	return {
+		id: `btts-rate${threshold}-last5`,
+		title: `Both teams: last 5 BTTS >= ${threshold}%`,
+		description: `Each team recorded BTTS in at least ${threshold}% of its previous 5 matches.`,
+		bttsRateThreshold: threshold,
+		sample: 'last5'
+	};
+}
+
 export const bttsStrategyVariations: BttsStrategyVariation[] = [
-	...thresholds.map((threshold) => createVariation(threshold, undefined, 'last5')),
-	...thresholds.map((threshold) => createVariation(undefined, threshold, 'last5')),
-	...thresholds.flatMap((scoringThreshold) =>
-		thresholds.map((defensiveThreshold) =>
+	...([40, 60, 80] as const).map(createBttsRateVariation),
+	...scoringThresholds.map((threshold) => createVariation(threshold, undefined, 'last5')),
+	...defensiveThresholds.map((threshold) => createVariation(undefined, threshold, 'last5')),
+	...scoringThresholds.flatMap((scoringThreshold) =>
+		defensiveThresholds.map((defensiveThreshold) =>
 			createVariation(scoringThreshold, defensiveThreshold, 'last5')
 		)
 	),
-	...thresholds.map((threshold) => createVariation(threshold, undefined, 'season')),
-	...thresholds.map((threshold) => createVariation(undefined, threshold, 'season')),
-	...thresholds.flatMap((scoringThreshold) =>
-		thresholds.map((defensiveThreshold) =>
+	...scoringThresholds.map((threshold) => createVariation(threshold, undefined, 'season')),
+	...defensiveThresholds.map((threshold) => createVariation(undefined, threshold, 'season')),
+	...scoringThresholds.flatMap((scoringThreshold) =>
+		defensiveThresholds.map((defensiveThreshold) =>
 			createVariation(scoringThreshold, defensiveThreshold, 'season')
 		)
 	)
@@ -69,6 +82,14 @@ export function matchesBttsStrategyVariation(
 	const home = variation.sample === 'last5' ? snapshot.home.last5Venue : snapshot.home.fixtures.home;
 	const away = variation.sample === 'last5' ? snapshot.away.last5Venue : snapshot.away.fixtures.away;
 	if (!home || !away) return false;
+
+	if (
+		variation.bttsRateThreshold !== undefined &&
+		(snapshot.home.last5.btts.percentage < variation.bttsRateThreshold ||
+			snapshot.away.last5.btts.percentage < variation.bttsRateThreshold)
+	) {
+		return false;
+	}
 
 	if (
 		variation.scoringThreshold !== undefined &&
