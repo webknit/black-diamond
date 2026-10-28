@@ -35,11 +35,12 @@ export type Fixture = {
     away: FixtureTeam;
   };
   goals: FixtureScore;
-  score: {
+  score?: {
     halftime: FixtureScore;
     fulltime: FixtureScore;
     extratime: FixtureScore;
     penalty: FixtureScore;
+    penalties?: FixtureScore;
   };
 };
 

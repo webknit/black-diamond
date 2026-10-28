@@ -8,6 +8,7 @@ export async function searchFixtures(query: string, limit = 8): Promise<Fixture[
 
   const database = await getDatabase();
   const expression = new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i");
+  const recentFinishedCutoff = Math.floor(Date.now() / 1000) - 48 * 60 * 60;
   return database
     .collection<Fixture>("fixtures")
     .aggregate<Fixture>([
@@ -26,9 +27,18 @@ export async function searchFixtures(query: string, limit = 8): Promise<Fixture[
             $switch: {
               branches: [
                 { case: { $in: ["$fixture.status.short", ["1H", "HT", "2H", "ET", "BT", "P", "LIVE"]] }, then: 0 },
-                { case: { $eq: ["$fixture.status.short", "NS"] }, then: 1 },
+                {
+                  case: {
+                    $and: [
+                      { $in: ["$fixture.status.short", ["FT", "AET", "PEN"]] },
+                      { $gte: ["$fixture.timestamp", recentFinishedCutoff] },
+                    ],
+                  },
+                  then: 1,
+                },
+                { case: { $eq: ["$fixture.status.short", "NS"] }, then: 2 },
               ],
-              default: 2,
+              default: 3,
             },
           },
           searchTimestampOrder: {

@@ -21,6 +21,7 @@ type FixtureSummaryProjection = {
     away: { id: number; name: string; logo: string };
   };
   goals: { home: number | null; away: number | null };
+  score?: Fixture["score"];
 };
 
 export async function getFixtureSummariesBetweenDates(startDate: string, endDate: string) {
@@ -58,6 +59,10 @@ export async function getFixtureSummariesBetweenDates(startDate: string, endDate
           "teams.away.logo": 1,
           "goals.home": 1,
           "goals.away": 1,
+          "score.fulltime": 1,
+          "score.extratime": 1,
+          "score.penalty": 1,
+          "score.penalties": 1,
         },
       },
     )

@@ -40,6 +40,10 @@ describe("getFixtureSummariesBetweenDates", () => {
           "teams.away.logo": 1,
           "goals.home": 1,
           "goals.away": 1,
+          "score.fulltime": 1,
+          "score.extratime": 1,
+          "score.penalty": 1,
+          "score.penalties": 1,
         },
       },
     );

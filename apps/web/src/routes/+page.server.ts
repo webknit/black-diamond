@@ -248,6 +248,9 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 				awayTeamLogo: fixture.teams.away.logo,
 				homeGoals: fixture.goals.home,
 				awayGoals: fixture.goals.away,
+				fullTimeScore: fixture.score?.fulltime,
+				extraTimeScore: fixture.score?.extratime,
+				penaltyScore: fixture.score?.penalty ?? fixture.score?.penalties,
 				stats: stats
 					? {
 							home: {

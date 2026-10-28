@@ -8,6 +8,8 @@
 		timestamp: number;
 		status: string;
 		elapsed: number | null;
+		homeGoals: number | null;
+		awayGoals: number | null;
 		leagueName: string;
 		homeTeamName: string;
 		awayTeamName: string;
@@ -67,6 +69,10 @@
 
 	function isLiveSearchResult(status: string) {
 		return ['1H', 'HT', '2H', 'ET', 'BT', 'P', 'LIVE'].includes(status);
+	}
+
+	function isSettledSearchResult(status: string) {
+		return ['FT', 'AET', 'PEN'].includes(status);
 	}
 
 	async function toggleSearch() {
@@ -326,11 +332,16 @@
 										>
 											<div class="flex items-center gap-1.5">
 												<p class="text-xs font-medium text-slate-900">{fixture.homeTeamName} v {fixture.awayTeamName}</p>
+												{#if isSettledSearchResult(fixture.status) && fixture.homeGoals !== null && fixture.awayGoals !== null}
+													<span class="text-xs font-semibold text-slate-700">{fixture.homeGoals}–{fixture.awayGoals}</span>
+												{/if}
 												{#if isLiveSearchResult(fixture.status)}
 													<span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700">
 														<span class="size-1.5 rounded-full bg-emerald-500"></span>
 														{fixture.elapsed === null ? 'LIVE' : `${fixture.elapsed}'`}
 													</span>
+												{:else if isSettledSearchResult(fixture.status)}
+													<span class="text-[10px] font-semibold text-slate-500">{fixture.status}</span>
 												{/if}
 											</div>
 											<p class="mt-0.5 text-[10px] text-slate-500">{formatSearchDate(fixture.timestamp)} · {fixture.leagueName}</p>

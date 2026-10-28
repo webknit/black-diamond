@@ -35,6 +35,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			homeTeamName: fixture.teams.home.name, homeTeamId: fixture.teams.home.id, homeTeamLogo: fixture.teams.home.logo,
 			awayTeamName: fixture.teams.away.name, awayTeamId: fixture.teams.away.id, awayTeamLogo: fixture.teams.away.logo,
 			homeGoals: fixture.goals.home, awayGoals: fixture.goals.away,
+			fullTimeScore: fixture.score?.fulltime, extraTimeScore: fixture.score?.extratime, penaltyScore: fixture.score?.penalty ?? fixture.score?.penalties,
 			stats: statsByFixtureId.get(fixture.fixture.id) ?? null, prediction: null, events: [], statistics: null, injuries: null, lineups: null,
 			odds: oddsByFixtureId.get(fixture.fixture.id) ?? null
 		}));

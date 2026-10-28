@@ -88,6 +88,9 @@ export type FixtureCardData = {
 	awayTeamLogo: string;
 	homeGoals: number | null;
 	awayGoals: number | null;
+	fullTimeScore?: { home: number | null; away: number | null };
+	extraTimeScore?: { home: number | null; away: number | null };
+	penaltyScore?: { home: number | null; away: number | null };
 	stats: FixtureStatsData | null;
 	odds: FixtureOddsData | null;
 	prediction: FixturePredictionData | null;

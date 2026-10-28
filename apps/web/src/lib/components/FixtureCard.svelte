@@ -78,8 +78,14 @@
 			return fixture.status.elapsed === null ? 'Live' : `${fixture.status.elapsed}'`;
 		}
 
-		if (completedStatuses.has(fixture.status.short)) return 'Full time';
+		if (fixture.status.short === 'AET') return 'After extra time';
+		if (fixture.status.short === 'PEN') return '';
+		if (fixture.status.short === 'FT') return 'Full time';
 		return fixture.status.long;
+	}
+
+	function hasResult(score: { home: number | null; away: number | null } | undefined) {
+		return score?.home !== null && score?.home !== undefined && score.away !== null && score.away !== undefined;
 	}
 </script>
 
@@ -124,13 +130,25 @@
 						{formatKickoff(fixture.timestamp)}
 					</p>
 				{/if}
-				<p
-					class="mt-0.5 text-[10px] font-semibold"
-					class:text-emerald-700={isLive(fixture.status.short)}
-					class:text-slate-500={!isLive(fixture.status.short)}
-				>
-					{formatStatus()}
-				</p>
+				{#if hasResult(fixture.extraTimeScore)}
+					<p class="text-[9px] text-slate-500">
+						AET {fixture.extraTimeScore?.home}–{fixture.extraTimeScore?.away}
+					</p>
+				{/if}
+				{#if hasResult(fixture.penaltyScore)}
+					<p class="text-[9px] font-semibold text-slate-600">
+						Pens {fixture.penaltyScore?.home}–{fixture.penaltyScore?.away}
+					</p>
+				{/if}
+				{#if fixture.status.short !== 'PEN'}
+					<p
+						class="mt-0.5 text-[10px] font-semibold"
+						class:text-emerald-700={isLive(fixture.status.short)}
+						class:text-slate-500={!isLive(fixture.status.short)}
+					>
+						{formatStatus()}
+					</p>
+				{/if}
 				<FixtureEvents
 					events={fixture.events}
 					statistics={fixture.statistics}
