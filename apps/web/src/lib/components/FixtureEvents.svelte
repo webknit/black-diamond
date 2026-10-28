@@ -136,9 +136,11 @@
 				<li class="grid grid-cols-[minmax(0,1fr)_3.5rem_minmax(0,1fr)] items-center gap-2 py-2 text-xs">
 					<div class="min-w-0 text-left">
 						{#if event.team.id === homeTeam.id}
-							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail ?? event.type}</p>
-							{#if event.assist.name}
+							<p class="break-words font-medium text-slate-900">{event.type === 'subst' ? event.assist.name ?? event.player.name ?? event.detail ?? event.type : event.player.name ?? event.detail ?? event.type}</p>
+							{#if event.type === 'Goal' && event.assist.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
+							{:else if event.type === 'subst' && event.player.name}
+								<p class="mt-0.5 break-words text-[10px] text-slate-500">Replaced: {event.player.name}</p>
 							{/if}
 						{/if}
 					</div>
@@ -148,9 +150,11 @@
 					</div>
 					<div class="min-w-0 text-right">
 						{#if event.team.id === awayTeam.id}
-							<p class="break-words font-medium text-slate-900">{event.player.name ?? event.detail ?? event.type}</p>
-							{#if event.assist.name}
+							<p class="break-words font-medium text-slate-900">{event.type === 'subst' ? event.assist.name ?? event.player.name ?? event.detail ?? event.type : event.player.name ?? event.detail ?? event.type}</p>
+							{#if event.type === 'Goal' && event.assist.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
+							{:else if event.type === 'subst' && event.player.name}
+								<p class="mt-0.5 break-words text-[10px] text-slate-500">Replaced: {event.player.name}</p>
 							{/if}
 						{/if}
 					</div>

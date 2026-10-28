@@ -5,12 +5,14 @@
 		stats,
 		homeTeamId,
 		awayTeamId,
+		hasLeagueTable = true,
 		onOpenLeagueStandings,
 		onOpenTeamForm
 	}: {
 		stats: FixtureStatsData;
 		homeTeamId: number;
 		awayTeamId: number;
+		hasLeagueTable?: boolean;
 		onOpenLeagueStandings: (teamId: number) => void;
 		onOpenTeamForm: (teamId: number, scope: 'home' | 'away' | 'overall') => void;
 	} = $props();
@@ -60,7 +62,7 @@
 				<span class="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
 					{panel.label}
 				</span>
-				{#if panel.team.leaguePosition !== null}
+				{#if hasLeagueTable && panel.team.leaguePosition !== null}
 					<button
 						type="button"
 						class="cursor-pointer text-[10px] text-slate-500 underline decoration-slate-300 underline-offset-2 hover:text-emerald-700 hover:decoration-emerald-500"
@@ -70,7 +72,7 @@
 						<span class="text-slate-700">{panel.team.leaguePosition}</span>/{panel.team.leagueTeams}
 						· {panel.team.fixtures.total.played} played
 					</button>
-				{:else}
+				{:else if hasLeagueTable}
 					<span class="text-[10px] text-slate-500">—/{panel.team.leagueTeams} · {panel.team.fixtures.total.played} played</span>
 				{/if}
 			</div>

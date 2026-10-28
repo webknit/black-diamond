@@ -22,6 +22,7 @@
 	const ukTimeZone = 'Europe/London';
 	const liveStatuses = new Set(['1H', '2H', 'ET', 'P', 'LIVE', 'HT', 'BT']);
 	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
+	const hasLeagueTable = $derived(fixture.hasLeagueTable ?? true);
 	let leagueStandingsOpen = $state(false);
 	let formRequestId = 0;
 	let formSelection = $state<{ requestId: number; teamId: number; teamName: string; scope: 'home' | 'away' | 'overall' } | null>(null);
@@ -181,6 +182,7 @@
 					stats={fixture.stats}
 					homeTeamId={fixture.homeTeamId}
 					awayTeamId={fixture.awayTeamId}
+					{hasLeagueTable}
 					onOpenLeagueStandings={openLeagueStandings}
 					onOpenTeamForm={openTeamForm}
 				/>
@@ -208,13 +210,15 @@
 
 		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
 	</div>
-	<LeagueStandingsModal
-		leagueId={fixture.leagueId}
-		season={fixture.leagueSeason}
-		leagueName={fixture.leagueName}
-		highlightedTeamIds={[fixture.homeTeamId, fixture.awayTeamId]}
-		bind:isOpen={leagueStandingsOpen}
-	/>
+	{#if hasLeagueTable}
+		<LeagueStandingsModal
+			leagueId={fixture.leagueId}
+			season={fixture.leagueSeason}
+			leagueName={fixture.leagueName}
+			highlightedTeamIds={[fixture.homeTeamId, fixture.awayTeamId]}
+			bind:isOpen={leagueStandingsOpen}
+		/>
+	{/if}
 	{#if formSelection}
 		{#key formSelection.requestId}
 			<FixtureFormModal

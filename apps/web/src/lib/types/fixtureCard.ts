@@ -74,6 +74,7 @@ export type FixtureCardData = {
 	leagueName: string;
 	leagueId: number;
 	leagueSeason: number;
+	hasLeagueTable?: boolean;
 	leagueOrder: number;
 	leagueCountry: string;
 	leagueLogo: string | null;
