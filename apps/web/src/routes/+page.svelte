@@ -57,6 +57,9 @@
 	);
 	const todaysBetWins = $derived(data.todaysBets.filter((bet) => bet.status === 'won').length);
 	const todaysBetLosses = $derived(data.todaysBets.filter((bet) => bet.status === 'lost').length);
+	const todaysProfit = $derived(
+		data.todaysBets.reduce((total, bet) => total + (bet.profit ?? 0), 0)
+	);
 	const todaysBetsToPlay = $derived(
 		data.todaysBets.filter((bet) => bet.status === 'pending' && bet.matchStatus === 'matched').length
 	);
@@ -298,6 +301,12 @@
 					<span class="flex items-center gap-2 text-[11px] font-medium tabular-nums text-slate-600">
 						{todaysBetWins}/{todaysBetLosses} · {todaysBetsToPlay} to play
 						{#if todaysUnmatchedBets > 0} · {todaysUnmatchedBets} unmatched{/if}
+						<span>
+							P/L
+							<span class:text-emerald-700={todaysProfit > 0} class:text-rose-700={todaysProfit < 0}>
+								{todaysProfit > 0 ? '+' : ''}{formatMoney(todaysProfit)}
+							</span>
+						</span>
 						<svg
 							aria-hidden="true"
 							viewBox="0 0 20 20"
