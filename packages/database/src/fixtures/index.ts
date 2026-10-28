@@ -7,6 +7,7 @@ export { getFixtureSummariesBetweenDates } from "./operations/getFixtureSummarie
 export { getFixturesBefore } from "./operations/getFixturesBefore.js";
 export { getRecentTeamFixturesBefore } from "./operations/getRecentTeamFixturesBefore.js";
 export { getFixturesAwaitingResult } from "./operations/getFixturesAwaitingResult.js";
+export { getUpcomingFixtures } from "./operations/getUpcomingFixtures.js";
 export { getFixturesForLineupSync } from "./operations/getFixturesForLineupSync.js";
 export { getRecentlyFinishedFixtures } from "./operations/getRecentlyFinishedFixtures.js";
 export { getFixturesWithoutStatsSnapshots } from "./operations/getFixturesWithoutStatsSnapshots.js";

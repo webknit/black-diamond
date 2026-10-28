@@ -12,6 +12,7 @@
     "sync:all": "node --env-file-if-exists=.env --import tsx src/index.ts all",
     "backfill": "node --env-file-if-exists=.env --import tsx src/index.ts backfill",
     "backfill:strategy-performances": "node --env-file-if-exists=.env --import tsx src/index.ts strategy-performances",
+    "sync:botd": "node --env-file-if-exists=.env --import tsx src/index.ts botd",
     "sync:daily": "node --env-file-if-exists=.env --import tsx src/index.ts daily",
     "sync:hourly": "node --env-file-if-exists=.env --import tsx src/index.ts hourly",
     "sync:live": "node --env-file-if-exists=.env --import tsx src/index.ts live",

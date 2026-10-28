@@ -63,7 +63,7 @@ function getRecordValue(value: unknown): Record<string, unknown> | null {
 		: null;
 }
 
-function getFixturePrediction(response: Record<string, unknown>) {
+export function getFixturePrediction(response: Record<string, unknown>) {
 	const predictions = getRecordValue(response.predictions);
 	if (!predictions) return null;
 
@@ -81,6 +81,7 @@ function getFixturePrediction(response: Record<string, unknown>) {
 }
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
+	const minimalCardData = url.searchParams.get('minimal') === '1';
 	const now = new Date();
 	const todayUk = getUkDateKey(now);
 	const requestedDate = url.searchParams.get('date');
@@ -140,13 +141,13 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
 	])];
 	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, fixtureStatistics, fixtureInjuries, fixtureLineups, bets, leagueDocuments] = await Promise.all([
-		getFixtureCardSnapshots(fixtureIds),
+		minimalCardData ? Promise.resolve([]) : getFixtureCardSnapshots(fixtureIds),
 		getFixtureCardOdds(fixtureIds),
-		getPredictionsForFixtures(marketFixtureIds),
-		getFixtureEventsForFixtures(fixtureIds),
-		getFixtureStatisticsForFixtures(fixtureIds),
-		getFixtureInjuriesForFixtures(fixtureIds),
-		getFixtureLineupsForFixtures(fixtureIds),
+		minimalCardData ? Promise.resolve([]) : getPredictionsForFixtures(marketFixtureIds),
+		minimalCardData ? Promise.resolve([]) : getFixtureEventsForFixtures(fixtureIds),
+		minimalCardData ? Promise.resolve([]) : getFixtureStatisticsForFixtures(fixtureIds),
+		minimalCardData ? Promise.resolve([]) : getFixtureInjuriesForFixtures(fixtureIds),
+		minimalCardData ? Promise.resolve([]) : getFixtureLineupsForFixtures(fixtureIds),
 		locals.accountId
 			? getBetsForFixturesByAccountId(locals.accountId, relevantFixtureIds)
 			: Promise.resolve([]),

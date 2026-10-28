@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   logSyncStep: vi.fn(),
   runFixtureStatsSnapshotBackfill: vi.fn(),
   syncStrategyPerformances: vi.fn(),
+  syncBotdFixtures: vi.fn(),
 }));
 
 vi.mock("../sync/fixtureOdds/backfillFixtureOdds.js", () => ({
@@ -17,6 +18,7 @@ vi.mock("./backfillFixtureStatsSnapshots.js", () => ({
 vi.mock("../sync/strategyPerformances/syncStrategyPerformances.js", () => ({
   syncStrategyPerformances: mocks.syncStrategyPerformances,
 }));
+vi.mock("../sync/botdFixtures/syncBotdFixtures.js", () => ({ syncBotdFixtures: mocks.syncBotdFixtures }));
 
 import { runBackfill } from "./backfill.js";
 
@@ -35,5 +37,6 @@ describe("backfill run", () => {
       "backfill strategy performances",
       mocks.syncStrategyPerformances,
     );
+    expect(mocks.logSyncStep).toHaveBeenCalledWith("sync BotD fixtures", mocks.syncBotdFixtures);
   });
 });

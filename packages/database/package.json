@@ -81,6 +81,10 @@
       "types": "./src/strategyPerformances/index.ts",
       "default": "./src/strategyPerformances/index.ts"
     },
+    "./botdFixtures": {
+      "types": "./src/botdFixtures/index.ts",
+      "default": "./src/botdFixtures/index.ts"
+    },
     "./leagues": {
       "types": "./src/leagues/index.ts",
       "default": "./src/leagues/index.ts"

@@ -15,6 +15,7 @@ import { runHourlySync } from "./runs/hourlySync.js";
 import { runLiveSync } from "./runs/liveSync.js";
 import { runThreeHourlySync } from "./runs/threeHourlySync.js";
 import { runWeeklySync } from "./runs/weeklySync.js";
+import { syncBotdFixtures } from "./sync/botdFixtures/syncBotdFixtures.js";
 import { logSyncStep } from "./utils/logging/logSyncStep.js";
 
 const syncRuns = {
@@ -24,6 +25,7 @@ const syncRuns = {
     label: "backfill strategy performances",
     run: runStrategyResultsBackfill,
   },
+  botd: { label: "sync BotD fixtures", run: syncBotdFixtures },
   indexes: { label: "ensure database indexes", run: ensureDatabaseIndexes },
   daily: {
     label: "daily sync",

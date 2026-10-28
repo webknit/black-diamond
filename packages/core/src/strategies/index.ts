@@ -4,6 +4,7 @@ export {
   teamFilterVariations,
   type TeamFilterVariation,
 } from "./strategies.js";
+export { botdStrategies } from "./botdStrategies.js";
 export {
   bttsStrategyVariations,
   matchesBttsStrategyVariation,

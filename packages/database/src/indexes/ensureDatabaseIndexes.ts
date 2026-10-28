@@ -100,6 +100,13 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { strategyId: 1, strategyVersion: 1 },
     { name: "unique_strategy_summary", unique: true },
   );
+  await database.collection("botdFixtures").createIndex(
+    { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
+  );
+  await database.collection("botdFixtures").createIndex(
+    { fixtureDate: 1, matchingStrategyIds: 1, over2_5ReferenceOdd: 1 },
+    { name: "fixture_date_strategy_odd" },
+  );
   await database.collection("fullSeasonFixtureSyncStates").createIndex(
     { leagueId: 1, season: 1 },
     { name: "unique_league_season", unique: true },

@@ -56,6 +56,9 @@
     "./strategyPerformance": {
       "types": "./src/types/strategyPerformance.ts"
     },
+    "./botdFixture": {
+      "types": "./src/types/botdFixture.ts"
+    },
     "./strategies": {
       "types": "./src/strategies/index.ts",
       "default": "./src/strategies/index.ts"
