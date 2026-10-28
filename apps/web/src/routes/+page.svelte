@@ -314,7 +314,7 @@
 							<ul class="divide-y divide-slate-100">
 								{#each data.todaysBets as bet (bet.id)}
 									<li class="py-2 first:pt-0 last:pb-0">
-										<div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+										<div class="flex items-center justify-between gap-3">
 											<div class="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-600">
 												{#if bet.selections.length === 1}
 													<span class="font-semibold tabular-nums text-slate-800">{formatBetTime(bet.selections[0].timestamp)}</span>
@@ -336,9 +336,12 @@
 													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status}
 												</span>
 											</div>
+											{#if bet.selections.length === 1}
+												<button type="button" class="shrink-0 text-lg leading-none text-amber-500 hover:text-amber-600" class:text-slate-300={!watchlistedFixtureIds.includes(bet.selections[0].fixtureId)} onclick={() => toggleWatchlist(bet.selections[0].fixtureId)} aria-label={watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? 'Remove from watchlist' : 'Add to watchlist'}>{watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? '★' : '☆'}</button>
+											{/if}
 										</div>
-										<p class="mt-1 flex flex-wrap items-center gap-x-2 text-[11px] tabular-nums text-slate-800">
-											<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> <strong>{formatMoney(bet.stake)}</strong></span>
+										<p class="mt-1 flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-800">
+											{#if bet.selections.length === 1}<span>{bet.selections[0].market}</span>{/if}
 											{#if bet.status !== 'pending' && bet.profit !== null}
 												<span class="whitespace-nowrap">
 													<span class="text-slate-500">P/L</span>
@@ -347,21 +350,22 @@
 													</span>
 												</span>
 											{/if}
-											<span class="whitespace-nowrap"><span class="text-slate-500">Odds</span> <strong>{bet.placedOdds}</strong></span>
+											<span class="whitespace-nowrap"><span class="text-slate-500">Odds</span> <span class="text-slate-800">{bet.placedOdds}</span></span>
+											<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> <span>{formatMoney(bet.stake)}</span></span>
 										</p>
 										{#each bet.selections as selection}
 											<div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
-												<span class="min-w-0 text-slate-800">
-													<span class="font-medium">{selection.market}</span>
-													<span class="text-slate-600">
-														· {selection.homeTeamName}
-														{#if selection.homeGoals !== null && selection.awayGoals !== null}
-															<strong class="mx-1 tabular-nums text-slate-900">{selection.homeGoals}–{selection.awayGoals}</strong>
-														{:else}
-															<span class="mx-1">v</span>
-														{/if}
-														{selection.awayTeamName}
-													</span>
+												<span class="min-w-0 flex-1 text-slate-800">
+													{#if selection.homeGoals !== null && selection.awayGoals !== null}
+														<span class="mt-0.5 grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-slate-600">
+															<span class:font-semibold={selection.homeGoals > selection.awayGoals} class:text-slate-900={selection.homeGoals > selection.awayGoals}>{selection.homeTeamName}</span>
+															<strong class="rounded px-1.5 py-0.5 tabular-nums text-slate-800" class:bg-emerald-100={selection.homeGoals > selection.awayGoals}>{selection.homeGoals}</strong>
+															<span class:font-semibold={selection.awayGoals > selection.homeGoals} class:text-slate-900={selection.awayGoals > selection.homeGoals}>{selection.awayTeamName}</span>
+															<strong class="rounded px-1.5 py-0.5 tabular-nums text-slate-800" class:bg-emerald-100={selection.awayGoals > selection.homeGoals}>{selection.awayGoals}</strong>
+														</span>
+													{:else}
+														<span class="mt-0.5 block text-slate-600">{selection.homeTeamName} <span class="mx-1">v</span> {selection.awayTeamName}</span>
+													{/if}
 												</span>
 												{#if bet.selections.length > 1}
 													<span class="text-[10px] tabular-nums text-slate-500">
