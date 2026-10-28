@@ -18,7 +18,8 @@ export async function load({ url }: { url: URL }) {
 			? (requestedOddsRange as StrategyOddsFilter)
 			: 'all';
 	const storedPerformances = await getStrategyPerformanceSummaries(
-		bttsStrategyVariations.map((variation) => variation.id)
+		bttsStrategyVariations.map((variation) => variation.id),
+		selectedOddsRange === 'all' ? null : selectedOddsRange
 	);
 	const availableWeeks = [...new Set(storedPerformances.flatMap((performance) => Object.keys(performance.weeks)))]
 		.filter((week) => week >= oldestWeek && week <= currentWeek)

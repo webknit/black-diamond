@@ -22,7 +22,10 @@ export async function load({ url }: { url: URL }) {
 		...teamFilterVariations.map((variation) => variation.id),
 		...over2_5RateStrategyVariations.map((variation) => variation.id)
 	];
-	const storedPerformances = await getStrategyPerformanceSummaries(strategyIds);
+	const storedPerformances = await getStrategyPerformanceSummaries(
+		strategyIds,
+		selectedOddsRange === 'all' ? null : selectedOddsRange
+	);
 	const availableWeeks = [...new Set(storedPerformances.flatMap((performance) => Object.keys(performance.weeks)))]
 		.filter((week) => week >= oldestWeek && week <= currentWeek)
 		.sort((left, right) => right.localeCompare(left));
