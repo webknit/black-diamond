@@ -18,6 +18,8 @@ import {
 	 matchesBttnsStrategyVariation,
 	 matchesOver2_5RateStrategyVariation,
 	 matchesOver1_5StrategyVariation,
+  leagueRateStrategyVariations,
+	 matchesLeagueRateStrategyVariation,
   matchesTeamFilterVariation,
 	 bttsStrategyVariations,
 	 bttnsStrategyVariations,
@@ -44,7 +46,38 @@ const strategyIds = [
   ...over1_5StrategyVariations.map((strategy) => strategy.id),
   ...bttsStrategyVariations.map((strategy) => strategy.id),
   ...bttnsStrategyVariations.map((strategy) => strategy.id),
+  ...leagueRateStrategyVariations.map((strategy) => strategy.id),
 ];
+
+type LeagueRateAccumulator = {
+  fixturesPlayed: number;
+  over1_5: number;
+  over2_5: number;
+  btts: number;
+};
+
+function createLeagueRateAccumulator(): LeagueRateAccumulator {
+  return { fixturesPlayed: 0, over1_5: 0, over2_5: 0, btts: 0 };
+}
+
+function toLeagueRateContext(totals: LeagueRateAccumulator) {
+  const percentage = (count: number) => totals.fixturesPlayed === 0 ? 0 : (count / totals.fixturesPlayed) * 100;
+  return {
+    fixturesPlayed: totals.fixturesPlayed,
+    over1_5Percentage: percentage(totals.over1_5),
+    over2_5Percentage: percentage(totals.over2_5),
+    bttsPercentage: percentage(totals.btts),
+  };
+}
+
+function addCompletedFixtureToLeagueRate(totals: LeagueRateAccumulator, fixture: FinishedFixtureWithStatsSnapshot) {
+  if (fixture.goals.home === null || fixture.goals.away === null) return;
+  const goals = fixture.goals.home + fixture.goals.away;
+  totals.fixturesPlayed++;
+  if (goals > 1) totals.over1_5++;
+  if (goals > 2) totals.over2_5++;
+  if (fixture.goals.home > 0 && fixture.goals.away > 0) totals.btts++;
+}
 
 const emptyTotals = (): StrategyPerformanceTotals => ({ bets: 0, wins: 0, losses: 0, profit: 0 });
 const emptyOddsBand = () => ({ seasonPerformance: emptyTotals(), weeks: {}, months: {} });
@@ -158,10 +191,23 @@ async function createStrategyPerformances(
   );
   const odds = await getFixtureOddsForFixtures(fixtures.map((fixture) => fixture.fixture.id));
   const oddsByFixtureId = new Map(odds.map((fixtureOdds) => [fixtureOdds.fixtureId, fixtureOdds]));
+  const leagueRates = createLeagueRateAccumulator();
+  let currentKickoffTimestamp: number | null = null;
+  let fixturesAtCurrentKickoff: FinishedFixtureWithStatsSnapshot[] = [];
   for (const fixture of fixtures) {
+    if (currentKickoffTimestamp !== null && fixture.fixture.timestamp !== currentKickoffTimestamp) {
+      for (const completedFixture of fixturesAtCurrentKickoff) {
+        addCompletedFixtureToLeagueRate(leagueRates, completedFixture);
+      }
+      fixturesAtCurrentKickoff = [];
+    }
+    currentKickoffTimestamp = fixture.fixture.timestamp;
     const snapshot = fixture.fixtureStatsSnapshot;
     const storedOdds = oddsByFixtureId.get(fixture.fixture.id);
-    if (snapshot === null || !storedOdds) continue;
+    if (snapshot === null || !storedOdds) {
+      fixturesAtCurrentKickoff.push(fixture);
+      continue;
+    }
 
     const date = new Date(fixture.fixture.timestamp * 1000);
     const week = getUkWeekStartDateKey(date);
@@ -203,6 +249,11 @@ async function createStrategyPerformances(
       );
     }
 
+    const leagueRateContext = toLeagueRateContext(leagueRates);
+    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'over2_5')) {
+      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), over2_5Won, over2_5ReferenceOdd);
+    }
+
     const over1_5Won =
       fixture.goals.home !== null &&
       fixture.goals.away !== null &&
@@ -216,6 +267,9 @@ async function createStrategyPerformances(
         over1_5ReferenceOdd,
       );
     }
+    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'over1_5')) {
+      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), over1_5Won, over1_5ReferenceOdd);
+    }
 
     const bttsWon = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home > 0 && fixture.goals.away > 0;
     const bttsReferenceOdd = getBttsYesReferenceOdd(storedOdds.odds);
@@ -226,6 +280,9 @@ async function createStrategyPerformances(
         bttsWon,
         bttsReferenceOdd,
       );
+    }
+    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'btts')) {
+      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), bttsWon, bttsReferenceOdd);
     }
 
     const bttnsWon = fixture.goals.home !== null && fixture.goals.away !== null && (fixture.goals.home === 0 || fixture.goals.away === 0);
@@ -238,6 +295,15 @@ async function createStrategyPerformances(
         bttnsReferenceOdd,
       );
     }
+    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'bttns')) {
+      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), bttnsWon, bttnsReferenceOdd);
+    }
+
+    fixturesAtCurrentKickoff.push(fixture);
+  }
+
+  for (const completedFixture of fixturesAtCurrentKickoff) {
+    addCompletedFixtureToLeagueRate(leagueRates, completedFixture);
   }
 
   return [...performances.values()];

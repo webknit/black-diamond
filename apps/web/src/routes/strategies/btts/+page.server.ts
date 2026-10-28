@@ -1,5 +1,6 @@
 import {
 	bttsStrategyVariations,
+	leagueRateStrategyVariations,
 	over2_5OddsRanges,
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
@@ -18,7 +19,7 @@ export async function load({ url }: { url: URL }) {
 			? (requestedOddsRange as StrategyOddsFilter)
 			: 'all';
 	const storedPerformances = await getStrategyPerformanceSummaries(
-		bttsStrategyVariations.map((variation) => variation.id),
+		[...bttsStrategyVariations, ...leagueRateStrategyVariations.filter((variation) => variation.market === 'btts')].map((variation) => variation.id),
 		selectedOddsRange === 'all' ? null : selectedOddsRange
 	);
 	const availableWeeks = [...new Set(storedPerformances.flatMap((performance) => Object.keys(performance.weeks)))]
@@ -60,7 +61,8 @@ export async function load({ url }: { url: URL }) {
 		selectedOddsRange,
 		oddsRanges: over2_5OddsRanges,
 		availableWeeks,
-		bttsResults: bttsStrategyVariations
+		bttsResults: [
+			...bttsStrategyVariations
 			.filter((variation) => variation.sample === 'last5')
 			.map((variation) => ({
 				...variation,
@@ -69,7 +71,13 @@ export async function load({ url }: { url: URL }) {
 					variation.bttsRateThreshold === undefined
 						? performance(variation.id.replace(/-last5$/, '-season'))
 						: null
+			})),
+			...leagueRateStrategyVariations.filter((variation) => variation.market === 'btts').map((variation) => ({
+				...variation,
+				...performance(variation.id),
+				seasonPerformance: null
 			}))
+		]
 			.sort(
 				(left, right) =>
 					right.profit - left.profit ||

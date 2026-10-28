@@ -25,6 +25,13 @@ export {
   type Over1_5StrategyVariation,
 } from "./over1_5Strategies.js";
 export {
+  leagueRateStrategyVariations,
+  matchesLeagueRateStrategyVariation,
+  type LeagueRateContext,
+  type LeagueRateMarket,
+  type LeagueRateStrategyVariation,
+} from "./leagueRateStrategies.js";
+export {
   getStrategyOddsRangeIds,
   over1_5OddsRanges,
   over2_5OddsRanges,

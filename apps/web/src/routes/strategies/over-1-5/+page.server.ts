@@ -1,6 +1,7 @@
 import {
 	over1_5OddsRanges,
 	over1_5StrategyVariations,
+	leagueRateStrategyVariations,
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
@@ -18,7 +19,7 @@ export async function load({ url }: { url: URL }) {
 			? (requestedOddsRange as StrategyOddsFilter)
 			: 'all';
 	const performances = await getStrategyPerformanceSummaries(
-		over1_5StrategyVariations.map((variation) => variation.id),
+		[...over1_5StrategyVariations, ...leagueRateStrategyVariations.filter((variation) => variation.market === 'over1_5')].map((variation) => variation.id),
 		selectedOddsRange === 'all' ? null : selectedOddsRange
 	);
 	const availableWeeks = [...new Set(performances.flatMap((performance) => Object.keys(performance.weeks)))]
@@ -45,7 +46,7 @@ export async function load({ url }: { url: URL }) {
 		selectedOddsRange,
 		availableWeeks,
 		oddsRanges: over1_5OddsRanges,
-		results: over1_5StrategyVariations
+		results: [...over1_5StrategyVariations, ...leagueRateStrategyVariations.filter((variation) => variation.market === 'over1_5')]
 			.map((variation) => {
 				const totals = totalsByStrategy.get(variation.id) ?? { bets: 0, wins: 0, losses: 0, profit: 0 };
 				return { ...variation, ...totals, returnOnInvestment: totals.bets === 0 ? null : (totals.profit / totals.bets) * 100 };

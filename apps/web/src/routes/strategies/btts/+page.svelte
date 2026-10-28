@@ -45,13 +45,13 @@
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">Both Teams To Score strategies based on recent relevant-venue form.</p>
 		</header>
 		<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-			<div class="flex flex-wrap items-end justify-between gap-3">
+			<div>
 				<div>
 					<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">BTTS strategy explorer</p>
 					<h2 class="mt-1 text-base font-semibold text-slate-950">Scoring and conceding filters</h2>
-					<p class="mt-1 text-xs leading-5 text-slate-600">All 37 recent-form variations use flat £1 stakes and stored pre-match BTTS odds. Smaller figures show the equivalent season-wide filter where available.</p>
+					<p class="mt-1 text-xs leading-5 text-slate-600">League-rate and recent-form variations use flat £1 stakes and stored pre-match BTTS odds. Smaller figures show the equivalent season-wide filter where available.</p>
 				</div>
-				<div class="flex items-end gap-3">
+				<div class="mt-4 flex flex-wrap items-end gap-3">
 					<div>
 					<label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500" for="strategy-week">Historical week</label>
 					<select id="strategy-week" value={data.selectedWeek} onchange={selectHistoricalWeek} disabled={isWeekLoading} class="mt-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-800 disabled:cursor-wait disabled:opacity-60">

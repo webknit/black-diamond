@@ -113,6 +113,10 @@
 		}).format(value);
 	}
 
+	function isFixtureLive(status: string) {
+		return ['1H', 'HT', '2H', 'ET', 'P', 'LIVE', 'BT'].includes(status);
+	}
+
 	async function updateFilterQuery(nextLeagueIds: number[] | null, nextShowFinished: boolean) {
 		const url = new URL(page.url.href);
 		url.searchParams.delete('leagues');
@@ -322,7 +326,7 @@
 												{:else}
 													<span class="font-semibold text-slate-800">{bet.selections.length}-fold</span>
 												{/if}
-												<span
+												{#if bet.status !== 'pending' || bet.matchStatus === 'unmatched' || bet.selections.some((selection) => isFixtureLive(selection.status))}<span
 													class="rounded px-1 py-0.5 font-medium"
 													class:bg-amber-100={bet.status === 'pending'}
 													class:text-amber-800={bet.status === 'pending'}
@@ -333,15 +337,15 @@
 													class:bg-slate-100={bet.status === 'void' || bet.matchStatus === 'unmatched'}
 													class:text-slate-700={bet.status === 'void' || bet.matchStatus === 'unmatched'}
 												>
-													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status}
-												</span>
+													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status === 'pending' ? 'In play' : bet.status}
+												</span>{/if}
 											</div>
 											{#if bet.selections.length === 1}
 												<button type="button" class="shrink-0 text-lg leading-none text-amber-500 hover:text-amber-600" class:text-slate-300={!watchlistedFixtureIds.includes(bet.selections[0].fixtureId)} onclick={() => toggleWatchlist(bet.selections[0].fixtureId)} aria-label={watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? 'Remove from watchlist' : 'Add to watchlist'}>{watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? '★' : '☆'}</button>
 											{/if}
 										</div>
-										<p class="mt-1 flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-800">
-											{#if bet.selections.length === 1}<span>{bet.selections[0].market}</span>{/if}
+										{#if bet.selections.length === 1}<p class="mt-2 text-[11px] font-bold text-slate-900">{bet.selections[0].market}</p>{/if}
+										<p class="mt-1 flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-700">
 											{#if bet.status !== 'pending' && bet.profit !== null}
 												<span class="whitespace-nowrap">
 													<span class="text-slate-500">P/L</span>
@@ -354,7 +358,7 @@
 											<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> <span>{formatMoney(bet.stake)}</span></span>
 										</p>
 										{#each bet.selections as selection}
-											<div class="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
+											<div class="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
 												<span class="min-w-0 flex-1 text-slate-800">
 													{#if selection.homeGoals !== null && selection.awayGoals !== null}
 														<span class="mt-0.5 grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-slate-600">

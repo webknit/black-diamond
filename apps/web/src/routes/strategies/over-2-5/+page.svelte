@@ -4,7 +4,7 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let isWeekLoading = $derived(navigating.to?.url.pathname === '/strategies');
+	let isWeekLoading = $derived(navigating.to?.url.pathname === '/strategies/over-2-5');
 
 	function formatPercentage(value: number) {
 		return `${value.toFixed(1)}%`;
@@ -31,7 +31,7 @@
 		const query = new URLSearchParams();
 		if (week !== 'all') query.set('week', week);
 		if (data.selectedOddsRange !== 'all') query.set('odds', data.selectedOddsRange);
-		void goto(`/strategies${query.size ? `?${query}` : ''}`);
+		void goto(`/strategies/over-2-5${query.size ? `?${query}` : ''}`);
 	}
 
 	function selectOddsRange(event: Event) {
@@ -39,32 +39,32 @@
 		const query = new URLSearchParams();
 		if (data.selectedWeek !== 'all') query.set('week', data.selectedWeek);
 		if (odds !== 'all') query.set('odds', odds);
-		void goto(`/strategies${query.size ? `?${query}` : ''}`);
+		void goto(`/strategies/over-2-5${query.size ? `?${query}` : ''}`);
 	}
 </script>
 
 <svelte:head>
-	<title>Black Diamond · Strategies</title>
-	<meta name="description" content="Upcoming fixtures matching Black Diamond betting strategies." />
+	<title>Black Diamond · Over 2.5 strategies</title>
+	<meta name="description" content="Historical Over 2.5 goals strategy performance." />
 </svelte:head>
 
 <main class="min-h-screen bg-slate-100">
 	<div class="mx-auto max-w-5xl px-3 py-4 sm:px-6 sm:py-6">
 		<header class="mb-4 sm:mb-6">
-			<h1 class="text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Strategies</h1>
+			<h1 class="text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Over 2.5 goals strategies</h1>
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">
-				Upcoming fixtures that match your tested strategy conditions.
+				Historical performance for recent-form Over 2.5 goals strategies.
 			</p>
 		</header>
 
 		<section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-				<div class="flex flex-wrap items-end justify-between gap-3">
+				<div>
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Over 2.5 strategy explorer</p>
 						<h2 class="mt-1 text-base font-semibold text-slate-950">Scoring and defensive filters</h2>
-					<p class="mt-1 text-xs leading-5 text-slate-600">All 33 recent-form variations use flat £1 stakes and stored pre-match Over 2.5 odds. The smaller figures show the equivalent season-wide filter where available. Rows are ranked by profit for the chosen odds range.</p>
+					<p class="mt-1 text-xs leading-5 text-slate-600">League-rate and recent-form variations use flat £1 stakes and stored pre-match Over 2.5 odds. The smaller figures show the equivalent season-wide filter where available. Rows are ranked by profit for the chosen odds range.</p>
 					</div>
-				<div class="flex items-end gap-3">
+				<div class="mt-4 flex flex-wrap items-end gap-3">
 					<div>
 						<label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500" for="strategy-week">Historical week</label>
 						<select id="strategy-week" value={data.selectedWeek} onchange={selectHistoricalWeek} disabled={isWeekLoading} class="mt-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-800 disabled:cursor-wait disabled:opacity-60">

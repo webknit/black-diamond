@@ -11,8 +11,7 @@ export async function getStrategyPerformanceSummaries(
 		: {
 				strategyId: 1,
 				weeks: 1,
-				[`oddsBands.${oddsRangeId}.seasonPerformance`]: 1,
-				[`oddsBands.${oddsRangeId}.weeks`]: 1
+				oddsBands: 1
 			};
 
 	return database
