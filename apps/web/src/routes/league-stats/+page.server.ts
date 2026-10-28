@@ -1,5 +1,6 @@
 import { selectedLeagues } from '@black-diamond/core/selectedLeagues';
 import { getLeagueStats } from '@black-diamond/database/leagueStats';
+import { getLeaguesByIds } from '@black-diamond/database/leagues';
 
 const selectedLeagueOrder = new Map<number, number>(
 	selectedLeagues.map((league, index) => [league.id, index])
@@ -7,6 +8,8 @@ const selectedLeagueOrder = new Map<number, number>(
 
 export async function load() {
 	const leagueStats = await getLeagueStats(selectedLeagues.map((league) => league.id));
+	const leagues = await getLeaguesByIds(leagueStats.map((stats) => stats.league.id));
+	const leagueTypes = new Map(leagues.map((league) => [league.league.id, league.league.type]));
 
 	return {
 		leagueStats: leagueStats
@@ -17,6 +20,7 @@ export async function load() {
 			)
 			.map((stats) => ({
 				league: stats.league,
+				isCup: leagueTypes.get(stats.league.id) === 'Cup',
 				round: stats.round,
 				roundPhase: stats.roundPhase,
 				roundNumber: stats.roundNumber,
