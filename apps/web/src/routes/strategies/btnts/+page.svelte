@@ -4,7 +4,7 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
-	let isLoading = $derived(navigating.to?.url.pathname === '/strategies/bttns');
+	let isLoading = $derived(navigating.to?.url.pathname === '/strategies/btnts');
 
 	function formatPercentage(value: number) {
 		return `${value.toFixed(1)}%`;
@@ -36,7 +36,7 @@
 		const odds = filters.odds ?? data.selectedOddsRange;
 		if (week !== 'all') query.set('week', week);
 		if (odds !== 'all') query.set('odds', odds);
-		void goto(`/strategies/bttns${query.size ? `?${query}` : ''}`);
+		void goto(`/strategies/btnts${query.size ? `?${query}` : ''}`);
 	}
 </script>
 

@@ -115,10 +115,10 @@
 						{:else}
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/btts" onclick={() => (strategiesMenuOpen = false)}>BTTS</a>
 						{/if}
-						{#if page.url.pathname === '/strategies/bttns'}
+						{#if page.url.pathname === '/strategies/btnts'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">BTNTS</span>
 						{:else}
-							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/bttns" onclick={() => (strategiesMenuOpen = false)}>BTNTS</a>
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/btnts" onclick={() => (strategiesMenuOpen = false)}>BTNTS</a>
 						{/if}
 					</div>
 				{/if}

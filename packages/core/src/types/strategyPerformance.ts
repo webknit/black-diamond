@@ -22,3 +22,7 @@ export type StrategyPerformance = {
   oddsBands: Record<string, StrategyPerformanceOddsBand>;
   recalculatedAt: string;
 };
+
+// A compact all-selected-leagues view. The web app reads these rather than
+// combining the per-league records in a request.
+export type StrategyPerformanceSummary = Omit<StrategyPerformance, 'league' | 'season'>;

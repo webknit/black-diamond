@@ -1,6 +1,7 @@
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import type {
   StrategyPerformance,
+  StrategyPerformanceSummary,
   StrategyPerformanceTotals,
 } from "@black-diamond/core/strategyPerformance";
 import {
@@ -31,7 +32,10 @@ import {
   type FinishedFixtureWithStatsSnapshot,
 } from "@black-diamond/database/fixtureStatsSnapshots";
 import { getLeagueStats } from "@black-diamond/database/leagueStats";
-import { upsertStrategyPerformances } from "@black-diamond/database/strategyPerformances";
+import {
+  upsertStrategyPerformances,
+  upsertStrategyPerformanceSummaries,
+} from "@black-diamond/database/strategyPerformances";
 
 const strategyVersion = 1;
 const strategyIds = [
@@ -59,8 +63,53 @@ function getPeriodTotals(
   return (periods[key] ??= emptyTotals());
 }
 
+function addTotals(target: StrategyPerformanceTotals, source: StrategyPerformanceTotals) {
+  target.bets += source.bets;
+  target.wins += source.wins;
+  target.losses += source.losses;
+  target.profit += source.profit;
+}
+
+function createSummary(strategyId: string, recalculatedAt: string): StrategyPerformanceSummary {
+  return {
+    strategyId,
+    strategyVersion,
+    seasonPerformance: emptyTotals(),
+    weeks: {},
+    months: {},
+    oddsBands: Object.fromEntries(strategyOddsRanges.map((range) => [range.id, emptyOddsBand()])),
+    recalculatedAt,
+  };
+}
+
+function mergePeriods(
+  target: Record<string, StrategyPerformanceTotals>,
+  source: Record<string, StrategyPerformanceTotals>,
+) {
+  for (const [period, totals] of Object.entries(source)) {
+    addTotals(getPeriodTotals(target, period), totals);
+  }
+}
+
+function mergeIntoSummary(summary: StrategyPerformanceSummary, performance: StrategyPerformance) {
+  addTotals(summary.seasonPerformance, performance.seasonPerformance);
+  mergePeriods(summary.weeks, performance.weeks);
+  mergePeriods(summary.months, performance.months);
+  for (const [rangeId, totals] of Object.entries(performance.oddsBands)) {
+    const target = summary.oddsBands[rangeId];
+    if (!target) continue;
+    addTotals(target.seasonPerformance, totals.seasonPerformance);
+    mergePeriods(target.weeks, totals.weeks);
+    mergePeriods(target.months, totals.months);
+  }
+}
+
 export async function syncStrategyPerformances(): Promise<number> {
   const leagueStats = await getLeagueStats(selectedLeagues.map((league) => league.id));
+  const recalculatedAt = new Date().toISOString();
+  const summaries = new Map<string, StrategyPerformanceSummary>(
+    strategyIds.map((strategyId) => [strategyId, createSummary(strategyId, recalculatedAt)]),
+  );
   let performanceCount = 0;
 
   for (const leagueStatsForSeason of leagueStats) {
@@ -74,11 +123,16 @@ export async function syncStrategyPerformances(): Promise<number> {
       leagueStatsForSeason.league.season,
     );
     await upsertStrategyPerformances(performances);
+    for (const performance of performances) {
+      mergeIntoSummary(summaries.get(performance.strategyId)!, performance);
+    }
     performanceCount += performances.length;
     console.log(
       `[data-sync] Stored ${performances.length} strategy performances for ${leagueStatsForSeason.league.name}`,
     );
   }
+
+  await upsertStrategyPerformanceSummaries([...summaries.values()]);
 
   return performanceCount;
 }

@@ -5,7 +5,7 @@ import {
 	teamFilterVariations,
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
-import { getStrategyPerformances } from '@black-diamond/database/strategyPerformances';
+import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -13,17 +13,21 @@ export async function load({ url }: { url: URL }) {
 	oldest.setUTCDate(oldest.getUTCDate() - 28);
 	const currentWeek = getUkWeekStartDateKey(now);
 	const oldestWeek = getUkWeekStartDateKey(oldest);
-	const storedPerformances = await getStrategyPerformances();
-	const availableWeeks = [...new Set(storedPerformances.flatMap((performance) => Object.keys(performance.weeks)))]
-		.filter((week) => week >= oldestWeek && week <= currentWeek)
-		.sort((left, right) => right.localeCompare(left));
-	const requestedWeek = url.searchParams.get('week');
-	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
 	const requestedOddsRange = url.searchParams.get('odds');
 	const selectedOddsRange: StrategyOddsFilter =
 		requestedOddsRange === 'all' || over2_5OddsRanges.some((range) => range.id === requestedOddsRange)
 			? (requestedOddsRange as StrategyOddsFilter)
 			: 'all';
+	const strategyIds = [
+		...teamFilterVariations.map((variation) => variation.id),
+		...over2_5RateStrategyVariations.map((variation) => variation.id)
+	];
+	const storedPerformances = await getStrategyPerformanceSummaries(strategyIds);
+	const availableWeeks = [...new Set(storedPerformances.flatMap((performance) => Object.keys(performance.weeks)))]
+		.filter((week) => week >= oldestWeek && week <= currentWeek)
+		.sort((left, right) => right.localeCompare(left));
+	const requestedWeek = url.searchParams.get('week');
+	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
 	const byStrategyId = new Map<string, { bets: number; wins: number; losses: number; profit: number }>();
 
 	for (const storedPerformance of storedPerformances) {

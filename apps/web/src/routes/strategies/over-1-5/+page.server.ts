@@ -4,7 +4,7 @@ import {
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
-import { getStrategyPerformances } from '@black-diamond/database/strategyPerformances';
+import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -12,17 +12,19 @@ export async function load({ url }: { url: URL }) {
 	oldest.setUTCDate(oldest.getUTCDate() - 28);
 	const currentWeek = getUkWeekStartDateKey(now);
 	const oldestWeek = getUkWeekStartDateKey(oldest);
-	const performances = await getStrategyPerformances();
-	const availableWeeks = [...new Set(performances.flatMap((performance) => Object.keys(performance.weeks)))]
-		.filter((week) => week >= oldestWeek && week <= currentWeek)
-		.sort((left, right) => right.localeCompare(left));
-	const requestedWeek = url.searchParams.get('week');
-	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
 	const requestedOddsRange = url.searchParams.get('odds');
 	const selectedOddsRange: StrategyOddsFilter =
 		requestedOddsRange === 'all' || over1_5OddsRanges.some((range) => range.id === requestedOddsRange)
 			? (requestedOddsRange as StrategyOddsFilter)
 			: 'all';
+	const performances = await getStrategyPerformanceSummaries(
+		over1_5StrategyVariations.map((variation) => variation.id)
+	);
+	const availableWeeks = [...new Set(performances.flatMap((performance) => Object.keys(performance.weeks)))]
+		.filter((week) => week >= oldestWeek && week <= currentWeek)
+		.sort((left, right) => right.localeCompare(left));
+	const requestedWeek = url.searchParams.get('week');
+	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
 	const totalsByStrategy = new Map<string, { bets: number; wins: number; losses: number; profit: number }>();
 	for (const performance of performances) {
 		const oddsBand = selectedOddsRange === 'all' ? null : performance.oddsBands?.[selectedOddsRange];
