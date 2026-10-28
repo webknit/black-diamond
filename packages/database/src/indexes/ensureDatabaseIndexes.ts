@@ -89,6 +89,9 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   await database.collection("fixtureStatsSnapshots").createIndex(
     { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
   );
+  await database.collection("fixtureWatchlist").createIndex(
+    { accountId: 1, fixtureId: 1 }, { name: "unique_account_fixture_watchlist", unique: true },
+  );
   await database.collection("strategyPerformances").createIndex(
     { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
     { name: "unique_strategy_league_season", unique: true },

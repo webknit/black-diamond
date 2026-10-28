@@ -11,6 +11,7 @@ import { getFixtureLineupsForFixtures } from '@black-diamond/database/fixtureLin
 import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { insufficientBalanceErrorCode, placeBet } from '@black-diamond/database/bets';
 import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
+import { getWatchlistFixtureIds } from '@black-diamond/database/fixtureWatchlist';
 import type { BetSelection } from '@black-diamond/core/bet';
 import { selectedLeagues } from '@black-diamond/core/selectedLeagues';
 import { getBetSelection } from '#lib/server/bets/getBetSelection.js';
@@ -105,6 +106,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			? getFixtureSummariesBetweenDates(todayStart, todayEnd)
 			: Promise.resolve(null)
 	]);
+	const watchlistedFixtureIds = locals.accountId ? await getWatchlistFixtureIds(locals.accountId) : [];
 	const selectedDayFixtures = allSelectedFixtures
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedDate)
 		.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
@@ -210,6 +212,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		hasFixtures: selectedDayFixtures.length > 0,
 		leagues,
 		placedBetSelectionKeys,
+		watchlistedFixtureIds,
 		todaysBets,
 		fixtures: fixturesForPage.map((fixture) => {
 			const stats = statsByFixtureId.get(fixture.fixture.id);

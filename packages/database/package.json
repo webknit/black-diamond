@@ -72,6 +72,7 @@
       "types": "./src/fixtureLineups/index.ts",
       "default": "./src/fixtureLineups/index.ts"
     },
+    "./fixtureWatchlist": { "types": "./src/fixtureWatchlist/index.ts", "default": "./src/fixtureWatchlist/index.ts" },
     "./fixtureStatsSnapshots": {
       "types": "./src/fixtureStatsSnapshots/index.ts",
       "default": "./src/fixtureStatsSnapshots/index.ts"

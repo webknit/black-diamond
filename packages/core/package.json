@@ -31,6 +31,7 @@
     "./fixtureLineups": {
       "types": "./src/types/fixtureLineups.ts"
     },
+    "./fixtureWatchlist": { "types": "./src/types/fixtureWatchlist.ts" },
     "./fixtureStatsSnapshot": {
       "types": "./src/types/fixtureStatsSnapshot.ts"
     },

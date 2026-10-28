@@ -19,6 +19,10 @@
 	let previousFilterStateKey = $state<string>();
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
 	let todaysBetsExpanded = $state(true);
+	let watchlistedFixtureIds = $state<number[]>([]);
+	$effect(() => {
+		watchlistedFixtureIds = data.watchlistedFixtureIds;
+	});
 
 	const leagues = $derived(data.leagues);
 	const leaguesByCountry = $derived(
@@ -225,6 +229,14 @@
 		betSlipSelections = betSlipSelections.filter((_, index) => index !== existingSelectionIndex);
 	}
 
+	async function toggleWatchlist(fixtureId: number) {
+		if (!data.account) return void goto('/login');
+		const response = await fetch(`/api/watchlist/${fixtureId}`, { method: 'POST' });
+		if (!response.ok) return;
+		const { starred } = await response.json() as { starred: boolean };
+		watchlistedFixtureIds = starred ? [...watchlistedFixtureIds, fixtureId] : watchlistedFixtureIds.filter((id) => id !== fixtureId);
+	}
+
 </script>
 
 <svelte:head>
@@ -377,6 +389,8 @@
 						isLoading={isLoading || !filterResultIsCurrent}
 						placedSelectionKeys={data.placedBetSelectionKeys}
 						onSelectOdd={chooseOdd}
+						{watchlistedFixtureIds}
+						onToggleWatchlist={toggleWatchlist}
 					/>
 					{#if filterResultIsCurrent && filteredFixtures.length < data.totalFixtureCount}
 						<div class="mt-5 text-center">

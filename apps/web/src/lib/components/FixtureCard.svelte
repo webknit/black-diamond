@@ -10,11 +10,13 @@
 	let {
 		fixture,
 		placedSelectionKeys = [],
-		onSelectOdd
+		onSelectOdd, isWatchlisted = false, onToggleWatchlist
 	}: {
 		fixture: FixtureCardData;
 		placedSelectionKeys?: string[];
 		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
+		isWatchlisted?: boolean;
+		onToggleWatchlist?: (fixtureId: number) => void;
 	} = $props();
 
 	const ukTimeZone = 'Europe/London';
@@ -94,6 +96,7 @@
 			<p class="truncate text-xs font-semibold text-slate-900">{fixture.leagueName}</p>
 			<p class="truncate text-[10px] text-slate-500">{fixture.leagueCountry}</p>
 		</div>
+		{#if onToggleWatchlist}<button type="button" class="ml-auto rounded p-1 text-lg leading-none text-amber-500 hover:bg-amber-50" class:text-slate-300={!isWatchlisted} onclick={() => onToggleWatchlist(fixture.id)} aria-label={isWatchlisted ? 'Remove from watchlist' : 'Add to watchlist'}>{isWatchlisted ? '★' : '☆'}</button>{/if}
 	</header>
 
 	<div class="px-3 pb-3 pt-3">

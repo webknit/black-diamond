@@ -85,6 +85,13 @@
 					BOTD
 				</a>
 			{/if}
+			{#if page.data.account}
+				{#if page.url.pathname === '/watchlist'}
+					<span aria-current="page" class="inline-flex items-center text-xs font-bold leading-none text-slate-950">Watchlist</span>
+				{:else}
+					<a class="inline-flex items-center text-xs font-medium leading-none text-slate-700 transition-colors hover:text-slate-950" href="/watchlist">Watchlist</a>
+				{/if}
+			{/if}
 			<div bind:this={strategiesMenu} class="relative flex items-center">
 				<button
 					type="button"
