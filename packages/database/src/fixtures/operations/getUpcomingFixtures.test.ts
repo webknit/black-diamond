@@ -13,9 +13,20 @@ describe("getUpcomingFixtures", () => {
 
     await getUpcomingFixtures(now, 7);
 
-    expect(mocks.find).toHaveBeenCalledWith({
-      "fixture.timestamp": { $gt: 1792584000, $lte: 1793188800 },
-      "fixture.status.short": "NS",
-    });
+    expect(mocks.find).toHaveBeenCalledWith(
+      {
+        "fixture.timestamp": { $gt: 1792584000, $lte: 1793188800 },
+        "fixture.status.short": "NS",
+      },
+      {
+        projection: {
+          _id: 0,
+          "fixture.id": 1,
+          "fixture.timestamp": 1,
+          "fixture.status.short": 1,
+          "league.id": 1,
+        },
+      },
+    );
   });
 });

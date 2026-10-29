@@ -5,18 +5,12 @@ const mocks = vi.hoisted(() => ({
   getUpcomingFixtures: vi.fn(),
   getFixtureOddsForFixtures: vi.fn(),
   getFixtureStatsSnapshots: vi.fn(),
-  getPredictionsForFixtures: vi.fn(),
-  getFixtureInjuriesForFixtures: vi.fn(),
-  getFixtureLineupsForFixtures: vi.fn(),
   getLeaguesByIds: vi.fn(),
   upsertBotdDays: vi.fn(),
 }));
 vi.mock("@black-diamond/database/fixtures", () => ({ getUpcomingFixtures: mocks.getUpcomingFixtures }));
 vi.mock("@black-diamond/database/fixtureOdds", () => ({ getFixtureOddsForFixtures: mocks.getFixtureOddsForFixtures }));
 vi.mock("@black-diamond/database/fixtureStatsSnapshots", () => ({ getFixtureStatsSnapshots: mocks.getFixtureStatsSnapshots }));
-vi.mock("@black-diamond/database/predictions", () => ({ getPredictionsForFixtures: mocks.getPredictionsForFixtures }));
-vi.mock("@black-diamond/database/fixtureInjuries", () => ({ getFixtureInjuriesForFixtures: mocks.getFixtureInjuriesForFixtures }));
-vi.mock("@black-diamond/database/fixtureLineups", () => ({ getFixtureLineupsForFixtures: mocks.getFixtureLineupsForFixtures }));
 vi.mock("@black-diamond/database/leagues", () => ({ getLeaguesByIds: mocks.getLeaguesByIds }));
 vi.mock("@black-diamond/database/botdDays", () => ({ upsertBotdDays: mocks.upsertBotdDays }));
 import { syncBotdFixtures } from "./syncBotdFixtures.js";
@@ -32,9 +26,6 @@ describe("syncBotdFixtures", () => {
     mocks.getUpcomingFixtures.mockResolvedValue([included]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([]);
     mocks.getFixtureOddsForFixtures.mockResolvedValue([]);
-    mocks.getPredictionsForFixtures.mockResolvedValue([]);
-    mocks.getFixtureInjuriesForFixtures.mockResolvedValue([]);
-    mocks.getFixtureLineupsForFixtures.mockResolvedValue([]);
     mocks.getLeaguesByIds.mockResolvedValue([]);
 
     await syncBotdFixtures(now);

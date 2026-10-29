@@ -8,5 +8,15 @@ export async function getUpcomingFixtures(now: Date, daysAhead: number): Promise
   return (await getDatabase()).collection<Fixture>("fixtures").find({
     "fixture.timestamp": { $gt: nowTimestamp, $lte: endTimestamp },
     "fixture.status.short": "NS",
+  }, {
+    // BotD only needs these fields to identify and group upcoming fixtures.
+    // Avoid loading the full API fixture payload for every league into memory.
+    projection: {
+      _id: 0,
+      "fixture.id": 1,
+      "fixture.timestamp": 1,
+      "fixture.status.short": 1,
+      "league.id": 1,
+    },
   }).toArray();
 }
