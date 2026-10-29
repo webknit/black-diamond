@@ -87,6 +87,7 @@ export function getFixturePrediction(response: Record<string, unknown>) {
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const minimalCardData = url.searchParams.get('minimal') === '1';
+	const isFixtureIdLookup = url.searchParams.has('fixtureIds');
 	const now = new Date();
 	const todayUk = getUkDateKey(now);
 	const requestedDate = url.searchParams.get('date');
@@ -104,6 +105,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const todayAtUtc = new Date(`${todayUk}T00:00:00.000Z`);
 	const todayStart = getUtcDateKey(new Date(todayAtUtc.getTime() - 24 * 60 * 60 * 1000));
 	const todayEnd = getUtcDateKey(new Date(todayAtUtc.getTime() + 48 * 60 * 60 * 1000));
+	const fixtureSummariesStartedAt = performance.now();
 	const [allSelectedFixtures, fetchedTodayFixtures] = await Promise.all([
 		// BotD already has the exact fixture IDs it needs. Querying the whole
 		// three-day fixture window first becomes expensive once every league is synced.
@@ -114,6 +116,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			? getFixtureSummariesBetweenDates(todayStart, todayEnd)
 			: Promise.resolve(null)
 	]);
+	if (isFixtureIdLookup) {
+		console.info('[fixtures] summary lookup', {
+			milliseconds: Math.round(performance.now() - fixtureSummariesStartedAt),
+			fixtureCount: allSelectedFixtures.length
+		});
+	}
 	const watchlistedFixtureIds = locals.accountId ? await getWatchlistFixtureIds(locals.accountId) : [];
 	const selectedDayFixtures = allSelectedFixtures
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedDate)
@@ -152,6 +160,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		...fixtureIds,
 		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
 	])];
+	const cardDataStartedAt = performance.now();
 	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, fixtureStatistics, fixtureInjuries, fixtureLineups, bets, leagueDocuments] = await Promise.all([
 		minimalCardData ? Promise.resolve([]) : getFixtureCardSnapshots(fixtureIds),
 		getFixtureCardOdds(fixtureIds),
@@ -165,6 +174,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			: Promise.resolve([]),
 		getLeaguesByIds([...new Set(fixturesForPage.map((fixture) => fixture.league.id))])
 	]);
+	if (isFixtureIdLookup) {
+		console.info('[fixtures] card-data lookup', {
+			milliseconds: Math.round(performance.now() - cardDataStartedAt),
+			fixtureCount: fixtureIds.length
+		});
+	}
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
 	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
