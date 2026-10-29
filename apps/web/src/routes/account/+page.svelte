@@ -29,7 +29,10 @@
 	let notificationAvailability = $state<'checking' | 'supported' | 'ios-not-installed' | 'unsupported'>('checking');
 
 	onMount(() => {
-		notificationsEnabled = data.notificationsEnabled;
+		void initialiseNotifications();
+	});
+
+	async function initialiseNotifications() {
 		const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
 			(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 		const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
@@ -40,7 +43,12 @@
 			: data.vapidPublicKey && 'serviceWorker' in navigator && 'PushManager' in window
 				? 'supported'
 				: 'unsupported';
-	});
+
+		if (notificationAvailability === 'supported') {
+			const registration = await navigator.serviceWorker.getRegistration();
+			notificationsEnabled = Boolean(await registration?.pushManager.getSubscription());
+		}
+	}
 
 	function base64ToBytes(value: string) { const padding = '='.repeat((4 - value.length % 4) % 4); const binary = atob((value + padding).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(binary, (character) => character.charCodeAt(0)); }
 	async function enableNotifications() {
@@ -55,7 +63,27 @@
 			notificationsEnabled = response.ok;
 		} catch (error) { notificationMessage = error instanceof Error ? `Could not enable notifications: ${error.message}` : 'Could not enable notifications.'; }
 	}
-	async function disableNotifications() { const registration = await navigator.serviceWorker.getRegistration(); const subscription = await registration?.pushManager.getSubscription(); await subscription?.unsubscribe(); notificationsEnabled = false; notificationMessage = 'Notifications disabled on this device.'; }
+	async function disableNotifications() {
+		try {
+			const registration = await navigator.serviceWorker.getRegistration();
+			const subscription = await registration?.pushManager.getSubscription();
+			if (!subscription) {
+				notificationsEnabled = false;
+				return;
+			}
+			const response = await fetch('/api/push-subscription', {
+				method: 'DELETE',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ endpoint: subscription.endpoint })
+			});
+			if (!response.ok) throw new Error('Could not remove notification settings.');
+			await subscription.unsubscribe();
+			notificationsEnabled = false;
+			notificationMessage = 'Notifications disabled on this device.';
+		} catch (error) {
+			notificationMessage = error instanceof Error ? error.message : 'Could not disable notifications.';
+		}
+	}
 </script>
 
 <svelte:head>
