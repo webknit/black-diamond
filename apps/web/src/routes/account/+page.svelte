@@ -24,7 +24,7 @@
 			: null
 	);
 	let notificationMessage = $state<string | null>(null);
-	let notificationsEnabled = $state(false);
+	let notificationsEnabled = $state(data.notificationsEnabled);
 	function base64ToBytes(value: string) { const padding = '='.repeat((4 - value.length % 4) % 4); const binary = atob((value + padding).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(binary, (character) => character.charCodeAt(0)); }
 	async function enableNotifications() {
 		try {

@@ -1,16 +1,19 @@
 import { addAccountDeposit } from '@black-diamond/database/accounts';
 import { getBetsByAccountId, getPendingBetSummaryByAccountId } from '@black-diamond/database/bets';
+import { hasPushSubscription } from '@black-diamond/database/pushSubscriptions';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 
 export async function load({ locals }: { locals: App.Locals }) {
 	if (!locals.accountId) throw redirect(303, '/login');
-	const [pendingBetSummary, bets] = await Promise.all([
+	const [pendingBetSummary, bets, notificationsEnabled] = await Promise.all([
 		getPendingBetSummaryByAccountId(locals.accountId),
-		getBetsByAccountId(locals.accountId)
+		getBetsByAccountId(locals.accountId),
+		hasPushSubscription(locals.accountId)
 	]);
 	return {
 		vapidPublicKey: process.env.VAPID_PUBLIC_KEY ?? null,
+		notificationsEnabled,
 		pendingBetSummary,
 		realizedProfitLoss: bets.reduce(
 			(total, bet) => total + (bet.status === 'pending' ? 0 : (bet.profit ?? 0)),
