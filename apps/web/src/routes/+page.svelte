@@ -73,7 +73,16 @@
 	const unwatchedTodaysBetFixtureIds = $derived(
 		todaysBetFixtureIds.filter((fixtureId) => !watchlistedFixtureIds.includes(fixtureId))
 	);
-	const showTodaysBets = $derived(Boolean(data.account && data.date === data.todayDate));
+	const showTodaysBets = $derived(Boolean(data.account));
+	const betsHeading = $derived(
+		data.date === data.todayDate
+			? "Today's bets"
+			: `Bets · ${new Intl.DateTimeFormat('en-GB', {
+				timeZone: 'Europe/London',
+				day: 'numeric',
+				month: 'short'
+			}).format(new Date(`${data.date}T12:00:00Z`))}`
+	);
 
 	function getLeagueIdsFromQuery(value: string | null): number[] | null {
 		if (value === null) return null;
@@ -312,7 +321,13 @@
 		>
 			{#if showTodaysBets}
 				<aside class="min-[1100px]:order-1">
-			<section class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:px-4" aria-labelledby="todays-bets-heading">
+			<section class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:px-4" aria-labelledby="todays-bets-heading" aria-busy={isLoading}>
+				{#if isLoading}
+					<div class="py-10 text-center" role="status">
+						<span class="mx-auto block size-5 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span>
+						<p class="mt-2 text-xs font-medium text-slate-600">Loading bets…</p>
+					</div>
+				{:else}
 				<div>
 					<button
 						type="button"
@@ -322,7 +337,7 @@
 						onclick={() => (todaysBetsExpanded = !todaysBetsExpanded)}
 					>
 					<span id="todays-bets-heading" class="text-sm font-semibold text-slate-950">
-						Today's bets ({data.todaysBets.length})
+						{betsHeading} ({data.todaysBets.length})
 					</span>
 					<span class="flex items-center gap-2 text-[11px] font-medium tabular-nums text-slate-600">
 						{todaysBetWins}/{todaysBetLosses} · {todaysBetsToPlay} to play
@@ -357,7 +372,7 @@
 							</div>
 						{/if}
 						{#if data.todaysBets.length === 0}
-							<p class="py-1 text-xs text-slate-600">No bets on today's fixtures yet.</p>
+							<p class="py-1 text-xs text-slate-600">No bets on these fixtures yet.</p>
 						{:else}
 							<ul class="divide-y divide-slate-100">
 								{#each data.todaysBets as bet (bet.id)}
@@ -384,11 +399,8 @@
 													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status === 'pending' ? 'In play' : bet.status}
 												</span>{/if}
 											</div>
-											{#if bet.selections.length === 1}
-												<button type="button" class="shrink-0 text-lg leading-none text-amber-500 hover:text-amber-600" class:text-slate-300={!watchlistedFixtureIds.includes(bet.selections[0].fixtureId)} onclick={() => void toggleWatchlist(bet.selections[0].fixtureId)} aria-label={watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? 'Remove from watchlist' : 'Add to watchlist'}>{watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? '★' : '☆'}</button>
-											{/if}
 										</div>
-										<a class="mt-2 block rounded-sm text-slate-900 transition hover:bg-slate-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" href={`/fixtures/${bet.selections[0].fixtureId}`} aria-label={`View ${bet.selections[0].homeTeamName} versus ${bet.selections[0].awayTeamName}`}>
+										<div class="mt-2">
 											<p class="flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-700">
 											{#if bet.status !== 'pending' && bet.profit !== null}
 												<span class="whitespace-nowrap">
@@ -403,8 +415,8 @@
 										</p>
 											{#if bet.selections.length === 1}<p class="mt-1 text-[11px] font-bold">{bet.selections[0].market}</p>{/if}
 											{#each bet.selections as selection}
-											<div class="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
-												<span class="min-w-0 flex-1 text-slate-800">
+											<div class="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1 text-xs">
+												<a class="min-w-0 rounded-sm text-slate-800 transition hover:bg-slate-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" class:row-start-2={bet.selections.length > 1} class:col-start-1={bet.selections.length > 1} href={`/fixtures/${selection.fixtureId}`} aria-label={`View ${selection.homeTeamName} versus ${selection.awayTeamName}`}>
 													{#if selection.homeGoals !== null && selection.awayGoals !== null}
 														<span class="mt-0.5 grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1 text-slate-600">
 															<span class:font-semibold={selection.homeGoals > selection.awayGoals} class:text-slate-900={selection.homeGoals > selection.awayGoals}>{selection.homeTeamName}</span>
@@ -415,20 +427,23 @@
 													{:else}
 														<span class="mt-0.5 block text-slate-600">{selection.homeTeamName} <span class="mx-1">v</span> {selection.awayTeamName}</span>
 													{/if}
-												</span>
+												</a>
 												{#if bet.selections.length > 1}
-													<span class="text-[10px] tabular-nums text-slate-500">
-														{formatBetTime(selection.timestamp)} · {selection.status}
+													<span class="col-span-2 row-start-1 flex items-center gap-1.5 text-[10px] tabular-nums text-slate-500">
+														<span class="font-semibold text-slate-800">{formatBetTime(selection.timestamp)}</span>
+														<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold text-slate-600">{selection.status}</span>
 													</span>
 												{/if}
+												<button type="button" class="text-lg leading-none text-amber-500 hover:text-amber-600" class:row-start-2={bet.selections.length > 1} class:col-start-2={bet.selections.length > 1} class:text-slate-300={!watchlistedFixtureIds.includes(selection.fixtureId)} onclick={() => void toggleWatchlist(selection.fixtureId)} aria-label={watchlistedFixtureIds.includes(selection.fixtureId) ? `Remove ${selection.homeTeamName} versus ${selection.awayTeamName} from watchlist` : `Add ${selection.homeTeamName} versus ${selection.awayTeamName} to watchlist`}>{watchlistedFixtureIds.includes(selection.fixtureId) ? '★' : '☆'}</button>
 											</div>
 										{/each}
-										</a>
+										</div>
 									</li>
 								{/each}
 							</ul>
 						{/if}
 					</div>
+				{/if}
 				{/if}
 			</section>
 				</aside>

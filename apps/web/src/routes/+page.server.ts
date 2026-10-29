@@ -99,20 +99,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const selectedDateAtUtc = new Date(`${selectedDate}T00:00:00.000Z`);
 	const selectedStart = getUtcDateKey(new Date(selectedDateAtUtc.getTime() - 24 * 60 * 60 * 1000));
 	const selectedEnd = getUtcDateKey(new Date(selectedDateAtUtc.getTime() + 48 * 60 * 60 * 1000));
-	const todayAtUtc = new Date(`${todayUk}T00:00:00.000Z`);
-	const todayStart = getUtcDateKey(new Date(todayAtUtc.getTime() - 24 * 60 * 60 * 1000));
-	const todayEnd = getUtcDateKey(new Date(todayAtUtc.getTime() + 48 * 60 * 60 * 1000));
 	const fixtureSummariesStartedAt = performance.now();
-	const [allSelectedFixtures, fetchedTodayFixtures] = await Promise.all([
-		// BotD already has the exact fixture IDs it needs. Querying the whole
-		// three-day fixture window first becomes expensive once every league is synced.
-		selectedFixtureIds === null
-			? getFixtureSummariesBetweenDates(selectedStart, selectedEnd)
-			: getFixturesByIds(selectedFixtureIds),
-		selectedDate !== todayUk
-			? getFixtureSummariesBetweenDates(todayStart, todayEnd)
-			: Promise.resolve(null)
-	]);
+	// BotD already has the exact fixture IDs it needs. Querying the whole
+	// three-day fixture window first becomes expensive once every league is synced.
+	const allSelectedFixtures = selectedFixtureIds === null
+		? await getFixtureSummariesBetweenDates(selectedStart, selectedEnd)
+		: await getFixturesByIds(selectedFixtureIds);
 	if (isFixtureIdLookup) {
 		console.info('[fixtures] summary lookup', {
 			milliseconds: Math.round(performance.now() - fixtureSummariesStartedAt),
@@ -123,12 +115,6 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const selectedDayFixtures = allSelectedFixtures
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === selectedDate)
 		.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
-	const todaysFixtureSummaries =
-		selectedDate === todayUk
-			? selectedDayFixtures
-			: (fetchedTodayFixtures ?? [])
-					.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === todayUk)
-					.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
 	const filterableFixtures = selectedDayFixtures.filter(
 		(fixture) =>
 			fixture.fixture.status.short !== 'PST' &&
@@ -155,7 +141,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		.map((fixture) => fixture.fixture.id);
 	const relevantFixtureIds = [...new Set([
 		...fixtureIds,
-		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
+		...selectedDayFixtures.map((fixture) => fixture.fixture.id)
 	])];
 	const cardDataStartedAt = performance.now();
 	const [statsSnapshots, fixtureOdds, predictions, teamNewsFixtureIds, bets, leagueDocuments] = await Promise.all([
@@ -183,12 +169,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 					`${selection.fixture.id}|${selection.market.name.toLowerCase()}|${selection.market.selection.toLowerCase()}`
 				)
 			);
-	const todayFixtureById = new Map(
-		todaysFixtureSummaries.map((fixture) => [fixture.fixture.id, fixture])
+	const selectedDateFixtureById = new Map(
+		selectedDayFixtures.map((fixture) => [fixture.fixture.id, fixture])
 	);
 	const todaysBets = bets.flatMap((bet) => {
 		const selections = bet.selections.flatMap((selection) => {
-			const fixture = todayFixtureById.get(selection.fixture.id);
+			const fixture = selectedDateFixtureById.get(selection.fixture.id);
 			if (!fixture) return [];
 			return [{
 				fixtureId: fixture.fixture.id,
