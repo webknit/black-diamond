@@ -1,9 +1,11 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import Header from '#lib/components/Header.svelte';
 	import '../app.css';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+	onMount(() => { if ('serviceWorker' in navigator) void navigator.serviceWorker.register(`/service-worker.js?v=${import.meta.env.VITE_BUILD_VERSION ?? 'local'}`); });
 </script>
 
 <svelte:head>
