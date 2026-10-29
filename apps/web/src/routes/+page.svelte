@@ -19,6 +19,7 @@
 	let previousFilterStateKey = $state<string>();
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
 	let todaysBetsExpanded = $state(true);
+	let isWatchingAllTodaysBets = $state(false);
 	let watchlistedFixtureIds = $state<number[]>([]);
 	$effect(() => {
 		watchlistedFixtureIds = data.watchlistedFixtureIds;
@@ -65,6 +66,12 @@
 	);
 	const todaysUnmatchedBets = $derived(
 		data.todaysBets.filter((bet) => bet.matchStatus === 'unmatched').length
+	);
+	const todaysBetFixtureIds = $derived([
+		...new Set(data.todaysBets.flatMap((bet) => bet.selections.map((selection) => selection.fixtureId)))
+	]);
+	const unwatchedTodaysBetFixtureIds = $derived(
+		todaysBetFixtureIds.filter((fixtureId) => !watchlistedFixtureIds.includes(fixtureId))
 	);
 	const showTodaysBets = $derived(Boolean(data.account && data.date === data.todayDate));
 
@@ -244,6 +251,24 @@
 		watchlistedFixtureIds = starred ? [...watchlistedFixtureIds, fixtureId] : watchlistedFixtureIds.filter((id) => id !== fixtureId);
 	}
 
+	async function watchAllTodaysBets() {
+		if (!data.account) return void goto('/login');
+		const fixtureIds = unwatchedTodaysBetFixtureIds;
+		if (fixtureIds.length === 0) return;
+		isWatchingAllTodaysBets = true;
+		try {
+			const response = await fetch('/api/watchlist', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ fixtureIds })
+			});
+			if (!response.ok) return;
+			watchlistedFixtureIds = [...new Set([...watchlistedFixtureIds, ...fixtureIds])];
+		} finally {
+			isWatchingAllTodaysBets = false;
+		}
+	}
+
 </script>
 
 <svelte:head>
@@ -288,13 +313,14 @@
 			{#if showTodaysBets}
 				<aside class="min-[1100px]:order-1 min-[1100px]:sticky min-[1100px]:top-4">
 			<section class="rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm sm:px-4" aria-labelledby="todays-bets-heading">
-				<button
-					type="button"
-					class="flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 text-left"
-					aria-expanded={todaysBetsExpanded}
-					aria-controls="todays-bets-content"
-					onclick={() => (todaysBetsExpanded = !todaysBetsExpanded)}
-				>
+				<div>
+					<button
+						type="button"
+						class="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-x-3 gap-y-1 text-left"
+						aria-expanded={todaysBetsExpanded}
+						aria-controls="todays-bets-content"
+						onclick={() => (todaysBetsExpanded = !todaysBetsExpanded)}
+					>
 					<span id="todays-bets-heading" class="text-sm font-semibold text-slate-950">
 						Today's bets ({data.todaysBets.length})
 					</span>
@@ -317,10 +343,19 @@
 							class:rotate-180={todaysBetsExpanded}
 						><path d="m5 7.5 5 5 5-5" /></svg>
 					</span>
-				</button>
+					</button>
+				</div>
 
 				{#if todaysBetsExpanded}
 					<div id="todays-bets-content" class="mt-2 border-t border-slate-100 pt-2">
+						{#if unwatchedTodaysBetFixtureIds.length > 0}
+							<div class="mb-2 border-b border-slate-100 pb-2">
+								<button type="button" class="flex w-full items-center justify-between text-left text-[11px] font-medium text-slate-600 transition hover:text-amber-700 disabled:cursor-wait disabled:opacity-60" onclick={watchAllTodaysBets} disabled={isWatchingAllTodaysBets}>
+									<span>{isWatchingAllTodaysBets ? 'Watching fixtures…' : `Watch all ${unwatchedTodaysBetFixtureIds.length} fixtures`}</span>
+									<span class="flex size-4 items-center justify-center text-base leading-none text-slate-500">☆</span>
+								</button>
+							</div>
+						{/if}
 						{#if data.todaysBets.length === 0}
 							<p class="py-1 text-xs text-slate-600">No bets on today's fixtures yet.</p>
 						{:else}

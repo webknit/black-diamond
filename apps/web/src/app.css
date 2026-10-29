@@ -1,1 +1,7 @@
 @import 'tailwindcss';
+
+/* Make interactive controls feel consistently clickable across the app. */
+a[href],
+button:not(:disabled) {
+	cursor: pointer;
+}
