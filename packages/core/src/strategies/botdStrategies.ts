@@ -16,17 +16,30 @@ export type BotdStrategy = {
 	market: BotdMarket;
 };
 
+function asBotdStrategy(
+	strategy: Pick<BotdStrategy, 'id' | 'title' | 'description'>,
+	market: BotdMarket
+): BotdStrategy {
+	const marketLabel = getBotdMarketLabel(market);
+	return {
+		...strategy,
+		title: `${marketLabel} · ${strategy.title}`,
+		description: `Bet: ${marketLabel}. ${strategy.description}`,
+		market
+	};
+}
+
 export const botdStrategies: BotdStrategy[] = [
 	...teamFilterVariations
 		.filter((strategy) => strategy.sample === 'last5')
-		.map((strategy) => ({ ...strategy, market: 'over2_5' as const })),
-	...over2_5RateStrategyVariations.map((strategy) => ({ ...strategy, market: 'over2_5' as const })),
-	...over1_5StrategyVariations.map((strategy) => ({ ...strategy, market: 'over1_5' as const })),
+		.map((strategy) => asBotdStrategy(strategy, 'over2_5')),
+	...over2_5RateStrategyVariations.map((strategy) => asBotdStrategy(strategy, 'over2_5')),
+	...over1_5StrategyVariations.map((strategy) => asBotdStrategy(strategy, 'over1_5')),
 	...bttsStrategyVariations
 		.filter((strategy) => strategy.sample === 'last5')
-		.map((strategy) => ({ ...strategy, market: 'btts' as const })),
-	...bttnsStrategyVariations.map((strategy) => ({ ...strategy, market: 'bttns' as const })),
-	...leagueRateStrategyVariations.map((strategy) => ({ ...strategy, market: strategy.market }))
+		.map((strategy) => asBotdStrategy(strategy, 'btts')),
+	...bttnsStrategyVariations.map((strategy) => asBotdStrategy(strategy, 'bttns')),
+	...leagueRateStrategyVariations.map((strategy) => asBotdStrategy(strategy, strategy.market))
 ];
 
 export function matchesBotdStrategy(snapshot: FixtureStatsSnapshot, league: LeagueRateContext | undefined, strategy: BotdStrategy): boolean {
