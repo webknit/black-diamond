@@ -59,6 +59,9 @@
     "./botdFixture": {
       "types": "./src/types/botdFixture.ts"
     },
+    "./botdDay": {
+      "types": "./src/types/botdDay.ts"
+    },
     "./strategies": {
       "types": "./src/strategies/index.ts",
       "default": "./src/strategies/index.ts"

@@ -1,5 +1,5 @@
 import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
-import { getBotdFixturesForDate } from '@black-diamond/database/botdFixtures';
+import { getBotdDay } from '@black-diamond/database/botdDays';
 import { selectedLeagues } from '@black-diamond/core/selectedLeagues';
 import { botdStrategies } from '@black-diamond/core/strategies';
 import { getUkDateKey } from '@black-diamond/core/time';
@@ -34,8 +34,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const selectedStrategyId = getSelectedStrategyId(url.searchParams.get('strategy'));
 	const minimumOdds = getMinimumOdds(url.searchParams.get('minOdds'));
 	const selectedStrategy = botdStrategies.find((strategy) => strategy.id === selectedStrategyId)!;
-	const matchingFixtures = (await getBotdFixturesForDate(date, selectedStrategyId, minimumOdds))
+	const botdDay = await getBotdDay(date);
+	const matchingFixtures = (botdDay?.fixtures ?? [])
 		.filter((item) => item.fixture && item.statsSnapshot)
+		.filter((item) => item.matchingStrategyIds.includes(selectedStrategyId))
+		.filter((item) => minimumOdds === 0 || (item.over2_5ReferenceOdd !== null && item.over2_5ReferenceOdd >= minimumOdds))
 		.sort((left, right) => left.fixture.fixture.timestamp - right.fixture.fixture.timestamp);
 	const fixtureIds = matchingFixtures.map((item) => item.fixtureId);
 	const bets = locals.accountId ? await getBetsForFixturesByAccountId(locals.accountId, fixtureIds) : [];

@@ -85,6 +85,10 @@
       "types": "./src/botdFixtures/index.ts",
       "default": "./src/botdFixtures/index.ts"
     },
+    "./botdDays": {
+      "types": "./src/botdDays/index.ts",
+      "default": "./src/botdDays/index.ts"
+    },
     "./leagues": {
       "types": "./src/leagues/index.ts",
       "default": "./src/leagues/index.ts"

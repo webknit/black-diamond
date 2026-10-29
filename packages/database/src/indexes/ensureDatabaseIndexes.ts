@@ -103,6 +103,9 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   await database.collection("botdFixtures").createIndex(
     { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
   );
+  await database.collection("botdDays").createIndex(
+    { fixtureDate: 1 }, { name: "unique_fixture_date", unique: true },
+  );
   await database.collection("botdFixtures").createIndex(
     { fixtureDate: 1, matchingStrategyIds: 1, over2_5ReferenceOdd: 1 },
     { name: "fixture_date_strategy_odd" },

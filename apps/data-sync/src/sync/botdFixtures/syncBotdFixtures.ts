@@ -1,6 +1,6 @@
 import { botdStrategies, getOver2_5ReferenceOdd, matchesTeamFilterVariation } from "@black-diamond/core/strategies";
 import { getUkDateKey } from "@black-diamond/core/time";
-import { deleteBotdFixtures, upsertBotdFixtures } from "@black-diamond/database/botdFixtures";
+import { upsertBotdDays } from "@black-diamond/database/botdDays";
 import { getUpcomingFixtures } from "@black-diamond/database/fixtures";
 import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
 import { getFixtureStatsSnapshots } from "@black-diamond/database/fixtureStatsSnapshots";
@@ -49,8 +49,10 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
       updatedAt: now.toISOString(),
     }];
   });
-  await Promise.all([
-    matches.length > 0 ? upsertBotdFixtures(matches) : Promise.resolve(),
-    deleteBotdFixtures(upcoming.filter((fixture) => !matches.some((match) => match.fixtureId === fixture.fixture.id)).map((fixture) => fixture.fixture.id)),
-  ]);
+  const fixtureDates = [...new Set(upcoming.map((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000))))];
+  await upsertBotdDays(fixtureDates.map((fixtureDate) => ({
+    fixtureDate,
+    fixtures: matches.filter((fixture) => fixture.fixtureDate === fixtureDate),
+    updatedAt: now.toISOString(),
+  })));
 }

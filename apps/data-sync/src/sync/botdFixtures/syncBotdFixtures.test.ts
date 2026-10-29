@@ -9,8 +9,7 @@ const mocks = vi.hoisted(() => ({
   getFixtureInjuriesForFixtures: vi.fn(),
   getFixtureLineupsForFixtures: vi.fn(),
   getLeaguesByIds: vi.fn(),
-  upsertBotdFixtures: vi.fn(),
-  deleteBotdFixtures: vi.fn(),
+  upsertBotdDays: vi.fn(),
 }));
 vi.mock("@black-diamond/database/fixtures", () => ({ getUpcomingFixtures: mocks.getUpcomingFixtures }));
 vi.mock("@black-diamond/database/fixtureOdds", () => ({ getFixtureOddsForFixtures: mocks.getFixtureOddsForFixtures }));
@@ -19,10 +18,7 @@ vi.mock("@black-diamond/database/predictions", () => ({ getPredictionsForFixture
 vi.mock("@black-diamond/database/fixtureInjuries", () => ({ getFixtureInjuriesForFixtures: mocks.getFixtureInjuriesForFixtures }));
 vi.mock("@black-diamond/database/fixtureLineups", () => ({ getFixtureLineupsForFixtures: mocks.getFixtureLineupsForFixtures }));
 vi.mock("@black-diamond/database/leagues", () => ({ getLeaguesByIds: mocks.getLeaguesByIds }));
-vi.mock("@black-diamond/database/botdFixtures", () => ({
-  upsertBotdFixtures: mocks.upsertBotdFixtures,
-  deleteBotdFixtures: mocks.deleteBotdFixtures,
-}));
+vi.mock("@black-diamond/database/botdDays", () => ({ upsertBotdDays: mocks.upsertBotdDays }));
 import { syncBotdFixtures } from "./syncBotdFixtures.js";
 
 function fixture(id: number, timestamp: number, status = "NS") {
@@ -46,7 +42,6 @@ describe("syncBotdFixtures", () => {
     expect(mocks.getUpcomingFixtures).toHaveBeenCalledWith(now, 7);
     expect(mocks.getFixtureStatsSnapshots).toHaveBeenCalledWith([1]);
     expect(mocks.getFixtureOddsForFixtures).toHaveBeenCalledWith([1]);
-    expect(mocks.upsertBotdFixtures).not.toHaveBeenCalled();
-    expect(mocks.deleteBotdFixtures).toHaveBeenCalledWith([1]);
+    expect(mocks.upsertBotdDays).toHaveBeenCalledWith([{ fixtureDate: "2026-10-21", fixtures: [], updatedAt: now.toISOString() }]);
   });
 });
