@@ -33,6 +33,7 @@
 	},
 	"dependencies": {
 		"@black-diamond/core": "workspace:*",
-		"@black-diamond/database": "workspace:*"
+		"@black-diamond/database": "workspace:*",
+		"web-push": "^3.6.7"
 	}
 }

@@ -10,6 +10,7 @@ export async function load({ locals }: { locals: App.Locals }) {
 		getBetsByAccountId(locals.accountId)
 	]);
 	return {
+		vapidPublicKey: process.env.VAPID_PUBLIC_KEY ?? null,
 		pendingBetSummary,
 		realizedProfitLoss: bets.reduce(
 			(total, bet) => total + (bet.status === 'pending' ? 0 : (bet.profit ?? 0)),

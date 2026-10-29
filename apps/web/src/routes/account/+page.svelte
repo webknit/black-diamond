@@ -23,6 +23,17 @@
 			? (profitLoss / contributedCapital) * 100
 			: null
 	);
+	let notificationMessage = $state<string | null>(null);
+	function base64ToBytes(value: string) { const padding = '='.repeat((4 - value.length % 4) % 4); const binary = atob((value + padding).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(binary, (character) => character.charCodeAt(0)); }
+	async function enableNotifications() {
+		if (!data.vapidPublicKey || !('serviceWorker' in navigator) || !('PushManager' in window)) { notificationMessage = 'Notifications are not supported on this device.'; return; }
+		const permission = await Notification.requestPermission();
+		if (permission !== 'granted') { notificationMessage = 'Notifications were not enabled.'; return; }
+		const registration = await navigator.serviceWorker.register('/service-worker.js');
+		const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: base64ToBytes(data.vapidPublicKey) });
+		const response = await fetch('/api/push-subscription', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(subscription) });
+		notificationMessage = response.ok ? 'Notifications enabled for watched fixtures.' : 'Could not save notification settings.';
+	}
 </script>
 
 <svelte:head>
@@ -57,6 +68,12 @@
 				<p class="mt-1 text-sm text-slate-600">
 					Outstanding bets: {data.pendingBetSummary.count} · {formatCurrency(data.pendingBetSummary.totalStake, data.account.currency)} staked
 				</p>
+			</section>
+			<section class="mt-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+				<h2 class="text-sm font-semibold text-slate-950">Fixture notifications</h2>
+				<p class="mt-1 text-sm text-slate-600">Get goal and full-time alerts for fixtures on your watchlist.</p>
+				<button type="button" class="mt-3 rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700" onclick={enableNotifications}>Enable notifications</button>
+				{#if notificationMessage}<p class="mt-2 text-sm text-slate-600">{notificationMessage}</p>{/if}
 			</section>
 			<section class="mt-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
 				<h2 class="text-sm font-semibold text-slate-950">Add deposit</h2>

@@ -5,7 +5,8 @@
   "type": "module",
   "dependencies": {
     "@black-diamond/core": "workspace:*",
-    "@black-diamond/database": "workspace:*"
+    "@black-diamond/database": "workspace:*",
+    "web-push": "^3.6.7"
   },
   "scripts": {
     "sync:indexes": "node --env-file-if-exists=.env --import tsx src/index.ts indexes",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@types/web-push": "^3.6.4",
     "tsx": "^4.0.0",
     "typescript": "^6.0.3",
     "vitest": "^5.0.5"
