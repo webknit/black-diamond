@@ -11,6 +11,10 @@
 	let { data }: PageProps = $props();
 	let isLoading = $state(false);
 	let betSlipSelections = $state<BetSlipSelection[]>([]);
+	let watchlistedFixtureIds = $state<number[]>([]);
+	$effect(() => {
+		watchlistedFixtureIds = data.watchlistedFixtureIds;
+	});
 
 	function changeDate(event: Event) {
 		const input = event.currentTarget;
@@ -59,6 +63,18 @@
 			? [...betSlipSelections, { fixture, selection }]
 			: betSlipSelections.filter((_, itemIndex) => itemIndex !== index);
 	}
+
+	async function toggleWatchlist(fixtureId: number) {
+		if (!data.account) return void goto('/login');
+
+		const response = await fetch(`/api/watchlist/${fixtureId}`, { method: 'POST' });
+		if (!response.ok) return;
+
+		const { starred } = (await response.json()) as { starred: boolean };
+		watchlistedFixtureIds = starred
+			? [...watchlistedFixtureIds, fixtureId]
+			: watchlistedFixtureIds.filter((id) => id !== fixtureId);
+	}
 </script>
 
 <svelte:head>
@@ -106,6 +122,8 @@
 			isLoading={isLoading}
 			placedSelectionKeys={data.placedBetSelectionKeys}
 			onSelectOdd={chooseOdd}
+			{watchlistedFixtureIds}
+			onToggleWatchlist={data.account ? toggleWatchlist : undefined}
 		/>
 	</div>
 </main>
