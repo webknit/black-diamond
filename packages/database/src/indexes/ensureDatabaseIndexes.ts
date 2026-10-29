@@ -41,6 +41,15 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { name: "league_season_timestamp" },
   );
   await database.collection("fixtures").createIndex(
+    {
+      "league.id": 1,
+      "league.season": 1,
+      "fixture.status.short": 1,
+      "fixture.timestamp": 1,
+    },
+    { name: "league_season_status_timestamp" },
+  );
+  await database.collection("fixtures").createIndex(
     { "league.id": 1, "league.season": 1, "teams.home.id": 1, "fixture.status.short": 1, "fixture.timestamp": -1 },
     { name: "league_season_home_team_form" },
   );
@@ -92,6 +101,15 @@ export async function ensureDatabaseIndexes(): Promise<void> {
   await database.collection("fixtureWatchlist").createIndex(
     { accountId: 1, fixtureId: 1 }, { name: "unique_account_fixture_watchlist", unique: true },
   );
+  await database.collection("fixtureWatchlist").createIndex(
+    { fixtureId: 1, accountId: 1 }, { name: "fixture_watchers" },
+  );
+  await database.collection("pushSubscriptions").createIndex(
+    { endpoint: 1 }, { name: "unique_subscription_endpoint", unique: true },
+  );
+  await database.collection("pushSubscriptions").createIndex(
+    { accountId: 1 }, { name: "account_push_subscriptions" },
+  );
   await database.collection("strategyPerformances").createIndex(
     { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
     { name: "unique_strategy_league_season", unique: true },
@@ -100,15 +118,8 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { strategyId: 1, strategyVersion: 1 },
     { name: "unique_strategy_summary", unique: true },
   );
-  await database.collection("botdFixtures").createIndex(
-    { fixtureId: 1 }, { name: "unique_fixture_id", unique: true },
-  );
   await database.collection("botdDays").createIndex(
     { fixtureDate: 1 }, { name: "unique_fixture_date", unique: true },
-  );
-  await database.collection("botdFixtures").createIndex(
-    { fixtureDate: 1, matchingStrategyIds: 1, over2_5ReferenceOdd: 1 },
-    { name: "fixture_date_strategy_odd" },
   );
   await database.collection("fullSeasonFixtureSyncStates").createIndex(
     { leagueId: 1, season: 1 },

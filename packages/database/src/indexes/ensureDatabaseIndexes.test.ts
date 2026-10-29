@@ -31,6 +31,15 @@ describe("ensureDatabaseIndexes", () => {
       { name: "league_season_timestamp" },
     );
     expect(mocks.createIndex).toHaveBeenCalledWith(
+      {
+        "league.id": 1,
+        "league.season": 1,
+        "fixture.status.short": 1,
+        "fixture.timestamp": 1,
+      },
+      { name: "league_season_status_timestamp" },
+    );
+    expect(mocks.createIndex).toHaveBeenCalledWith(
       { accountId: 1, "selections.fixture.id": 1 },
       { name: "account_selection_fixture" },
     );
@@ -44,5 +53,18 @@ describe("ensureDatabaseIndexes", () => {
       { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
       { name: "unique_strategy_league_season", unique: true },
     );
+    expect(mocks.createIndex).toHaveBeenCalledWith(
+      { fixtureId: 1, accountId: 1 },
+      { name: "fixture_watchers" },
+    );
+    expect(mocks.createIndex).toHaveBeenCalledWith(
+      { endpoint: 1 },
+      { name: "unique_subscription_endpoint", unique: true },
+    );
+    expect(mocks.createIndex).toHaveBeenCalledWith(
+      { accountId: 1 },
+      { name: "account_push_subscriptions" },
+    );
+    expect(mocks.collection).not.toHaveBeenCalledWith("botdFixtures");
   });
 });

@@ -150,17 +150,17 @@
 					</p>
 				{/if}
 				<FixtureEvents
-					events={fixture.events}
-					statistics={fixture.statistics}
+					fixtureId={fixture.id}
 					homeTeam={{ id: fixture.homeTeamId, name: fixture.homeTeamName, logo: fixture.homeTeamLogo }}
 					awayTeam={{ id: fixture.awayTeamId, name: fixture.awayTeamName, logo: fixture.awayTeamLogo }}
 					homeGoals={fixture.homeGoals}
 					awayGoals={fixture.awayGoals}
 					status={formatStatus()}
+					statusShort={fixture.status.short}
 				/>
 				<FixtureTeamNews
-					injuries={fixture.injuries}
-					lineups={fixture.lineups}
+					fixtureId={fixture.id}
+					hasTeamNews={fixture.hasTeamNews}
 					homeTeam={{ id: fixture.homeTeamId, name: fixture.homeTeamName }}
 					awayTeam={{ id: fixture.awayTeamId, name: fixture.awayTeamName }}
 				/>

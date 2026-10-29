@@ -2,10 +2,7 @@ import type { Actions } from './$types';
 import { getFixtureSummariesBetweenDates, getFixturesByIds } from '@black-diamond/database/fixtures';
 import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
-import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
-import { getFixtureStatisticsForFixtures } from '@black-diamond/database/fixtureStatistics';
-import { getFixtureInjuriesForFixtures } from '@black-diamond/database/fixtureInjuries';
-import { getFixtureLineupsForFixtures } from '@black-diamond/database/fixtureLineups';
+import { getFixtureTeamNewsAvailability } from '@black-diamond/database/fixtureTeamNews';
 import { getPredictionsForFixtures } from '@black-diamond/database/predictions';
 import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
 import { getWatchlistFixtureIds } from '@black-diamond/database/fixtureWatchlist';
@@ -161,14 +158,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		...todaysFixtureSummaries.map((fixture) => fixture.fixture.id)
 	])];
 	const cardDataStartedAt = performance.now();
-	const [statsSnapshots, fixtureOdds, predictions, fixtureEvents, fixtureStatistics, fixtureInjuries, fixtureLineups, bets, leagueDocuments] = await Promise.all([
+	const [statsSnapshots, fixtureOdds, predictions, teamNewsFixtureIds, bets, leagueDocuments] = await Promise.all([
 		minimalCardData ? Promise.resolve([]) : getFixtureCardSnapshots(fixtureIds),
 		getFixtureCardOdds(fixtureIds),
 		minimalCardData ? Promise.resolve([]) : getPredictionsForFixtures(marketFixtureIds),
-		minimalCardData ? Promise.resolve([]) : getFixtureEventsForFixtures(fixtureIds),
-		minimalCardData ? Promise.resolve([]) : getFixtureStatisticsForFixtures(fixtureIds),
-		minimalCardData ? Promise.resolve([]) : getFixtureInjuriesForFixtures(fixtureIds),
-		minimalCardData ? Promise.resolve([]) : getFixtureLineupsForFixtures(fixtureIds),
+		minimalCardData ? Promise.resolve(new Set<number>()) : getFixtureTeamNewsAvailability(fixtureIds),
 		locals.accountId
 			? getBetsForFixturesByAccountId(locals.accountId, relevantFixtureIds)
 			: Promise.resolve([]),
@@ -183,10 +177,6 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const statsByFixtureId = new Map(statsSnapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
 	const oddsByFixtureId = new Map(fixtureOdds.map((odds) => [odds.fixtureId, odds]));
 	const predictionsByFixtureId = new Map(predictions.map((prediction) => [prediction.fixtureId, prediction]));
-	const eventsByFixtureId = new Map(fixtureEvents.map((fixtureEvent) => [fixtureEvent.fixtureId, fixtureEvent.events]));
-	const statisticsByFixtureId = new Map(fixtureStatistics.map((statistics) => [statistics.fixtureId, statistics]));
-	const injuriesByFixtureId = new Map(fixtureInjuries.map((injuries) => [injuries.fixtureId, injuries.injuries]));
-	const lineupsByFixtureId = new Map(fixtureLineups.map((lineups) => [lineups.fixtureId, lineups.lineups]));
 	const leaguesById = new Map(leagueDocuments.map((league) => [league.league.id, league]));
 	const placedBetSelectionKeys = bets.flatMap((bet) =>
 				bet.selections.map((selection) =>
@@ -245,9 +235,6 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			const stats = statsByFixtureId.get(fixture.fixture.id);
 			const odds = oddsByFixtureId.get(fixture.fixture.id);
 			const prediction = predictionsByFixtureId.get(fixture.fixture.id);
-			const fixtureStatistics = statisticsByFixtureId.get(fixture.fixture.id);
-			const injuries = injuriesByFixtureId.get(fixture.fixture.id);
-			const lineups = lineupsByFixtureId.get(fixture.fixture.id);
 
 			return {
 				id: fixture.fixture.id,
@@ -373,23 +360,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 						}
 					: null,
 				prediction: prediction ? getFixturePrediction(prediction.response) : null,
-				events: eventsByFixtureId.get(fixture.fixture.id) ?? [],
-				statistics: fixtureStatistics
-					? {
-							home: {
-								shots: fixtureStatistics.home.shots,
-								shotsOnTarget: fixtureStatistics.home.shotsOnTarget,
-								possession: fixtureStatistics.home.possession
-							},
-							away: {
-								shots: fixtureStatistics.away.shots,
-								shotsOnTarget: fixtureStatistics.away.shotsOnTarget,
-								possession: fixtureStatistics.away.possession
-							}
-						}
-					: null,
-				injuries: injuries ?? null,
-				lineups: lineups ?? null
+				hasTeamNews: teamNewsFixtureIds.has(fixture.fixture.id)
 			};
 		}),
 		today: new Intl.DateTimeFormat('en-GB', {

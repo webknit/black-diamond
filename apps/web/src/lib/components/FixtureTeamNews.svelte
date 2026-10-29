@@ -4,17 +4,20 @@
 	import Modal from './modal/Modal.svelte';
 
 	let {
-		injuries,
-		lineups,
+		fixtureId,
+		hasTeamNews,
 		homeTeam,
 		awayTeam
 	}: {
-		injuries: FixtureInjury[] | null;
-		lineups: FixtureTeamLineup[] | null;
+		fixtureId: number;
+		hasTeamNews: boolean;
 		homeTeam: { id: number; name: string };
 		awayTeam: { id: number; name: string };
 	} = $props();
 	let isOpen = $state(false);
+	let isLoading = $state(false);
+	let injuries = $state<FixtureInjury[] | null>(null);
+	let lineups = $state<FixtureTeamLineup[] | null>(null);
 
 	const reportedInjuries = $derived(injuries ?? []);
 	const uniqueInjuries = $derived(
@@ -31,7 +34,21 @@
 	const homeLineup = $derived(lineups?.find((lineup) => lineup.teamId === homeTeam.id) ?? null);
 	const awayLineup = $derived(lineups?.find((lineup) => lineup.teamId === awayTeam.id) ?? null);
 	const hasAnnouncedLineup = $derived(lineups?.some((lineup) => lineup.startXI.length > 0) ?? false);
-	const hasTeamNews = $derived(uniqueInjuries.length > 0 || hasAnnouncedLineup);
+
+	async function openTeamNews() {
+		isOpen = true;
+		if (injuries !== null || isLoading) return;
+		isLoading = true;
+		try {
+			const response = await fetch(`/api/fixtures/${fixtureId}/team-news`);
+			if (!response.ok) return;
+			const data = await response.json() as { injuries: FixtureInjury[]; lineups: FixtureTeamLineup[] };
+			injuries = data.injuries;
+			lineups = data.lineups;
+		} finally {
+			isLoading = false;
+		}
+	}
 
 	function injuryDescription(injury: FixtureInjury) {
 		return injury.player.reason ?? injury.player.type;
@@ -43,7 +60,7 @@
 		<button
 			type="button"
 			class="cursor-pointer text-[10px] text-slate-500 underline decoration-slate-300 underline-offset-2 transition hover:text-emerald-700 hover:decoration-emerald-500"
-			onclick={() => (isOpen = true)}
+			onclick={openTeamNews}
 		>
 			<span>Team news</span>
 			{#if uniqueInjuries.length > 0 && !hasAnnouncedLineup}<span>· 🏥 {uniqueInjuries.length}</span>{/if}
@@ -58,6 +75,9 @@
 			<button type="button" data-modal-close class="absolute right-0 top-0 rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close team news">✕</button>
 		</header>
 
+		{#if isLoading}
+			<div class="flex flex-1 items-center justify-center py-12" role="status"><span class="size-5 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span><span class="sr-only">Loading team news</span></div>
+		{:else}
 		<div class="grid max-h-[calc(80dvh-4.5rem)] grid-cols-2 divide-x divide-slate-100 overflow-y-auto">
 			{#each [
 				{ team: homeTeam, lineup: homeLineup, injuries: homeInjuries, alignment: 'text-left' },
@@ -104,5 +124,6 @@
 				</section>
 			{/each}
 		</div>
+		{/if}
 	</Modal>
 {/if}

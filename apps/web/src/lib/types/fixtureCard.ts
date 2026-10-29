@@ -94,14 +94,5 @@ export type FixtureCardData = {
 	stats: FixtureStatsData | null;
 	odds: FixtureOddsData | null;
 	prediction: FixturePredictionData | null;
-	events: FixtureEvent[];
-	statistics: {
-		home: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
-		away: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
-	} | null;
-	injuries: FixtureInjury[] | null;
-	lineups: FixtureTeamLineup[] | null;
+	hasTeamNews: boolean;
 };
-import type { FixtureEvent } from '@black-diamond/core/fixtureEvents';
-import type { FixtureInjury } from '@black-diamond/core/fixtureInjuries';
-import type { FixtureTeamLineup } from '@black-diamond/core/fixtureLineups';

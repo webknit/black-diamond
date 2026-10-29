@@ -4,6 +4,7 @@ import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 import { getWatchlistFixtureIds } from '@black-diamond/database/fixtureWatchlist';
 import { getLeaguesByIds } from '@black-diamond/database/leagues';
+import { getFixtureTeamNewsAvailability } from '@black-diamond/database/fixtureTeamNews';
 import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
@@ -17,10 +18,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === date)
 		.sort((left, right) => left.fixture.timestamp - right.fixture.timestamp);
 	const fixtureIdsForDate = savedFixtures.map((fixture) => fixture.fixture.id);
-	const [odds, snapshots, leagueDocuments] = await Promise.all([
+	const [odds, snapshots, leagueDocuments, teamNewsFixtureIds] = await Promise.all([
 		getFixtureCardOdds(fixtureIdsForDate),
 		getFixtureCardSnapshots(fixtureIdsForDate),
-		getLeaguesByIds([...new Set(savedFixtures.map((fixture) => fixture.league.id))])
+		getLeaguesByIds([...new Set(savedFixtures.map((fixture) => fixture.league.id))]),
+		getFixtureTeamNewsAvailability(fixtureIdsForDate)
 	]);
 	const oddsByFixtureId = new Map(odds.map((odds) => [odds.fixtureId, odds]));
 	const statsByFixtureId = new Map(snapshots.map((snapshot) => [snapshot.fixtureId, snapshot]));
@@ -36,7 +38,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			awayTeamName: fixture.teams.away.name, awayTeamId: fixture.teams.away.id, awayTeamLogo: fixture.teams.away.logo,
 			homeGoals: fixture.goals.home, awayGoals: fixture.goals.away,
 			fullTimeScore: fixture.score?.fulltime, extraTimeScore: fixture.score?.extratime, penaltyScore: fixture.score?.penalty ?? fixture.score?.penalties,
-			stats: statsByFixtureId.get(fixture.fixture.id) ?? null, prediction: null, events: [], statistics: null, injuries: null, lineups: null,
+			stats: statsByFixtureId.get(fixture.fixture.id) ?? null, prediction: null, hasTeamNews: teamNewsFixtureIds.has(fixture.fixture.id),
 			odds: oddsByFixtureId.get(fixture.fixture.id) ?? null
 		}));
 	return { date, fixtures };

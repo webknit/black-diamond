@@ -9,33 +9,33 @@
 	};
 
 	let {
-		events,
+		fixtureId,
 		homeTeam,
 		awayTeam,
 		homeGoals,
 		awayGoals,
-		statistics,
-		status
+		status,
+		statusShort
 	}: {
-		events: FixtureEvent[];
+		fixtureId: number;
 		homeTeam: Team;
 		awayTeam: Team;
 		homeGoals: number | null;
 		awayGoals: number | null;
-		statistics: {
-			home: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
-			away: { shots: number | null; shotsOnTarget: number | null; possession: number | null };
-		} | null;
 		status: string;
+		statusShort: string;
 	} = $props();
 	let isOpen = $state(false);
+	let isLoading = $state(false);
+	let events = $state<FixtureEvent[] | null>(null);
+	let statistics = $state<{ home: { shots: number | null; shotsOnTarget: number | null; possession: number | null }; away: { shots: number | null; shotsOnTarget: number | null; possession: number | null } } | null>(null);
 
 	const isScoredGoal = (event: FixtureEvent) =>
 		event.type === 'Goal' && ['Normal Goal', 'Own Goal', 'Penalty'].includes(event.detail ?? '');
 	const isMissedPenalty = (event: FixtureEvent) => event.type === 'Goal' && event.detail === 'Missed Penalty';
-	const goals = $derived(events.filter(isScoredGoal));
-	const yellowCards = $derived(events.filter((event) => event.detail?.includes('Yellow')).length);
-	const redCards = $derived(events.filter((event) => event.detail?.includes('Red')).length);
+	const goals = $derived((events ?? []).filter(isScoredGoal));
+	const yellowCards = $derived((events ?? []).filter((event) => event.detail?.includes('Yellow')).length);
+	const redCards = $derived((events ?? []).filter((event) => event.detail?.includes('Red')).length);
 	const hasShots = $derived(statistics?.home.shots != null || statistics?.away.shots != null);
 	const hasShotsOnTarget = $derived(
 		statistics?.home.shotsOnTarget != null || statistics?.away.shotsOnTarget != null
@@ -44,6 +44,22 @@
 		statistics?.home.possession != null || statistics?.away.possession != null
 	);
 	const hasStatistics = $derived(hasShots || hasShotsOnTarget || hasPossession);
+	const hasStarted = $derived(!['NS', 'TBD', 'PST', 'CANC'].includes(statusShort));
+
+	async function openDetails() {
+		isOpen = true;
+		if (events !== null || isLoading) return;
+		isLoading = true;
+		try {
+			const response = await fetch(`/api/fixtures/${fixtureId}/details`);
+			if (!response.ok) return;
+			const data = await response.json() as { events: FixtureEvent[]; statistics: typeof statistics };
+			events = data.events;
+			statistics = data.statistics;
+		} finally {
+			isLoading = false;
+		}
+	}
 
 	function eventMinute(event: FixtureEvent) {
 		return `${event.time.elapsed ?? '–'}′${event.time.extra ? `+${event.time.extra}` : ''}`;
@@ -69,11 +85,11 @@
 
 </script>
 
-{#if events.length > 0}
+{#if hasStarted}
 	<div class="mt-2 border-t border-slate-100 pt-2 text-center">
-		<button type="button" class="inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-slate-900 active:scale-[0.98]" onclick={() => (isOpen = true)}>
+		<button type="button" class="inline-flex max-w-full cursor-pointer items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[10px] text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-slate-900 active:scale-[0.98]" onclick={openDetails}>
 			<span aria-hidden="true">⚽</span>
-			<span>{goals.length}</span>
+			<span>{events === null ? 'Match details' : goals.length}</span>
 			{#if yellowCards > 0}<span>· 🟨 {yellowCards}</span>{/if}
 			{#if redCards > 0}<span>· 🟥 {redCards}</span>{/if}
 		</button>
@@ -100,7 +116,7 @@
 				</div>
 			</div>
 			<div class="mt-3 flex items-center justify-between gap-3">
-				<p class="text-xs text-slate-500">{events.length} recorded events</p>
+				<p class="text-xs text-slate-500">{events?.length ?? 0} recorded events</p>
 			<button type="button" data-modal-close class="rounded-md p-1 text-slate-500 hover:bg-slate-100 hover:text-slate-900" aria-label="Close match events">✕</button>
 			</div>
 			{#if statistics && hasStatistics}
@@ -135,8 +151,13 @@
 				</div>
 			{/if}
 		</header>
-		<ol class="mt-2 max-h-[calc(80dvh-12rem)] divide-y divide-slate-100 overflow-y-auto sm:mt-3">
-			{#each events as event, index (`${event.time.elapsed}-${event.type}-${event.player.id}-${index}`)}
+		{#if isLoading}
+			<div class="flex flex-1 items-center justify-center py-12" role="status"><span class="size-5 animate-spin rounded-full border-2 border-slate-300 border-t-emerald-700"></span><span class="sr-only">Loading match details</span></div>
+		{:else if events?.length === 0}
+			<p class="py-8 text-center text-xs text-slate-500">No match details are available yet.</p>
+		{:else}
+			<ol class="mt-2 max-h-[calc(80dvh-12rem)] divide-y divide-slate-100 overflow-y-auto sm:mt-3">
+			{#each events ?? [] as event, index (`${event.time.elapsed}-${event.type}-${event.player.id}-${index}`)}
 				<li class="grid grid-cols-[minmax(0,1fr)_3.5rem_minmax(0,1fr)] items-center gap-2 py-2 text-xs">
 					<div class="min-w-0 text-left">
 						{#if event.team.id === homeTeam.id}
@@ -168,6 +189,7 @@
 					</div>
 				</li>
 			{/each}
-		</ol>
+			</ol>
+		{/if}
 	</Modal>
 {/if}
