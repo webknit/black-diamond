@@ -22,6 +22,13 @@ export function didFixtureScoreIncrease(
   return refreshedTotal > previousTotal;
 }
 
+export function formatMatchMinute(
+  time: { elapsed: number | null; extra?: number | null },
+) {
+  if (time.elapsed === null) return null;
+  return `${time.elapsed}′${time.extra ? `+${time.extra}` : ""}`;
+}
+
 export async function syncFixturesInProgress() {
   const apiFootball = getApiFootballClient();
   const fixturesAwaitingResult = await getFixturesAwaitingResult();
@@ -55,6 +62,9 @@ async function notifyFixtureChanges(
       !["FT", "AET", "PEN"].includes(before.fixture.status.short);
     const goal = didFixtureScoreIncrease(before.goals, fixture.goals);
     if (!fullTime && !goal) continue;
+    const updateMinute = goal
+      ? formatMatchMinute({ elapsed: fixture.fixture.status.elapsed })
+      : null;
     const subscriptions = await getPushSubscriptionsByAccountIds(
       await getWatchingAccountIds(fixture.fixture.id),
     );
@@ -75,7 +85,7 @@ async function notifyFixtureChanges(
             ? `Full time · ${selection.market.selection} · ${result ? "Won" : "Lost"}`
             : fullTime
               ? "Full time"
-              : "⚽ Goal";
+              : `⚽ Update${updateMinute ? ` · ${updateMinute}` : ""}`;
         return webpush
           .sendNotification(
             subscription,

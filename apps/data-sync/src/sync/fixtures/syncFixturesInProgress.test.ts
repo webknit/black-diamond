@@ -16,6 +16,7 @@ vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
 
 import {
   didFixtureScoreIncrease,
+  formatMatchMinute,
   syncFixturesInProgress,
 } from "./syncFixturesInProgress.js";
 
@@ -57,5 +58,10 @@ describe("syncFixturesInProgress", () => {
         { home: 1, away: 0 },
       ),
     ).toBe(true);
+  });
+
+  it("formats the elapsed match minute for a score update", () => {
+    expect(formatMatchMinute({ elapsed: 63 })).toBe("63′");
+    expect(formatMatchMinute({ elapsed: null })).toBeNull();
   });
 });
