@@ -1,5 +1,5 @@
 import type { Actions } from './$types';
-import { getFixtureSummariesBetweenDates } from '@black-diamond/database/fixtures';
+import { getFixtureSummariesBetweenDates, getFixturesByIds } from '@black-diamond/database/fixtures';
 import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
 import { getFixtureCardSnapshots } from '@black-diamond/database/fixtureStatsSnapshots';
 import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
@@ -105,7 +105,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const todayStart = getUtcDateKey(new Date(todayAtUtc.getTime() - 24 * 60 * 60 * 1000));
 	const todayEnd = getUtcDateKey(new Date(todayAtUtc.getTime() + 48 * 60 * 60 * 1000));
 	const [allSelectedFixtures, fetchedTodayFixtures] = await Promise.all([
-		getFixtureSummariesBetweenDates(selectedStart, selectedEnd),
+		// BotD already has the exact fixture IDs it needs. Querying the whole
+		// three-day fixture window first becomes expensive once every league is synced.
+		selectedFixtureIds === null
+			? getFixtureSummariesBetweenDates(selectedStart, selectedEnd)
+			: getFixturesByIds(selectedFixtureIds),
 		selectedDate !== todayUk
 			? getFixtureSummariesBetweenDates(todayStart, todayEnd)
 			: Promise.resolve(null)
