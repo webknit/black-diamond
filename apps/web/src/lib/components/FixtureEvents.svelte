@@ -30,7 +30,10 @@
 	} = $props();
 	let isOpen = $state(false);
 
-	const goals = $derived(events.filter((event) => event.type === 'Goal'));
+	const isScoredGoal = (event: FixtureEvent) =>
+		event.type === 'Goal' && ['Normal Goal', 'Own Goal', 'Penalty'].includes(event.detail ?? '');
+	const isMissedPenalty = (event: FixtureEvent) => event.type === 'Goal' && event.detail === 'Missed Penalty';
+	const goals = $derived(events.filter(isScoredGoal));
 	const yellowCards = $derived(events.filter((event) => event.detail?.includes('Yellow')).length);
 	const redCards = $derived(events.filter((event) => event.detail?.includes('Red')).length);
 	const hasShots = $derived(statistics?.home.shots != null || statistics?.away.shots != null);
@@ -47,6 +50,7 @@
 	}
 
 	function eventIcon(event: FixtureEvent) {
+		if (isMissedPenalty(event)) return '✕';
 		if (event.type === 'Goal') return '⚽';
 		if (event.type === 'Card') return event.detail?.includes('Red') ? '🟥' : '🟨';
 		if (event.type === 'subst') return '⇄';
@@ -137,8 +141,10 @@
 					<div class="min-w-0 text-left">
 						{#if event.team.id === homeTeam.id}
 							<p class="break-words font-medium text-slate-900">{event.type === 'subst' ? event.assist.name ?? event.player.name ?? event.detail ?? event.type : event.player.name ?? event.detail ?? event.type}</p>
-							{#if event.type === 'Goal' && event.assist.name}
+							{#if isScoredGoal(event) && event.assist.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
+							{:else if isMissedPenalty(event)}
+								<p class="mt-0.5 text-[10px] font-medium text-rose-600">Missed penalty</p>
 							{:else if event.type === 'subst' && event.player.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Replaced: {event.player.name}</p>
 							{/if}
@@ -151,8 +157,10 @@
 					<div class="min-w-0 text-right">
 						{#if event.team.id === awayTeam.id}
 							<p class="break-words font-medium text-slate-900">{event.type === 'subst' ? event.assist.name ?? event.player.name ?? event.detail ?? event.type : event.player.name ?? event.detail ?? event.type}</p>
-							{#if event.type === 'Goal' && event.assist.name}
+							{#if isScoredGoal(event) && event.assist.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Assist: {event.assist.name}</p>
+							{:else if isMissedPenalty(event)}
+								<p class="mt-0.5 text-[10px] font-medium text-rose-600">Missed penalty</p>
 							{:else if event.type === 'subst' && event.player.name}
 								<p class="mt-0.5 break-words text-[10px] text-slate-500">Replaced: {event.player.name}</p>
 							{/if}

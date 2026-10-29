@@ -385,11 +385,11 @@
 												</span>{/if}
 											</div>
 											{#if bet.selections.length === 1}
-												<button type="button" class="shrink-0 text-lg leading-none text-amber-500 hover:text-amber-600" class:text-slate-300={!watchlistedFixtureIds.includes(bet.selections[0].fixtureId)} onclick={() => toggleWatchlist(bet.selections[0].fixtureId)} aria-label={watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? 'Remove from watchlist' : 'Add to watchlist'}>{watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? '★' : '☆'}</button>
+												<button type="button" class="shrink-0 text-lg leading-none text-amber-500 hover:text-amber-600" class:text-slate-300={!watchlistedFixtureIds.includes(bet.selections[0].fixtureId)} onclick={() => void toggleWatchlist(bet.selections[0].fixtureId)} aria-label={watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? 'Remove from watchlist' : 'Add to watchlist'}>{watchlistedFixtureIds.includes(bet.selections[0].fixtureId) ? '★' : '☆'}</button>
 											{/if}
 										</div>
-										{#if bet.selections.length === 1}<p class="mt-2 text-[11px] font-bold text-slate-900">{bet.selections[0].market}</p>{/if}
-										<p class="mt-1 flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-700">
+										<a class="mt-2 block rounded-sm text-slate-900 transition hover:bg-slate-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" href={`/fixtures/${bet.selections[0].fixtureId}`} aria-label={`View ${bet.selections[0].homeTeamName} versus ${bet.selections[0].awayTeamName}`}>
+											<p class="flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-700">
 											{#if bet.status !== 'pending' && bet.profit !== null}
 												<span class="whitespace-nowrap">
 													<span class="text-slate-500">P/L</span>
@@ -401,7 +401,8 @@
 											<span class="whitespace-nowrap"><span class="text-slate-500">Odds</span> <span class="text-slate-800">{bet.placedOdds}</span></span>
 											<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> <span>{formatMoney(bet.stake)}</span></span>
 										</p>
-										{#each bet.selections as selection}
+											{#if bet.selections.length === 1}<p class="mt-1 text-[11px] font-bold">{bet.selections[0].market}</p>{/if}
+											{#each bet.selections as selection}
 											<div class="mt-2 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 text-xs">
 												<span class="min-w-0 flex-1 text-slate-800">
 													{#if selection.homeGoals !== null && selection.awayGoals !== null}
@@ -422,6 +423,7 @@
 												{/if}
 											</div>
 										{/each}
+										</a>
 									</li>
 								{/each}
 							</ul>

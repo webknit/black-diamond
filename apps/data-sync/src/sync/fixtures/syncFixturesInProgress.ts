@@ -5,14 +5,18 @@ import {
 
 import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
 import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures.js";
-import { getWatchingAccountIds } from '@black-diamond/database/fixtureWatchlist';
-import { getPushSubscriptionsByAccountIds } from '@black-diamond/database/pushSubscriptions';
-import webpush from 'web-push';
+import { getWatchingAccountIds } from "@black-diamond/database/fixtureWatchlist";
+import { getPushSubscriptionsByAccountIds } from "@black-diamond/database/pushSubscriptions";
+import webpush from "web-push";
+import { getBetsForFixturesByAccountId } from "@black-diamond/database/bets";
+import { didBetSelectionWin } from "../bets/didBetSelectionWin.js";
 
 export async function syncFixturesInProgress() {
   const apiFootball = getApiFootballClient();
   const fixturesAwaitingResult = await getFixturesAwaitingResult();
-  const fixtureIds = fixturesAwaitingResult.map((fixture) => fixture.fixture.id);
+  const fixtureIds = fixturesAwaitingResult.map(
+    (fixture) => fixture.fixture.id,
+  );
   const refreshedFixtures = await fetchFixturesByIds(apiFootball, fixtureIds);
   await notifyFixtureChanges(fixturesAwaitingResult, refreshedFixtures);
 
@@ -21,11 +25,61 @@ export async function syncFixturesInProgress() {
   return refreshedFixtures;
 }
 
-async function notifyFixtureChanges(previous: typeof fixturesAwaitingResult, refreshed: typeof previous) {
+async function notifyFixtureChanges(
+  previous: typeof fixturesAwaitingResult,
+  refreshed: typeof previous,
+) {
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return;
-  webpush.setVapidDetails(process.env.VAPID_SUBJECT ?? 'mailto:notifications@blackdiamond.app', process.env.VAPID_PUBLIC_KEY, process.env.VAPID_PRIVATE_KEY);
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT ?? "mailto:notifications@blackdiamond.app",
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY,
+  );
   const old = new Map(previous.map((fixture) => [fixture.fixture.id, fixture]));
-  for (const fixture of refreshed) { const before = old.get(fixture.fixture.id); if (!before) continue; const fullTime = ['FT','AET','PEN'].includes(fixture.fixture.status.short) && !['FT','AET','PEN'].includes(before.fixture.status.short); const goal = fixture.goals.home !== before.goals.home || fixture.goals.away !== before.goals.away; if (!fullTime && !goal) continue; const subscriptions = await getPushSubscriptionsByAccountIds(await getWatchingAccountIds(fixture.fixture.id)); const score = `${fixture.teams.home.name} ${fixture.goals.home ?? 0}–${fixture.goals.away ?? 0} ${fixture.teams.away.name}`; await Promise.all(subscriptions.map(({ subscription }) => webpush.sendNotification(subscription, JSON.stringify({ title: fullTime ? 'Full time' : '⚽ Goal', body: score, url: `/fixtures/${fixture.fixture.id}` })).catch(() => undefined))); }
+  for (const fixture of refreshed) {
+    const before = old.get(fixture.fixture.id);
+    if (!before) continue;
+    const fullTime =
+      ["FT", "AET", "PEN"].includes(fixture.fixture.status.short) &&
+      !["FT", "AET", "PEN"].includes(before.fixture.status.short);
+    const goal =
+      fixture.goals.home !== before.goals.home ||
+      fixture.goals.away !== before.goals.away;
+    if (!fullTime && !goal) continue;
+    const subscriptions = await getPushSubscriptionsByAccountIds(
+      await getWatchingAccountIds(fixture.fixture.id),
+    );
+    const score = `${fixture.teams.home.name} ${fixture.goals.home ?? 0}–${fixture.goals.away ?? 0} ${fixture.teams.away.name}`;
+    await Promise.all(
+      subscriptions.map(async ({ accountId, subscription }) => {
+        const bets = fullTime
+          ? await getBetsForFixturesByAccountId(accountId, [fixture.fixture.id])
+          : [];
+        const selection = bets
+          .flatMap((bet) => bet.selections)
+          .find((item) => item.fixture.id === fixture.fixture.id);
+        const result = selection
+          ? didBetSelectionWin(selection, fixture)
+          : null;
+        const title =
+          fullTime && selection && result !== null
+            ? `Full time · ${selection.market.selection} · ${result ? "Won" : "Lost"}`
+            : fullTime
+              ? "Full time"
+              : "⚽ Goal";
+        return webpush
+          .sendNotification(
+            subscription,
+            JSON.stringify({
+              title,
+              body: score,
+              url: `/fixtures/${fixture.fixture.id}`,
+            }),
+          )
+          .catch(() => undefined);
+      }),
+    );
+  }
 }
 
 async function fetchFixturesByIds(
