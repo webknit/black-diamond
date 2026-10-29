@@ -21,10 +21,10 @@ export async function runDailySync(lastCompletedAt?: Date) {
   await logSyncStep("sync fixtures", () => syncFixtures(fixtureDateRange));
   await logSyncStep("settle completed bets", syncBetResults);
   await logSyncStep("sync fixture stats snapshots", syncFixtureStatsSnapshots);
-  await logSyncStep("sync BotD fixtures", syncBotdFixtures);
   await logSyncStep("sync team stats for today's fixtures", syncTeamStatsForTodaysFixtures);
   await logSyncStep("sync upcoming predictions", syncUpcomingPredictions);
   await logSyncStep("sync upcoming fixture injuries", syncUpcomingFixtureInjuries);
+  await logSyncStep("sync BotD fixtures", syncBotdFixtures);
   await logSyncStep("sync league stats", syncLeagueStats);
   await logSyncStep("sync standings", syncStandings);
   await logSyncStep("sync strategy performances", syncStrategyPerformances);

@@ -5,12 +5,20 @@ const mocks = vi.hoisted(() => ({
   getUpcomingFixtures: vi.fn(),
   getFixtureOddsForFixtures: vi.fn(),
   getFixtureStatsSnapshots: vi.fn(),
+  getPredictionsForFixtures: vi.fn(),
+  getFixtureInjuriesForFixtures: vi.fn(),
+  getFixtureLineupsForFixtures: vi.fn(),
+  getLeaguesByIds: vi.fn(),
   upsertBotdFixtures: vi.fn(),
   deleteBotdFixtures: vi.fn(),
 }));
 vi.mock("@black-diamond/database/fixtures", () => ({ getUpcomingFixtures: mocks.getUpcomingFixtures }));
 vi.mock("@black-diamond/database/fixtureOdds", () => ({ getFixtureOddsForFixtures: mocks.getFixtureOddsForFixtures }));
 vi.mock("@black-diamond/database/fixtureStatsSnapshots", () => ({ getFixtureStatsSnapshots: mocks.getFixtureStatsSnapshots }));
+vi.mock("@black-diamond/database/predictions", () => ({ getPredictionsForFixtures: mocks.getPredictionsForFixtures }));
+vi.mock("@black-diamond/database/fixtureInjuries", () => ({ getFixtureInjuriesForFixtures: mocks.getFixtureInjuriesForFixtures }));
+vi.mock("@black-diamond/database/fixtureLineups", () => ({ getFixtureLineupsForFixtures: mocks.getFixtureLineupsForFixtures }));
+vi.mock("@black-diamond/database/leagues", () => ({ getLeaguesByIds: mocks.getLeaguesByIds }));
 vi.mock("@black-diamond/database/botdFixtures", () => ({
   upsertBotdFixtures: mocks.upsertBotdFixtures,
   deleteBotdFixtures: mocks.deleteBotdFixtures,
@@ -18,7 +26,7 @@ vi.mock("@black-diamond/database/botdFixtures", () => ({
 import { syncBotdFixtures } from "./syncBotdFixtures.js";
 
 function fixture(id: number, timestamp: number, status = "NS") {
-  return { fixture: { id, timestamp, status: { short: status } } } as unknown as Fixture;
+  return { fixture: { id, timestamp, status: { short: status } }, league: { id: 39 } } as unknown as Fixture;
 }
 
 describe("syncBotdFixtures", () => {
@@ -28,6 +36,10 @@ describe("syncBotdFixtures", () => {
     mocks.getUpcomingFixtures.mockResolvedValue([included]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([]);
     mocks.getFixtureOddsForFixtures.mockResolvedValue([]);
+    mocks.getPredictionsForFixtures.mockResolvedValue([]);
+    mocks.getFixtureInjuriesForFixtures.mockResolvedValue([]);
+    mocks.getFixtureLineupsForFixtures.mockResolvedValue([]);
+    mocks.getLeaguesByIds.mockResolvedValue([]);
 
     await syncBotdFixtures(now);
 
