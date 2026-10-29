@@ -7,7 +7,7 @@
 		"dev": "node --env-file=.env ./node_modules/vite/bin/vite.js dev",
 		"create:account": "node --env-file=.env --import tsx src/scripts/createAccount.ts",
 		"reset:account": "node --env-file=.env --import tsx src/scripts/resetAccount.ts",
-		"build": "VITE_BUILD_VERSION=${VERCEL_GIT_COMMIT_SHA:-local} vite build",
+		"build": "vite build",
 		"preview": "node --env-file=.env ./node_modules/vite/bin/vite.js preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",

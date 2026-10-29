@@ -11,9 +11,5 @@ export const handle: Handle = async ({ event, resolve }) => {
 		SESSION_SECRET
 	);
 
-	const response = await resolve(event);
-	if (response.headers.get('content-type')?.includes('text/html')) {
-		response.headers.set('cache-control', 'no-cache, no-store, must-revalidate');
-	}
-	return response;
+	return resolve(event);
 };
