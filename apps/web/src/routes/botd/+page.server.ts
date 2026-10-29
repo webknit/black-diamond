@@ -1,7 +1,7 @@
 import { getBetsForFixturesByAccountId } from '@black-diamond/database/bets';
 import { getBotdFixturesForDate } from '@black-diamond/database/botdFixtures';
 import { getFixtureEventsForFixtures } from '@black-diamond/database/fixtureEvents';
-import { getFixtureById } from '@black-diamond/database/fixtures';
+import { getFixturesByIds } from '@black-diamond/database/fixtures';
 import { getFixtureInjuriesForFixtures } from '@black-diamond/database/fixtureInjuries';
 import { getFixtureLineupsForFixtures } from '@black-diamond/database/fixtureLineups';
 import { getFixtureCardOdds } from '@black-diamond/database/fixtureOdds';
@@ -44,8 +44,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const minimumOdds = getMinimumOdds(url.searchParams.get('minOdds'));
 	const selectedStrategy = botdStrategies.find((strategy) => strategy.id === selectedStrategyId)!;
 	const botdFixtures = await getBotdFixturesForDate(date, selectedStrategyId, minimumOdds);
-	const sourceFixtures = (await Promise.all(botdFixtures.map((fixture) => getFixtureById(fixture.fixtureId))))
-		.filter((fixture): fixture is NonNullable<typeof fixture> => fixture !== null)
+	const sourceFixtures = (await getFixturesByIds(botdFixtures.map((fixture) => fixture.fixtureId)))
 		.filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === date)
 		.sort((left, right) => left.fixture.timestamp - right.fixture.timestamp);
 	const fixtureIds = sourceFixtures.map((fixture) => fixture.fixture.id);

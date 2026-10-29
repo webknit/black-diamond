@@ -1,6 +1,7 @@
 export { upsertFixtures } from "./operations/upsertFixtures.js";
 export { getFixturesBetweenDates } from "./operations/getFixturesBetweenDates.js";
 export { getFixtureById } from "./operations/getFixtureById.js";
+export { getFixturesByIds } from "./operations/getFixturesByIds.js";
 export { searchFixtures } from "./operations/searchFixtures.js";
 export { getFixtureScoresByIds } from "./operations/getFixtureScoresByIds.js";
 export { getFixtureSummariesBetweenDates } from "./operations/getFixtureSummariesBetweenDates.js";
