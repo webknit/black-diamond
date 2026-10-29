@@ -31,6 +31,7 @@
 	let placedOdds = $state('');
 	let hasEditedPlacedOdds = $state(false);
 	let betError = $state<string | null>(null);
+	let isPlacing = $state(false);
 	const combinedOdds = $derived(
 		selections.every((item) => item.selection.odd !== null)
 			? selections.reduce((total, item) => total * Number(item.selection.odd), 1)
@@ -48,12 +49,12 @@
 	});
 </script>
 
-<aside class="fixed bottom-4 left-1/2 z-40 w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-xl" aria-label="Bet slip">
+<aside class="fixed bottom-4 left-1/2 z-40 w-[min(26rem,calc(100vw-2rem))] -translate-x-1/2 rounded-xl border border-slate-200 bg-white p-3 shadow-xl" aria-label="Bet slip" aria-busy={isPlacing}>
 	<div class="flex items-center justify-between gap-3">
 		<h2 class="text-sm font-semibold text-slate-950">
 			Bet slip <span class="text-slate-500">({selections.length})</span>
 		</h2>
-		<button type="button" class="text-xs font-medium text-slate-500 hover:text-slate-950" onclick={onClose}>
+		<button type="button" class="text-xs font-medium text-slate-500 hover:text-slate-950 disabled:cursor-wait disabled:opacity-50" onclick={onClose} disabled={isPlacing}>
 			Close
 		</button>
 	</div>
@@ -65,7 +66,7 @@
 					<p class="min-w-0 flex-1 truncate font-medium text-slate-900">
 						{item.fixture.homeTeamName} v {item.fixture.awayTeamName}
 					</p>
-					<button type="button" class="text-slate-500 hover:text-rose-700" aria-label="Remove selection" onclick={() => onRemove(index)}>×</button>
+					<button type="button" class="text-slate-500 hover:text-rose-700 disabled:cursor-wait disabled:opacity-50" aria-label="Remove selection" onclick={() => onRemove(index)} disabled={isPlacing}>×</button>
 				</div>
 				<p class="mt-0.5 flex justify-between gap-2 text-slate-600">
 					<span class="truncate">{item.selection.value}</span>
@@ -81,7 +82,9 @@
 		class="mt-3 space-y-2"
 		use:enhance={() => {
 			betError = null;
+			isPlacing = true;
 			return async ({ result }) => {
+				isPlacing = false;
 				if (result.type === 'failure') {
 					betError = (result.data as { betError?: string }).betError ?? 'Unable to place this bet.';
 					return;
@@ -103,21 +106,26 @@
 		<div class="grid grid-cols-2 gap-2">
 			<label class="text-xs font-medium text-slate-700">
 				<span>Odds</span>
-				<input class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm tabular-nums outline-none focus:border-emerald-600" name="placedOdds" type="number" min="1.01" step="0.01" inputmode="decimal" placeholder="0.00" bind:value={placedOdds} oninput={() => (hasEditedPlacedOdds = true)} required />
+			<input class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm tabular-nums outline-none focus:border-emerald-600 disabled:cursor-wait disabled:bg-slate-50" name="placedOdds" type="number" min="1.01" step="0.01" inputmode="decimal" placeholder="0.00" bind:value={placedOdds} oninput={() => (hasEditedPlacedOdds = true)} disabled={isPlacing} required />
 			</label>
 			<label class="text-xs font-medium text-slate-700">
 				<span>Stake</span>
-				<input class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm tabular-nums outline-none focus:border-emerald-600" name="stake" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" bind:value={stake} required />
+			<input class="mt-1 block w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm tabular-nums outline-none focus:border-emerald-600 disabled:cursor-wait disabled:bg-slate-50" name="stake" type="number" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" bind:value={stake} disabled={isPlacing} required />
 			</label>
 		</div>
-		<label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="isUnmatched" bind:checked={isUnmatched} /> Unmatched — do not settle yet</label>
+		<label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="isUnmatched" bind:checked={isUnmatched} disabled={isPlacing} /> Unmatched — do not settle yet</label>
 		<div class="flex justify-between text-[11px] text-slate-500">
 			<span>Available {currencyFormatter.format(balance)}</span>
 			{#if potentialReturn !== null}<span>Return {currencyFormatter.format(potentialReturn)}</span>{/if}
 		</div>
 		{#if betError}<p class="rounded-md bg-rose-50 px-2 py-1.5 text-xs text-rose-700" role="alert">{betError}</p>{/if}
-		<button class="w-full rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800">
-			Place {selections.length === 1 ? 'single' : `${selections.length}-fold`}
+		<button class="flex w-full items-center justify-center gap-2 rounded-md bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:cursor-wait disabled:bg-emerald-600" disabled={isPlacing}>
+			{#if isPlacing}
+				<span class="size-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true"></span>
+				Placing bet…
+			{:else}
+				Place {selections.length === 1 ? 'single' : `${selections.length}-fold`}
+			{/if}
 		</button>
 	</form>
 </aside>
