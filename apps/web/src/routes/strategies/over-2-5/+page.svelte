@@ -90,7 +90,8 @@
 					</section>
 				{:else}
 					<div class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
-						<table class="w-full min-w-[760px] text-left text-xs">
+						<table class="w-full min-w-[760px] table-fixed text-left text-xs">
+						<colgroup><col class="w-[40%]" /><col class="w-[15%]" /><col class="w-[15%]" /><col class="w-[15%]" /><col class="w-[15%]" /></colgroup>
 						<thead class="border-b border-slate-200 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500">
 							<tr><th class="px-3 py-2">Last-five variation</th><th class="px-3 py-2 text-right">Bets</th><th class="px-3 py-2 text-right">W / L</th><th class="px-3 py-2 text-right">P / L</th><th class="px-3 py-2 text-right">ROI</th></tr>
 						</thead>
@@ -99,7 +100,7 @@
 								<tr class="text-slate-700">
 									<td class="px-3 py-2"><p class="font-medium text-slate-950">{result.title}</p><p class="mt-0.5 text-[11px] text-slate-500">{result.description}</p></td>
 									<td class="px-3 py-2 text-right tabular-nums"><p>{result.bets}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.bets}</p>{/if}</td>
-									<td class="px-3 py-2 text-right tabular-nums"><p>{result.wins} / {result.losses}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.wins} / {result.seasonPerformance.losses}</p>{/if}</td>
+									<td class="px-3 py-2 text-right tabular-nums"><p>{result.wins} / {result.losses}</p><p class="mt-0.5 text-[10px] text-slate-400">{result.bets ? formatPercentage((result.wins / result.bets) * 100) : '—'}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.wins} / {result.seasonPerformance.losses}</p>{/if}</td>
 									<td class="px-3 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={result.profit > 0} class:text-rose-700={result.profit < 0}><p>{formatCurrency(result.profit)}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] font-medium text-slate-400">Season: {formatCurrency(result.seasonPerformance.profit)}</p>{/if}</td>
 									<td class="px-3 py-2 text-right tabular-nums"><p>{result.returnOnInvestment === null ? '—' : formatPercentage(result.returnOnInvestment)}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.returnOnInvestment === null ? '—' : formatPercentage(result.seasonPerformance.returnOnInvestment)}</p>{/if}</td>
 								</tr>

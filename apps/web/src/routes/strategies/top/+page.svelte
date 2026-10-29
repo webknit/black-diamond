@@ -49,7 +49,7 @@
 								<p class="mt-1 text-xs leading-5 text-slate-600">{strategy.description}</p>
 								<div class="mt-3 grid grid-cols-4 gap-2 border-t border-slate-100 pt-3 text-center text-[10px] text-slate-500 sm:max-w-md">
 									<div><p class="uppercase tracking-wide">Bets</p><p class="mt-0.5 text-xs font-medium tabular-nums text-slate-900">{strategy.bets}</p></div>
-									<div><p class="uppercase tracking-wide">W / L</p><p class="mt-0.5 text-xs font-medium tabular-nums text-slate-900">{strategy.wins} / {strategy.losses}</p></div>
+									<div><p class="uppercase tracking-wide">W / L</p><p class="mt-0.5 text-xs font-medium tabular-nums text-slate-900">{strategy.wins} / {strategy.losses}</p><p class="mt-0.5 text-[10px] tabular-nums text-slate-400">{formatPercentage(strategy.bets ? (strategy.wins / strategy.bets) * 100 : null)}</p></div>
 									<div><p class="uppercase tracking-wide">P / L</p><p class="mt-0.5 text-xs font-semibold tabular-nums" class:text-emerald-700={strategy.profit > 0} class:text-rose-700={strategy.profit < 0}>{formatCurrency(strategy.profit)}</p></div>
 									<div><p class="uppercase tracking-wide">ROI</p><p class="mt-0.5 text-xs font-medium tabular-nums text-slate-900">{formatPercentage(strategy.returnOnInvestment)}</p></div>
 								</div>

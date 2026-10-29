@@ -31,14 +31,14 @@
 	function changeMinimumOdds(event: Event) {
 		const input = event.currentTarget;
 		if (!(input instanceof HTMLSelectElement)) return;
-		void updateQuery({ minimumOdds: input.value });
+		void updateQuery({ minOdds: input.value });
 	}
 
-	async function updateQuery(values: { date?: string; strategy?: string; minimumOdds?: string }) {
+	async function updateQuery(values: { date?: string; strategy?: string; minOdds?: string }) {
 		const url = new URL(page.url.href);
 		if (values.date) url.searchParams.set('date', values.date);
 		if (values.strategy) url.searchParams.set('strategy', values.strategy);
-		if (values.minimumOdds !== undefined) url.searchParams.set('minOdds', values.minimumOdds);
+		if (values.minOdds !== undefined) url.searchParams.set('minOdds', values.minOdds);
 		isLoading = true;
 		try {
 			await goto(`${url.pathname}${url.search}`);
@@ -100,9 +100,11 @@
 					</select>
 				</div>
 				<div>
-					<label for="botd-minimum-odds" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Min. O2.5 odds</label>
+					<label for="botd-minimum-odds" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Min. {data.marketLabel ?? 'strategy'} odds</label>
 					<select id="botd-minimum-odds" value={String(data.minimumOdds)} onchange={changeMinimumOdds} disabled={isLoading} class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-wait disabled:opacity-60">
 						<option value="0">Any</option>
+						<option value="1.3">1.30</option>
+						<option value="1.5">1.50</option>
 						<option value="1.7">1.70</option>
 						<option value="2">2.00</option>
 					</select>
@@ -110,11 +112,13 @@
 			</div>
 		</header>
 
+		{#if data.selectedStrategy}
 		<section class="mb-5 rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
 			<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Selected strategy</p>
 			<h2 class="mt-1 text-sm font-semibold text-slate-950">{data.selectedStrategy.title}</h2>
 			<p class="mt-1 text-xs text-slate-600">{data.selectedStrategy.description}</p>
 		</section>
+		{/if}
 
 		<FixtureGrid
 			fixtures={data.fixtures}

@@ -85,3 +85,24 @@ export const teamFilterVariations: TeamFilterVariation[] = [
     ),
   ),
 ];
+import type { FixtureStatsSnapshot } from '../types/fixtureStatsSnapshot.js';
+
+
+function average(goals: number, played: number) {
+  return played === 0 ? null : goals / played;
+}
+
+function isExcluded(values: Array<number | null>, threshold: number, mode: TeamFilterVariation['exclusionMode']) {
+  if (values.some((value) => value === null)) return true;
+  const below = values.map((value) => value! < threshold);
+  return mode === 'eitherTeam' ? below.some(Boolean) : below.every(Boolean);
+}
+
+export function matchesTeamFilterVariation(snapshot: FixtureStatsSnapshot, variation: TeamFilterVariation) {
+  const home = variation.sample === 'last5' ? snapshot.home.last5Venue : snapshot.home.fixtures.home;
+  const away = variation.sample === 'last5' ? snapshot.away.last5Venue : snapshot.away.fixtures.away;
+  if (!home || !away) return false;
+  const scoring = [average(home.goalsFor, home.played), average(away.goalsFor, away.played)];
+  const defensive = [average(home.goalsAgainst, home.played), average(away.goalsAgainst, away.played)];
+  return !((variation.scoringThreshold !== undefined && isExcluded(scoring, variation.scoringThreshold, variation.exclusionMode)) || (variation.defensiveThreshold !== undefined && isExcluded(defensive, variation.defensiveThreshold, variation.exclusionMode)));
+}

@@ -2,9 +2,17 @@ import type { FixtureOdds } from "../types/fixtureOdds.js";
 import type { FixtureStatsSnapshot } from "../types/fixtureStatsSnapshot.js";
 export {
   teamFilterVariations,
+  matchesTeamFilterVariation,
   type TeamFilterVariation,
 } from "./strategies.js";
-export { botdStrategies } from "./botdStrategies.js";
+export {
+  botdStrategies,
+  getBotdMarketLabel,
+  getBotdReferenceOdd,
+  matchesBotdStrategy,
+  type BotdMarket,
+  type BotdStrategy,
+} from "./botdStrategies.js";
 export {
   bttsStrategyVariations,
   matchesBttsStrategyVariation,
@@ -40,7 +48,6 @@ export {
   type StrategyOddsFilter,
   type StrategyOddsRangeId,
 } from "./strategyOddsRanges.js";
-import type { TeamFilterVariation } from "./strategies.js";
 
 type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
 
@@ -73,17 +80,4 @@ export function matchesVenueScoringStrategy(snapshot: FixtureStatsSnapshot, mini
   const home = snapshot.home.fixtures.home;
   const away = snapshot.away.fixtures.away;
   return (average(home.goalsFor, home.played) ?? -Infinity) >= minimumGoalsPerFixture && (average(away.goalsFor, away.played) ?? -Infinity) >= minimumGoalsPerFixture;
-}
-function isExcluded(values: Array<number | null>, threshold: number, mode: TeamFilterVariation["exclusionMode"]) {
-  if (values.some((value) => value === null)) return true;
-  const below = values.map((value) => value! < threshold);
-  return mode === "eitherTeam" ? below.some(Boolean) : below.every(Boolean);
-}
-export function matchesTeamFilterVariation(snapshot: FixtureStatsSnapshot, variation: TeamFilterVariation) {
-  const home = variation.sample === "last5" ? snapshot.home.last5Venue : snapshot.home.fixtures.home;
-  const away = variation.sample === "last5" ? snapshot.away.last5Venue : snapshot.away.fixtures.away;
-  if (!home || !away) return false;
-  const scoring = [average(home.goalsFor, home.played), average(away.goalsFor, away.played)];
-  const defensive = [average(home.goalsAgainst, home.played), average(away.goalsAgainst, away.played)];
-  return !((variation.scoringThreshold !== undefined && isExcluded(scoring, variation.scoringThreshold, variation.exclusionMode)) || (variation.defensiveThreshold !== undefined && isExcluded(defensive, variation.defensiveThreshold, variation.exclusionMode)));
 }

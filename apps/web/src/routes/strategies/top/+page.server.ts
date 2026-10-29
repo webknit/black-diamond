@@ -6,7 +6,7 @@ import {
 	over2_5RateStrategyVariations,
 	teamFilterVariations
 } from '@black-diamond/core/strategies';
-import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+import { getStrategyPerformanceSeasonTotals } from '@black-diamond/database/strategyPerformances';
 
 type StrategyDefinition = {
 	id: string;
@@ -33,7 +33,7 @@ const strategyDefinitions: StrategyDefinition[] = [
 ];
 
 export async function load() {
-	const summaries = await getStrategyPerformanceSummaries(strategyDefinitions.map((strategy) => strategy.id));
+	const summaries = await getStrategyPerformanceSeasonTotals(strategyDefinitions.map((strategy) => strategy.id));
 	const summariesById = new Map(summaries.map((summary) => [summary.strategyId, summary.seasonPerformance]));
 
 	const strategies = strategyDefinitions

@@ -1,7 +1,6 @@
 export type BotdDayFixture = {
   fixtureId: number;
-  matchingStrategyIds: string[];
-  over2_5ReferenceOdd: number | null;
+  matches: Array<{ strategyId: string; referenceOdd: number | null }>;
   hasLeagueTable: boolean;
 };
 
