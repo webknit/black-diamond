@@ -56,7 +56,8 @@
 			if (!data.vapidPublicKey || !('serviceWorker' in navigator) || !('PushManager' in window)) { notificationMessage = 'Notifications are not supported on this device.'; return; }
 			const permission = await Notification.requestPermission();
 			if (permission !== 'granted') { notificationMessage = 'Notifications were not enabled.'; return; }
-			const registration = await navigator.serviceWorker.register('/service-worker.js');
+			await navigator.serviceWorker.register('/service-worker.js');
+			const registration = await navigator.serviceWorker.ready;
 			const subscription = await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: base64ToBytes(data.vapidPublicKey) });
 			const response = await fetch('/api/push-subscription', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(subscription) });
 			notificationMessage = response.ok ? 'Notifications enabled for watched fixtures.' : 'Could not save notification settings.';
