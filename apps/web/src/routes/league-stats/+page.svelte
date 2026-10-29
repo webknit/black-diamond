@@ -16,6 +16,10 @@
 	let sortKey = $state<SortKey | null>(null);
 	let sortDirection = $state<'asc' | 'desc'>('asc');
 	let showCups = $state(false);
+	let selectedCountry = $state('all');
+	const countries = $derived(
+		[...new Set(data.leagueStats.map((stats) => stats.league.country))].sort((a, b) => a.localeCompare(b))
+	);
 
 	function sortBy(key: SortKey) {
 		if (sortKey === key) {
@@ -38,9 +42,11 @@
 
 	let sortedLeagueStats = $derived.by(() => {
 		const key = sortKey;
-		const visibleLeagueStats = showCups
-			? data.leagueStats
-			: data.leagueStats.filter((stats) => !stats.isCup);
+		const visibleLeagueStats = data.leagueStats.filter(
+			(stats) =>
+				(showCups || !stats.isCup) &&
+				(selectedCountry === 'all' || stats.league.country === selectedCountry)
+		);
 		if (key === null) return visibleLeagueStats;
 
 		return [...visibleLeagueStats].sort((left, right) => {
@@ -74,15 +80,29 @@
 			</p>
 		</header>
 
-		<label class="mb-4 flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 sm:mb-6">
-			<input
-				type="checkbox"
-				checked={showCups}
-				onchange={(event) => (showCups = event.currentTarget.checked)}
-				class="size-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-700"
-			/>
-			<span>Show cups</span>
-		</label>
+		<div class="mb-4 flex flex-wrap items-center gap-3 sm:mb-6">
+			<label class="flex items-center gap-2 text-xs font-medium text-slate-700">
+				Country
+				<select
+					bind:value={selectedCountry}
+					class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm"
+				>
+					<option value="all">All countries</option>
+					{#each countries as country (country)}
+						<option value={country}>{country}</option>
+					{/each}
+				</select>
+			</label>
+			<label class="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
+				<input
+					type="checkbox"
+					checked={showCups}
+					onchange={(event) => (showCups = event.currentTarget.checked)}
+					class="size-4 rounded border-slate-300 text-emerald-700 focus:ring-emerald-700"
+				/>
+				<span>Show cups</span>
+			</label>
+		</div>
 
 		{#if data.leagueStats.length === 0}
 			<section class="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
@@ -110,6 +130,13 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-slate-100">
+						{#if sortedLeagueStats.length === 0}
+							<tr>
+								<td colspan="11" class="px-4 py-8 text-center text-sm text-slate-500">
+									No leagues match these filters.
+								</td>
+							</tr>
+						{:else}
 						{#each sortedLeagueStats as stats (stats.league.id)}
 							<tr class="group hover:bg-slate-50">
 								<th scope="row" class="sticky left-0 z-10 min-w-32 border-r border-slate-100 bg-white px-2 py-2 font-medium text-slate-900 shadow-[3px_0_5px_-4px_rgba(15,23,42,0.45)] group-hover:bg-slate-50">
@@ -132,6 +159,7 @@
 								<td class="px-2 py-2 text-right tabular-nums text-slate-700">{formatPercentage(stats.awayWinPercentage)}</td>
 							</tr>
 						{/each}
+						{/if}
 					</tbody>
 				</table>
 			</div>
