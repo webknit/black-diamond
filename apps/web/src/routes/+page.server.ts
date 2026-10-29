@@ -42,6 +42,11 @@ function getLeagueIds(value: string | null): number[] | null {
 	)];
 }
 
+function getFixtureIds(value: string | null): number[] | null {
+	if (value === null) return null;
+	return [...new Set(value.split(',').map(Number).filter((fixtureId) => Number.isSafeInteger(fixtureId) && fixtureId > 0))];
+}
+
 function getFixtureLimit(value: string | null): number {
 	const limit = Number(value ?? fixturePageSize);
 	return Number.isSafeInteger(limit) && limit > 0
@@ -88,6 +93,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const selectedDate = isDateKey(requestedDate) ? requestedDate : todayUk;
 	const fixtureLimit = getFixtureLimit(url.searchParams.get('limit'));
 	const selectedLeagueIds = getLeagueIds(url.searchParams.get('leagues'));
+	const selectedFixtureIds = getFixtureIds(url.searchParams.get('fixtureIds'));
 	const showFinishedQuery = url.searchParams.get('ft');
 	const showFinished = showFinishedQuery === null
 		? selectedDate < todayUk
@@ -129,7 +135,9 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		}
 	])).values()].sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 	const matchingFixtures = filterableFixtures.filter(
-		(fixture) => selectedLeagueIds === null || selectedLeagueIds.includes(fixture.league.id)
+		(fixture) =>
+			(selectedLeagueIds === null || selectedLeagueIds.includes(fixture.league.id)) &&
+			(selectedFixtureIds === null || selectedFixtureIds.includes(fixture.fixture.id))
 	);
 	const fixturesForPage = matchingFixtures.slice(0, fixtureLimit);
 	const fixtureIds = fixturesForPage.map((fixture) => fixture.fixture.id);

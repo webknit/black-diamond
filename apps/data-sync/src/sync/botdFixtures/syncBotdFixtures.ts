@@ -52,7 +52,9 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
   const fixtureDates = [...new Set(upcoming.map((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000))))];
   await upsertBotdDays(fixtureDates.map((fixtureDate) => ({
     fixtureDate,
-    fixtures: matches.filter((fixture) => fixture.fixtureDate === fixtureDate),
+    fixtures: matches
+      .filter((fixture) => fixture.fixtureDate === fixtureDate)
+      .map(({ fixtureId, matchingStrategyIds, over2_5ReferenceOdd, hasLeagueTable }) => ({ fixtureId, matchingStrategyIds, over2_5ReferenceOdd, hasLeagueTable })),
     updatedAt: now.toISOString(),
   })));
 }
