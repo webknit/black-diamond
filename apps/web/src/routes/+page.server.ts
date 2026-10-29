@@ -68,7 +68,7 @@ function getRecordValue(value: unknown): Record<string, unknown> | null {
 		: null;
 }
 
-export function getFixturePrediction(response: Record<string, unknown>) {
+function getFixturePrediction(response: Record<string, unknown>) {
 	const predictions = getRecordValue(response.predictions);
 	if (!predictions) return null;
 
