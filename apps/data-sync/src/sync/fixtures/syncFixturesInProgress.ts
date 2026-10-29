@@ -10,6 +10,17 @@ import { getPushSubscriptionsByAccountIds } from "@black-diamond/database/pushSu
 import webpush from "web-push";
 import { getBetsForFixturesByAccountId } from "@black-diamond/database/bets";
 import { didBetSelectionWin } from "../bets/didBetSelectionWin.js";
+import type { Fixture } from "@black-diamond/core/fixture";
+
+export function didFixtureScoreIncrease(
+  previous: Fixture["goals"],
+  refreshed: Fixture["goals"],
+) {
+  const previousTotal = (previous.home ?? 0) + (previous.away ?? 0);
+  const refreshedTotal = (refreshed.home ?? 0) + (refreshed.away ?? 0);
+
+  return refreshedTotal > previousTotal;
+}
 
 export async function syncFixturesInProgress() {
   const apiFootball = getApiFootballClient();
@@ -26,8 +37,8 @@ export async function syncFixturesInProgress() {
 }
 
 async function notifyFixtureChanges(
-  previous: typeof fixturesAwaitingResult,
-  refreshed: typeof previous,
+  previous: Fixture[],
+  refreshed: Fixture[],
 ) {
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return;
   webpush.setVapidDetails(
@@ -42,9 +53,7 @@ async function notifyFixtureChanges(
     const fullTime =
       ["FT", "AET", "PEN"].includes(fixture.fixture.status.short) &&
       !["FT", "AET", "PEN"].includes(before.fixture.status.short);
-    const goal =
-      fixture.goals.home !== before.goals.home ||
-      fixture.goals.away !== before.goals.away;
+    const goal = didFixtureScoreIncrease(before.goals, fixture.goals);
     if (!fullTime && !goal) continue;
     const subscriptions = await getPushSubscriptionsByAccountIds(
       await getWatchingAccountIds(fixture.fixture.id),

@@ -14,7 +14,10 @@ vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { syncFixturesInProgress } from "./syncFixturesInProgress.js";
+import {
+  didFixtureScoreIncrease,
+  syncFixturesInProgress,
+} from "./syncFixturesInProgress.js";
 
 describe("syncFixturesInProgress", () => {
   beforeEach(() => vi.clearAllMocks());
@@ -39,5 +42,20 @@ describe("syncFixturesInProgress", () => {
     await expect(syncFixturesInProgress()).resolves.toEqual([]);
 
     expect(mocks.get).not.toHaveBeenCalled();
+  });
+
+  it("does not mistake an initial null-to-zero score for a goal", () => {
+    expect(
+      didFixtureScoreIncrease(
+        { home: null, away: null },
+        { home: 0, away: 0 },
+      ),
+    ).toBe(false);
+    expect(
+      didFixtureScoreIncrease(
+        { home: 0, away: 0 },
+        { home: 1, away: 0 },
+      ),
+    ).toBe(true);
   });
 });
