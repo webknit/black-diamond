@@ -72,6 +72,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		minimumOdds,
 		selectedStrategy,
 		strategies,
-		marketLabel: selectedStrategy ? getBotdMarketLabel(selectedStrategy.market) : null
+		marketLabel: selectedStrategy ? getBotdMarketLabel(selectedStrategy.market) : null,
+		recommendedMarket: selectedStrategy?.market ?? null
 	};
 }

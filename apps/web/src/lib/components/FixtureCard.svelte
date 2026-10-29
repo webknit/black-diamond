@@ -10,13 +10,14 @@
 	let {
 		fixture,
 		placedSelectionKeys = [],
-		onSelectOdd, isWatchlisted = false, onToggleWatchlist
+		onSelectOdd, isWatchlisted = false, onToggleWatchlist, recommendedMarket
 	}: {
 		fixture: FixtureCardData;
 		placedSelectionKeys?: string[];
 		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
 		isWatchlisted?: boolean;
 		onToggleWatchlist?: (fixtureId: number) => void;
+		recommendedMarket?: string | null;
 	} = $props();
 
 	const ukTimeZone = 'Europe/London';
@@ -226,7 +227,7 @@
 			</div>
 		{/if}
 
-		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
+		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} {recommendedMarket} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
 	</div>
 	{#if hasLeagueTable}
 		<LeagueStandingsModal

@@ -124,6 +124,7 @@
 			fixtures={data.fixtures}
 			hasFixtures={data.hasFixtures}
 			isLoading={isLoading}
+			recommendedMarket={data.recommendedMarket}
 			placedSelectionKeys={data.placedBetSelectionKeys}
 			onSelectOdd={chooseOdd}
 			{watchlistedFixtureIds}

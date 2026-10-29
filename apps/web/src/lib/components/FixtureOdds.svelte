@@ -5,12 +5,14 @@
 		odds,
 		fixtureId,
 		placedSelectionKeys = [],
-		onSelectOdd
+		onSelectOdd,
+		recommendedMarket
 	}: {
 		odds: FixtureOddsData | null;
 		fixtureId: number;
 		placedSelectionKeys?: string[];
 		onSelectOdd?: (selection: FixtureOddSelection) => void;
+		recommendedMarket?: string | null;
 	} = $props();
 
 	type OddsSelection = { value: string; odd: string | null };
@@ -65,6 +67,18 @@
 		const marketName = odds?.odds.find((market) => marketNames.includes(market.name.toLowerCase()))?.name ?? marketNames[0];
 		return placedSelectionKeys.includes(`${fixtureId}|${marketName.toLowerCase()}|${selection.value.toLowerCase()}`);
 	}
+
+	function isRecommended(marketNames: string[], selection: OddsSelection) {
+		if (isPlaced(marketNames, selection)) return false;
+
+		const selectionValue = selection.value.trim().toLowerCase();
+		const isGoalsMarket = marketNames.includes('goals over/under') || marketNames.includes('goals over under');
+		const isBttsMarket = marketNames.includes('both teams score');
+		return (recommendedMarket === 'over2_5' && isGoalsMarket && selectionValue === 'over 2.5') ||
+			(recommendedMarket === 'over1_5' && isGoalsMarket && selectionValue === 'over 1.5') ||
+			(recommendedMarket === 'btts' && isBttsMarket && selectionValue === 'yes') ||
+			(recommendedMarket === 'bttns' && isBttsMarket && selectionValue === 'no');
+	}
 </script>
 
 <div class="mt-3 border-t border-slate-100 pt-3">
@@ -79,11 +93,11 @@
 					</p>
 					<div class="flex flex-wrap justify-evenly gap-1">
 						{#each oddsFor(market.markets, market.title === '1X2' ? ['Home', 'Draw', 'Away'] : ['Home/Draw', 'Home/Away', 'Draw/Away']) as selection}
-							<button type="button" onclick={() => selectOdd(market.markets, selection)} class="flex min-w-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(market.markets, selection)} class:bg-emerald-100={isPlaced(market.markets, selection)}>
-								<span class={`truncate border-r px-1.5 text-slate-600 ${isPlaced(market.markets, selection) ? 'border-emerald-200 bg-emerald-100' : 'border-slate-200 bg-slate-50'}`}>
+							<button type="button" onclick={() => selectOdd(market.markets, selection)} class="flex min-w-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(market.markets, selection)} class:bg-emerald-100={isPlaced(market.markets, selection)} class:border-indigo-600={isRecommended(market.markets, selection)} class:bg-indigo-50={isRecommended(market.markets, selection)} style:box-shadow={isRecommended(market.markets, selection) ? 'inset 0 0 0 2px rgb(79 70 229)' : undefined}>
+								<span class={`truncate border-r px-1.5 text-slate-600 ${isPlaced(market.markets, selection) ? 'border-emerald-200 bg-emerald-100' : isRecommended(market.markets, selection) ? 'border-indigo-200 bg-indigo-100' : 'border-slate-200 bg-slate-50'}`}>
 									{formatOddsLabel(selection.value)}
 								</span>
-								<span class="px-1.5 font-semibold tabular-nums text-slate-900">
+								<span class="px-1.5 font-semibold tabular-nums text-slate-900" class:bg-indigo-100={isRecommended(market.markets, selection)}>
 									{selection.odd ?? '–'}
 								</span>
 							</button>
@@ -102,11 +116,11 @@
 					<div class="overflow-x-auto pb-1">
 						<div class="flex w-max flex-nowrap gap-1">
 							{#each goalSelections(direction as 'over' | 'under') as selection}
-								<button type="button" onclick={() => selectOdd(['goals over/under', 'goals over under'], selection)} class="flex shrink-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(['goals over/under', 'goals over under'], selection)} class:bg-emerald-100={isPlaced(['goals over/under', 'goals over under'], selection)}>
-									<span class={`border-r px-1.5 text-slate-600 ${isPlaced(['goals over/under', 'goals over under'], selection) ? 'border-emerald-300 bg-emerald-100' : 'border-slate-200 bg-slate-50'}`}>
+								<button type="button" onclick={() => selectOdd(['goals over/under', 'goals over under'], selection)} class="flex shrink-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(['goals over/under', 'goals over under'], selection)} class:bg-emerald-100={isPlaced(['goals over/under', 'goals over under'], selection)} class:border-indigo-600={isRecommended(['goals over/under', 'goals over under'], selection)} class:bg-indigo-50={isRecommended(['goals over/under', 'goals over under'], selection)} style:box-shadow={isRecommended(['goals over/under', 'goals over under'], selection) ? 'inset 0 0 0 2px rgb(79 70 229)' : undefined}>
+									<span class={`border-r px-1.5 text-slate-600 ${isPlaced(['goals over/under', 'goals over under'], selection) ? 'border-emerald-300 bg-emerald-100' : isRecommended(['goals over/under', 'goals over under'], selection) ? 'border-indigo-200 bg-indigo-100' : 'border-slate-200 bg-slate-50'}`}>
 										{selection.value.replace(new RegExp(`^${direction}\\s*`, 'i'), '')}
 									</span>
-									<span class="px-1.5 font-semibold tabular-nums text-slate-900">
+									<span class="px-1.5 font-semibold tabular-nums text-slate-900" class:bg-indigo-100={isRecommended(['goals over/under', 'goals over under'], selection)}>
 									{selection.odd ?? '–'}
 									</span>
 								</button>
@@ -123,11 +137,11 @@
 			</p>
 			<div class="flex flex-wrap gap-1">
 				{#each oddsFor(['both teams score'], ['Yes', 'No']) as selection}
-					<button type="button" onclick={() => selectOdd(['both teams score'], selection)} class="flex min-w-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(['both teams score'], selection)} class:bg-emerald-100={isPlaced(['both teams score'], selection)}>
-						<span class={`truncate border-r px-1.5 text-slate-600 ${isPlaced(['both teams score'], selection) ? 'border-emerald-300 bg-emerald-100' : 'border-slate-200 bg-slate-50'}`}>
+					<button type="button" onclick={() => selectOdd(['both teams score'], selection)} class="flex min-w-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(['both teams score'], selection)} class:bg-emerald-100={isPlaced(['both teams score'], selection)} class:border-indigo-600={isRecommended(['both teams score'], selection)} class:bg-indigo-50={isRecommended(['both teams score'], selection)} style:box-shadow={isRecommended(['both teams score'], selection) ? 'inset 0 0 0 2px rgb(79 70 229)' : undefined}>
+						<span class={`truncate border-r px-1.5 text-slate-600 ${isPlaced(['both teams score'], selection) ? 'border-emerald-300 bg-emerald-100' : isRecommended(['both teams score'], selection) ? 'border-indigo-200 bg-indigo-100' : 'border-slate-200 bg-slate-50'}`}>
 							{formatOddsLabel(selection.value)}
 						</span>
-						<span class="px-1.5 font-semibold tabular-nums text-slate-900">
+						<span class="px-1.5 font-semibold tabular-nums text-slate-900" class:bg-indigo-100={isRecommended(['both teams score'], selection)}>
 							{selection.odd ?? '–'}
 						</span>
 					</button>

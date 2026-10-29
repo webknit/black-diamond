@@ -8,7 +8,7 @@
 		noLeaguesSelected = false,
 		isLoading = false,
 		placedSelectionKeys = [],
-		onSelectOdd, watchlistedFixtureIds = [], onToggleWatchlist
+		onSelectOdd, watchlistedFixtureIds = [], onToggleWatchlist, recommendedMarket
 	}: {
 		fixtures: FixtureCardData[];
 		hasFixtures: boolean;
@@ -18,6 +18,7 @@
 		onSelectOdd?: (fixture: FixtureCardData, selection: FixtureOddSelection) => void;
 		watchlistedFixtureIds?: number[];
 		onToggleWatchlist?: (fixtureId: number) => void;
+		recommendedMarket?: string | null;
 	} = $props();
 </script>
 
@@ -44,7 +45,7 @@
 {:else}
 	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 min-[1300px]:!grid-cols-3 min-[1536px]:grid-cols-5 2xl:gap-5">
 		{#each fixtures as fixture (fixture.id)}
-			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} isWatchlisted={watchlistedFixtureIds.includes(fixture.id)} {onToggleWatchlist} />
+			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} {recommendedMarket} isWatchlisted={watchlistedFixtureIds.includes(fixture.id)} {onToggleWatchlist} />
 		{/each}
 	</div>
 {/if}
