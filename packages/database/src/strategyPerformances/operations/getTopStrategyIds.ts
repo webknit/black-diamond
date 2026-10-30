@@ -1,6 +1,6 @@
 import { getStrategyPerformanceSeasonTotals } from './getStrategyPerformanceSeasonTotals.js';
 
-const minimumBetsForRanking = 30;
+const minimumBetsForRanking = 50;
 
 export async function getTopStrategyIds(strategyIds: readonly string[], limit: number): Promise<string[]> {
 	const summaries = await getStrategyPerformanceSeasonTotals(strategyIds);

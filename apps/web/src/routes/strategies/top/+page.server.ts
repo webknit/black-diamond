@@ -23,7 +23,7 @@ const marketDetails = {
 	bttns: { market: 'BTNTS', href: '/strategies/btnts' }
 } as const;
 
-const minimumBetsForRanking = 30;
+const minimumBetsForRanking = 50;
 
 const strategyDefinitions: StrategyDefinition[] = [
 	...teamFilterVariations.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
