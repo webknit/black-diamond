@@ -136,6 +136,18 @@
 		return ['1H', 'HT', '2H', 'ET', 'P', 'LIVE', 'BT'].includes(status);
 	}
 
+	function isFixtureCompleted(status: string) {
+		return ['FT', 'AET', 'PEN'].includes(status);
+	}
+
+	function getWatchableFixtureIds(selections: Array<{ fixtureId: number; status: string }>) {
+		return [...new Set(
+			selections
+				.filter((selection) => !isFixtureCompleted(selection.status))
+				.map((selection) => selection.fixtureId)
+		)];
+	}
+
 	async function updateFilterQuery(nextLeagueIds: number[] | null, nextShowFinished: boolean) {
 		const url = new URL(page.url.href);
 		url.searchParams.delete('leagues');
@@ -278,6 +290,22 @@
 		}
 	}
 
+	async function toggleAccumulatorWatchlist(fixtureIds: number[]) {
+		if (!data.account) return void goto('/login');
+		const uniqueFixtureIds = [...new Set(fixtureIds)];
+		const isWatchingEveryFixture = uniqueFixtureIds.every((fixtureId) => watchlistedFixtureIds.includes(fixtureId));
+		const response = await fetch('/api/watchlist', {
+			method: isWatchingEveryFixture ? 'DELETE' : 'POST',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify({ fixtureIds: uniqueFixtureIds })
+		});
+		if (!response.ok) return;
+
+		watchlistedFixtureIds = isWatchingEveryFixture
+			? watchlistedFixtureIds.filter((fixtureId) => !uniqueFixtureIds.includes(fixtureId))
+			: [...new Set([...watchlistedFixtureIds, ...uniqueFixtureIds])];
+	}
+
 </script>
 
 <svelte:head>
@@ -399,6 +427,16 @@
 													{bet.status === 'pending' && bet.matchStatus === 'unmatched' ? 'Unmatched' : bet.status === 'pending' ? 'In play' : bet.status}
 												</span>{/if}
 											</div>
+											{#if bet.selections.length > 1}
+												<button
+													type="button"
+													class="shrink-0 text-lg leading-none text-amber-500 hover:text-amber-600 disabled:cursor-not-allowed disabled:text-slate-300"
+													class:text-slate-300={getWatchableFixtureIds(bet.selections).length === 0 || !getWatchableFixtureIds(bet.selections).every((fixtureId) => watchlistedFixtureIds.includes(fixtureId))}
+													disabled={getWatchableFixtureIds(bet.selections).length === 0}
+													onclick={() => void toggleAccumulatorWatchlist(getWatchableFixtureIds(bet.selections))}
+													aria-label={getWatchableFixtureIds(bet.selections).length === 0 ? 'All accumulator fixtures are finished' : getWatchableFixtureIds(bet.selections).every((fixtureId) => watchlistedFixtureIds.includes(fixtureId)) ? 'Remove unfinished accumulator fixtures from watchlist' : 'Watch unfinished accumulator fixtures'}
+												>{getWatchableFixtureIds(bet.selections).every((fixtureId) => watchlistedFixtureIds.includes(fixtureId)) ? '★' : '☆'}</button>
+											{/if}
 										</div>
 										<div class="mt-2">
 											<p class="flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-700">
@@ -434,7 +472,9 @@
 														<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold text-slate-600">{selection.status}</span>
 													</span>
 												{/if}
-												<button type="button" class="text-lg leading-none text-amber-500 hover:text-amber-600" class:row-start-2={bet.selections.length > 1} class:col-start-2={bet.selections.length > 1} class:text-slate-300={!watchlistedFixtureIds.includes(selection.fixtureId)} onclick={() => void toggleWatchlist(selection.fixtureId)} aria-label={watchlistedFixtureIds.includes(selection.fixtureId) ? `Remove ${selection.homeTeamName} versus ${selection.awayTeamName} from watchlist` : `Add ${selection.homeTeamName} versus ${selection.awayTeamName} to watchlist`}>{watchlistedFixtureIds.includes(selection.fixtureId) ? '★' : '☆'}</button>
+												{#if bet.selections.length === 1}
+													<button type="button" class="text-lg leading-none text-amber-500 hover:text-amber-600 disabled:cursor-not-allowed disabled:text-slate-300" class:text-slate-300={isFixtureCompleted(selection.status) || !watchlistedFixtureIds.includes(selection.fixtureId)} disabled={isFixtureCompleted(selection.status)} onclick={() => void toggleWatchlist(selection.fixtureId)} aria-label={isFixtureCompleted(selection.status) ? `${selection.homeTeamName} versus ${selection.awayTeamName} is finished` : watchlistedFixtureIds.includes(selection.fixtureId) ? `Remove ${selection.homeTeamName} versus ${selection.awayTeamName} from watchlist` : `Add ${selection.homeTeamName} versus ${selection.awayTeamName} to watchlist`}>{watchlistedFixtureIds.includes(selection.fixtureId) ? '★' : '☆'}</button>
+												{/if}
 											</div>
 										{/each}
 										</div>

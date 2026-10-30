@@ -22,9 +22,10 @@ export function didFixtureScoreIncrease(
   return refreshedTotal > previousTotal;
 }
 
-export function formatMatchMinute(
-  time: { elapsed: number | null; extra?: number | null },
-) {
+export function formatMatchMinute(time: {
+  elapsed: number | null;
+  extra?: number | null;
+}) {
   if (time.elapsed === null) return null;
   return `${time.elapsed}′${time.extra ? `+${time.extra}` : ""}`;
 }
@@ -43,10 +44,7 @@ export async function syncFixturesInProgress() {
   return refreshedFixtures;
 }
 
-async function notifyFixtureChanges(
-  previous: Fixture[],
-  refreshed: Fixture[],
-) {
+async function notifyFixtureChanges(previous: Fixture[], refreshed: Fixture[]) {
   if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) return;
   webpush.setVapidDetails(
     process.env.VAPID_SUBJECT ?? "mailto:notifications@blackdiamond.app",
@@ -71,12 +69,28 @@ async function notifyFixtureChanges(
     const score = `${fixture.teams.home.name} ${fixture.goals.home ?? 0}–${fixture.goals.away ?? 0} ${fixture.teams.away.name}`;
     await Promise.all(
       subscriptions.map(async ({ accountId, subscription }) => {
-        const bets = fullTime
-          ? await getBetsForFixturesByAccountId(accountId, [fixture.fixture.id])
-          : [];
-        const selection = bets
-          .flatMap((bet) => bet.selections)
-          .find((item) => item.fixture.id === fixture.fixture.id);
+        const bets = await getBetsForFixturesByAccountId(accountId, [
+          fixture.fixture.id,
+        ]);
+        const selections = bets.flatMap((bet) =>
+          bet.selections
+            .filter((selection) => selection.fixture.id === fixture.fixture.id)
+            .map((selection) => ({
+              selection,
+              isAccumulator: bet.selections.length > 1,
+            })),
+        );
+        const selection = (
+          fullTime
+            ? selections.find((item) => !item.isAccumulator)
+            : selections[0]
+        )?.selection;
+        if (
+          fullTime &&
+          !selection &&
+          selections.some((item) => item.isAccumulator)
+        )
+          return;
         const result = selection
           ? didBetSelectionWin(selection, fixture)
           : null;
@@ -85,7 +99,7 @@ async function notifyFixtureChanges(
             ? `Full time · ${selection.market.selection} · ${result ? "Won" : "Lost"}`
             : fullTime
               ? "Full time"
-              : `⚽ Update${updateMinute ? ` · ${updateMinute}` : ""}`;
+              : `⚽ Update${updateMinute ? ` · ${updateMinute}` : ""}${selection ? ` · ${selection.market.selection}` : ""}`;
         return webpush
           .sendNotification(
             subscription,
