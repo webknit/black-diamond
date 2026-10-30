@@ -67,23 +67,6 @@ export const teamFilterVariations: TeamFilterVariation[] = [
       ),
     ),
   ),
-  ...thresholds.flatMap((threshold) =>
-    (["eitherTeam", "bothTeams"] as const).map((mode) =>
-      createVariation(threshold, undefined, mode, "season"),
-    ),
-  ),
-  ...thresholds.flatMap((threshold) =>
-    (["eitherTeam", "bothTeams"] as const).map((mode) =>
-      createVariation(undefined, threshold, mode, "season"),
-    ),
-  ),
-  ...thresholds.flatMap((scoring) =>
-    thresholds.flatMap((defensive) =>
-      (["eitherTeam", "bothTeams"] as const).map((mode) =>
-        createVariation(scoring, defensive, mode, "season"),
-      ),
-    ),
-  ),
 ];
 import type { FixtureStatsSnapshot } from '../types/fixtureStatsSnapshot.js';
 

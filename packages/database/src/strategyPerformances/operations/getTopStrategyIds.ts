@@ -1,5 +1,7 @@
 import { getStrategyPerformanceSeasonTotals } from './getStrategyPerformanceSeasonTotals.js';
 
+const minimumBetsForRanking = 30;
+
 export async function getTopStrategyIds(strategyIds: readonly string[], limit: number): Promise<string[]> {
 	const summaries = await getStrategyPerformanceSeasonTotals(strategyIds);
 	return summaries
@@ -12,8 +14,8 @@ export async function getTopStrategyIds(strategyIds: readonly string[], limit: n
 					? Number.NEGATIVE_INFINITY
 					: (summary.seasonPerformance.profit / summary.seasonPerformance.bets) * 100
 		}))
-		.filter((summary) => summary.bets > 0)
-		.sort((left, right) => right.profit - left.profit || right.returnOnInvestment - left.returnOnInvestment)
+		.filter((summary) => summary.bets >= minimumBetsForRanking)
+		.sort((left, right) => right.returnOnInvestment - left.returnOnInvestment || right.profit - left.profit)
 		.slice(0, limit)
 		.map((summary) => summary.strategyId);
 }

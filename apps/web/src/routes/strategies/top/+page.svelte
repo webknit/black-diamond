@@ -26,7 +26,7 @@
 		<header class="mb-4 sm:mb-6">
 			<h1 class="text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Top strategies</h1>
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">
-				The ten strongest performers across every stored strategy. Ranked by flat-stake profit, then ROI.
+				The ten strongest performers across every stored strategy with at least 30 bets. Ranked by ROI, then flat-stake profit.
 			</p>
 		</header>
 

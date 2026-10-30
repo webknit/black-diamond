@@ -58,13 +58,6 @@ export const bttsStrategyVariations: BttsStrategyVariation[] = [
 			createVariation(scoringThreshold, defensiveThreshold, 'last5')
 		)
 	),
-	...scoringThresholds.map((threshold) => createVariation(threshold, undefined, 'season')),
-	...defensiveThresholds.map((threshold) => createVariation(undefined, threshold, 'season')),
-	...scoringThresholds.flatMap((scoringThreshold) =>
-		defensiveThresholds.map((defensiveThreshold) =>
-			createVariation(scoringThreshold, defensiveThreshold, 'season')
-		)
-	)
 ];
 
 function average(goals: number, played: number) {

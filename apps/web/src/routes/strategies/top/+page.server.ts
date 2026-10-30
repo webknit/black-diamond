@@ -23,6 +23,8 @@ const marketDetails = {
 	bttns: { market: 'BTNTS', href: '/strategies/btnts' }
 } as const;
 
+const minimumBetsForRanking = 30;
+
 const strategyDefinitions: StrategyDefinition[] = [
 	...teamFilterVariations.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
 	...over2_5RateStrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
@@ -50,12 +52,12 @@ export async function load() {
 				returnOnInvestment: bets === 0 ? null : (profit / bets) * 100
 			};
 		})
-		.filter((strategy) => strategy.bets > 0)
+		.filter((strategy) => strategy.bets >= minimumBetsForRanking)
 		.sort(
 			(left, right) =>
-				right.profit - left.profit ||
 				(right.returnOnInvestment ?? Number.NEGATIVE_INFINITY) -
-					(left.returnOnInvestment ?? Number.NEGATIVE_INFINITY)
+					(left.returnOnInvestment ?? Number.NEGATIVE_INFINITY) ||
+				right.profit - left.profit
 		)
 		.slice(0, 10);
 
