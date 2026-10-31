@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Header from '#lib/components/Header.svelte';
+	import RefreshOnResume from '#lib/components/RefreshOnResume.svelte';
 	import '../app.css';
 	import type { LayoutProps } from './$types';
 
@@ -12,5 +13,6 @@
 </svelte:head>
 
 <Header />
+<RefreshOnResume />
 
 {@render children()}
