@@ -19,6 +19,7 @@
     "sync:live": "node --env-file-if-exists=.env --import tsx src/index.ts live",
     "sync:three-hourly": "node --env-file-if-exists=.env --import tsx src/index.ts three-hourly",
     "sync:weekly": "node --env-file-if-exists=.env --import tsx src/index.ts weekly",
+    "test:push": "node --env-file-if-exists=.env --import tsx src/scripts/sendTestPush.ts",
     "check": "tsc --noEmit",
     "test": "vitest run"
   },
