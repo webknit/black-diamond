@@ -7,6 +7,19 @@ import { logSyncStep } from "../utils/logging/logSyncStep.js";
 import { getFixturesForLineupSync, getRecentlyFinishedFixtures } from "@black-diamond/database/fixtures";
 import { getFixtureEventsForFixtures } from "@black-diamond/database/fixtureEvents";
 
+function isApiFootballRateLimitError(error: unknown): error is { status: number } {
+  return typeof error === "object" && error !== null && "status" in error && error.status === 429;
+}
+
+async function runOptionalLiveDataSync(label: string, work: () => Promise<unknown>) {
+  try {
+    await logSyncStep(label, work);
+  } catch (error) {
+    if (!isApiFootballRateLimitError(error)) throw error;
+    console.warn(`[data-sync] Skipped ${label} after API-Football rate limiting. The next live sync will try again.`);
+  }
+}
+
 export async function runLiveSync() {
   const fixtures = await logSyncStep("refresh live fixtures", syncFixturesInProgress);
   const recentlyFinishedFixtures = await getRecentlyFinishedFixtures();
@@ -19,18 +32,18 @@ export async function runLiveSync() {
     ...fixtures.map((fixture) => fixture.fixture.id),
     ...fixtureIdsMissingEvents,
   ])];
-  await logSyncStep("sync live fixture events", () =>
+  await runOptionalLiveDataSync("sync live fixture events", () =>
     syncFixtureEvents(eventFixtureIds),
   );
   const fixturesForStatistics = [...new Map([
     ...fixtures,
     ...recentlyFinishedFixtures,
   ].map((fixture) => [fixture.fixture.id, fixture])).values()];
-  await logSyncStep("sync live fixture statistics", () =>
+  await runOptionalLiveDataSync("sync live fixture statistics", () =>
     syncFixtureStatistics(fixturesForStatistics),
   );
   const fixturesForLineupSync = await getFixturesForLineupSync();
-  await logSyncStep("sync upcoming and live fixture lineups", () =>
+  await runOptionalLiveDataSync("sync upcoming and live fixture lineups", () =>
     syncFixtureLineups(fixturesForLineupSync.map((fixture) => fixture.fixture.id)),
   );
   await logSyncStep("settle completed bets", syncBetResults);

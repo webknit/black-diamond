@@ -1,7 +1,11 @@
 import { createRateLimiter } from "./rateLimiter.js";
 
 const API_FOOTBALL_BASE_URL = "https://v3.football.api-sports.io";
-const REQUEST_INTERVAL_MS = 1000 / 6;
+// Leave room below the provider limit for another scheduled job that happens
+// to overlap briefly with this process.
+const REQUEST_INTERVAL_MS = 1000 / 4;
+const MAX_RATE_LIMIT_RETRIES = 3;
+const DEFAULT_RATE_LIMIT_RETRY_MS = 10_000;
 
 type QueryValue = string | number | boolean | undefined;
 
@@ -9,12 +13,14 @@ export type ApiFootballClientOptions = {
   apiKey: string;
   fetch?: typeof globalThis.fetch;
   rateLimiter?: { waitForTurn: () => Promise<void> };
+  sleep?: (milliseconds: number) => Promise<void>;
 };
 
 export function createApiFootballClient({
   apiKey,
   fetch = globalThis.fetch,
   rateLimiter = createRateLimiter({ minimumIntervalMs: REQUEST_INTERVAL_MS }),
+  sleep = (milliseconds) => new Promise<void>((resolve) => setTimeout(resolve, milliseconds)),
 }: ApiFootballClientOptions) {
   if (!apiKey.trim()) {
     throw new Error("API_FOOTBALL_API_KEY must be provided");
@@ -32,34 +38,52 @@ export function createApiFootballClient({
       }
     }
 
-    await rateLimiter.waitForTurn();
+    for (let attempt = 0; ; attempt += 1) {
+      await rateLimiter.waitForTurn();
 
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "x-apisports-key": apiKey,
-      },
-    });
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "x-apisports-key": apiKey,
+        },
+      });
 
-    const responseText = await response.text();
-    const body = parseResponseBody(responseText);
+      const responseText = await response.text();
+      const body = parseResponseBody(responseText);
 
-    if (!response.ok) {
-      if (body === undefined) {
-        throw createApiFootballNonJsonHttpError(response.status, responseText);
+      if (response.status === 429 && attempt < MAX_RATE_LIMIT_RETRIES) {
+        const retryMilliseconds = getRetryMilliseconds(response.headers, attempt);
+        console.warn(
+          `[api-football] Rate limited. Retrying ${path} in ${Math.ceil(retryMilliseconds / 1000)}s (attempt ${attempt + 1}/${MAX_RATE_LIMIT_RETRIES}).`,
+        );
+        await sleep(retryMilliseconds);
+        continue;
       }
 
-      throw createApiFootballHttpError(response.status, body);
-    }
+      if (!response.ok) {
+        if (body === undefined) {
+          throw createApiFootballNonJsonHttpError(response.status, responseText);
+        }
 
-    if (body === undefined) {
-      throw createApiFootballInvalidResponseError(response.status, responseText);
-    }
+        throw createApiFootballHttpError(response.status, body);
+      }
 
-    return body as ResponseBody;
+      if (body === undefined) {
+        throw createApiFootballInvalidResponseError(response.status, responseText);
+      }
+
+      return body as ResponseBody;
+    }
   }
 
   return { get };
+}
+
+function getRetryMilliseconds(headers: Headers | undefined, attempt: number): number {
+  const retryAfter = Number(headers?.get("retry-after"));
+  if (Number.isFinite(retryAfter) && retryAfter > 0) return retryAfter * 1000;
+
+  return DEFAULT_RATE_LIMIT_RETRY_MS * (attempt + 1);
 }
 
 export type ApiFootballHttpError = Error & {

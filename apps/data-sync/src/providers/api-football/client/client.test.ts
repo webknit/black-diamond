@@ -33,6 +33,35 @@ describe("createApiFootballClient", () => {
     );
   });
 
+  it("waits and retries a rate-limited request", async () => {
+    const sleep = vi.fn().mockResolvedValue(undefined);
+    const fetch = vi.fn()
+      .mockResolvedValueOnce({
+        ok: false,
+        status: 429,
+        headers: new Headers({ "retry-after": "2" }),
+        text: async () => JSON.stringify({ errors: { rateLimit: "Too many requests" } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ response: [] }),
+      });
+    const rateLimiter = { waitForTurn: vi.fn() };
+    const client = createApiFootballClient({
+      apiKey: "test-key",
+      fetch: fetch as unknown as typeof globalThis.fetch,
+      rateLimiter,
+      sleep,
+    });
+
+    await expect(client.get("/fixtures/statistics", { fixture: 10 })).resolves.toEqual({ response: [] });
+
+    expect(sleep).toHaveBeenCalledWith(2_000);
+    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(rateLimiter.waitForTurn).toHaveBeenCalledTimes(2);
+  });
+
   it("includes HTTP status and response body in errors", async () => {
     const body = { message: "Not authorised" };
     const fetch = vi.fn().mockResolvedValue({
@@ -61,6 +90,8 @@ describe("createApiFootballClient", () => {
     const client = createApiFootballClient({
       apiKey: "test-key",
       fetch: fetch as unknown as typeof globalThis.fetch,
+      rateLimiter: { waitForTurn: vi.fn() },
+      sleep: vi.fn().mockResolvedValue(undefined),
     });
 
     await expect(client.get("/odds")).rejects.toMatchObject({
