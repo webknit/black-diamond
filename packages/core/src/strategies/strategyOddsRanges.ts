@@ -13,7 +13,7 @@ export const over1_5OddsRanges = ranges.slice(0, 4);
 export const over2_5OddsRanges = ranges.slice(4);
 export const strategyOddsRanges = ranges;
 export type StrategyOddsRangeId = (typeof ranges)[number]['id'];
-export type StrategyOddsFilter = 'all' | StrategyOddsRangeId;
+export type StrategyOddsFilter = 'all' | 'bettable' | StrategyOddsRangeId;
 
 export function getStrategyOddsRangeIds(odd: number): StrategyOddsRangeId[] {
 	if (!Number.isFinite(odd) || odd <= 1) return [];

@@ -1,11 +1,15 @@
 import {
 	over1_5OddsRanges,
+	getBettableOddsBandIds,
+	sumOddsBandPerformance,
 	over1_5StrategyVariations,
 	leagueRateStrategyVariations,
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
 import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+
+const minimumBetsForRanking = 50;
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -15,9 +19,9 @@ export async function load({ url }: { url: URL }) {
 	const oldestWeek = getUkWeekStartDateKey(oldest);
 	const requestedOddsRange = url.searchParams.get('odds');
 	const selectedOddsRange: StrategyOddsFilter =
-		requestedOddsRange === 'all' || over1_5OddsRanges.some((range) => range.id === requestedOddsRange)
+		requestedOddsRange === 'all' || requestedOddsRange === 'bettable' || over1_5OddsRanges.some((range) => range.id === requestedOddsRange)
 			? (requestedOddsRange as StrategyOddsFilter)
-			: 'all';
+			: 'bettable';
 	const performances = await getStrategyPerformanceSummaries(
 		[...over1_5StrategyVariations, ...leagueRateStrategyVariations.filter((variation) => variation.market === 'over1_5')].map((variation) => variation.id),
 		selectedOddsRange === 'all' ? null : selectedOddsRange
@@ -29,9 +33,11 @@ export async function load({ url }: { url: URL }) {
 	const selectedWeek = requestedWeek !== null && availableWeeks.includes(requestedWeek) ? requestedWeek : 'all';
 	const totalsByStrategy = new Map<string, { bets: number; wins: number; losses: number; profit: number }>();
 	for (const performance of performances) {
-		const oddsBand = selectedOddsRange === 'all' ? null : performance.oddsBands?.[selectedOddsRange];
+		const oddsBand = selectedOddsRange === 'all' || selectedOddsRange === 'bettable' ? null : performance.oddsBands?.[selectedOddsRange];
 		const totals = selectedOddsRange === 'all'
 			? (selectedWeek === 'all' ? performance.seasonPerformance : performance.weeks[selectedWeek])
+			: selectedOddsRange === 'bettable'
+				? sumOddsBandPerformance(performance.oddsBands, getBettableOddsBandIds('over1_5'), selectedWeek)
 			: (selectedWeek === 'all' ? oddsBand?.seasonPerformance : oddsBand?.weeks[selectedWeek]);
 		if (!totals) continue;
 		const current = totalsByStrategy.get(performance.strategyId) ?? { bets: 0, wins: 0, losses: 0, profit: 0 };
@@ -51,6 +57,7 @@ export async function load({ url }: { url: URL }) {
 				const totals = totalsByStrategy.get(variation.id) ?? { bets: 0, wins: 0, losses: 0, profit: 0 };
 				return { ...variation, ...totals, returnOnInvestment: totals.bets === 0 ? null : (totals.profit / totals.bets) * 100 };
 			})
+			.filter((result) => result.bets >= minimumBetsForRanking)
 			.sort((left, right) => right.profit - left.profit || (right.returnOnInvestment ?? -Infinity) - (left.returnOnInvestment ?? -Infinity))
 	};
 }

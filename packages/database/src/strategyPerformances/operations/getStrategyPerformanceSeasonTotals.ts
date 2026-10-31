@@ -4,6 +4,7 @@ import { getDatabase } from '../../mongodb.js';
 export type StrategyPerformanceSeasonTotals = {
 	strategyId: string;
 	seasonPerformance: StrategyPerformanceTotals;
+	oddsBands: Record<string, { seasonPerformance: StrategyPerformanceTotals }>;
 };
 
 export async function getStrategyPerformanceSeasonTotals(
@@ -13,7 +14,7 @@ export async function getStrategyPerformanceSeasonTotals(
 		.collection<StrategyPerformanceSeasonTotals>('strategyPerformanceSummaries')
 		.find(
 			{ strategyVersion: 1, strategyId: { $in: strategyIds } },
-			{ projection: { _id: 0, strategyId: 1, seasonPerformance: 1 } }
+		{ projection: { _id: 0, strategyId: 1, seasonPerformance: 1, oddsBands: 1 } }
 		)
 		.toArray();
 }

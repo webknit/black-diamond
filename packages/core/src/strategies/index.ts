@@ -48,6 +48,13 @@ export {
   type StrategyOddsFilter,
   type StrategyOddsRangeId,
 } from "./strategyOddsRanges.js";
+export {
+  bettableMinimumOdds,
+  getBettableMinimumOdds,
+  getBettableOddsBandIds,
+  sumOddsBandPerformance,
+  type BettableOddsMarket,
+} from "./bettableOdds.js";
 
 type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
 

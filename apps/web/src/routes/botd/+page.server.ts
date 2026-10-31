@@ -1,5 +1,5 @@
 import { getBotdDay } from '@black-diamond/database/botdDays';
-import { botdStrategies, getBotdMarketLabel } from '@black-diamond/core/strategies';
+import { botdStrategies, getBettableMinimumOdds, getBotdMarketLabel } from '@black-diamond/core/strategies';
 import { getUkDateKey } from '@black-diamond/core/time';
 import { getTopStrategyIds } from '@black-diamond/database/strategyPerformances';
 import { actions, load as loadFixtures } from '../+page.server.js';
@@ -25,17 +25,21 @@ function getSelectedDate(value: string | null) {
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const startedAt = performance.now();
 	const date = getSelectedDate(url.searchParams.get('date'));
-	const minimumOdds = getMinimumOdds(url.searchParams.get('minOdds'));
 	const botdDayStartedAt = performance.now();
 	const [botdDay, topStrategyIds] = await Promise.all([
 		getBotdDay(date),
-		getTopStrategyIds(botdStrategies.map((strategy) => strategy.id), 3)
+		getTopStrategyIds(botdStrategies, 3)
 	]);
 	const strategies = topStrategyIds
 		.map((strategyId) => botdStrategies.find((strategy) => strategy.id === strategyId))
 		.filter((strategy): strategy is (typeof botdStrategies)[number] => strategy !== undefined);
 	const selectedStrategyId = getSelectedStrategyId(url.searchParams.get('strategy'), strategies.map((strategy) => strategy.id));
 	const selectedStrategy = strategies.find((strategy) => strategy.id === selectedStrategyId) ?? null;
+	const minimumOdds = url.searchParams.has('minOdds')
+		? getMinimumOdds(url.searchParams.get('minOdds'))
+		: selectedStrategy
+			? getBettableMinimumOdds(selectedStrategy.market)
+			: 0;
 	console.info('[botd] botdDays lookup', {
 		date,
 		milliseconds: Math.round(performance.now() - botdDayStartedAt),

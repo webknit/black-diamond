@@ -25,7 +25,7 @@
 	function changeStrategy(event: Event) {
 		const input = event.currentTarget;
 		if (!(input instanceof HTMLSelectElement)) return;
-		void updateQuery({ strategy: input.value });
+		void updateQuery({ strategy: input.value, minOdds: null });
 	}
 
 	function changeMinimumOdds(event: Event) {
@@ -34,11 +34,12 @@
 		void updateQuery({ minOdds: input.value });
 	}
 
-	async function updateQuery(values: { date?: string; strategy?: string; minOdds?: string }) {
+	async function updateQuery(values: { date?: string; strategy?: string; minOdds?: string | null }) {
 		const url = new URL(page.url.href);
 		if (values.date) url.searchParams.set('date', values.date);
 		if (values.strategy) url.searchParams.set('strategy', values.strategy);
-		if (values.minOdds !== undefined) url.searchParams.set('minOdds', values.minOdds);
+		if (values.minOdds === null) url.searchParams.delete('minOdds');
+		if (typeof values.minOdds === 'string') url.searchParams.set('minOdds', values.minOdds);
 		isLoading = true;
 		try {
 			await goto(`${url.pathname}${url.search}`);
@@ -103,6 +104,8 @@
 					<label for="botd-minimum-odds" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Min. {data.marketLabel ?? 'strategy'} odds</label>
 					<select id="botd-minimum-odds" value={String(data.minimumOdds)} onchange={changeMinimumOdds} disabled={isLoading} class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-wait disabled:opacity-60">
 						<option value="0">Any</option>
+						<option value="1.1">1.10</option>
+						<option value="1.2">1.20</option>
 						<option value="1.3">1.30</option>
 						<option value="1.5">1.50</option>
 						<option value="1.7">1.70</option>

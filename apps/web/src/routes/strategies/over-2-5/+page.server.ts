@@ -3,10 +3,14 @@ import {
 	over2_5RateStrategyVariations,
 	leagueRateStrategyVariations,
 	over2_5OddsRanges,
+	getBettableOddsBandIds,
+	sumOddsBandPerformance,
 	teamFilterVariations,
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
 import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+
+const minimumBetsForRanking = 50;
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -16,9 +20,9 @@ export async function load({ url }: { url: URL }) {
 	const oldestWeek = getUkWeekStartDateKey(oldest);
 	const requestedOddsRange = url.searchParams.get('odds');
 	const selectedOddsRange: StrategyOddsFilter =
-		requestedOddsRange === 'all' || over2_5OddsRanges.some((range) => range.id === requestedOddsRange)
+		requestedOddsRange === 'all' || requestedOddsRange === 'bettable' || over2_5OddsRanges.some((range) => range.id === requestedOddsRange)
 			? (requestedOddsRange as StrategyOddsFilter)
-			: 'all';
+			: 'bettable';
 	const strategyIds = [
 		...teamFilterVariations.map((variation) => variation.id),
 		...over2_5RateStrategyVariations.map((variation) => variation.id)
@@ -36,9 +40,11 @@ export async function load({ url }: { url: URL }) {
 	const byStrategyId = new Map<string, { bets: number; wins: number; losses: number; profit: number }>();
 
 	for (const storedPerformance of storedPerformances) {
-		const oddsBand = selectedOddsRange === 'all' ? null : storedPerformance.oddsBands?.[selectedOddsRange];
+		const oddsBand = selectedOddsRange === 'all' || selectedOddsRange === 'bettable' ? null : storedPerformance.oddsBands?.[selectedOddsRange];
 		const totals = selectedOddsRange === 'all'
 			? (selectedWeek === 'all' ? storedPerformance.seasonPerformance : storedPerformance.weeks[selectedWeek])
+			: selectedOddsRange === 'bettable'
+				? sumOddsBandPerformance(storedPerformance.oddsBands, getBettableOddsBandIds('over2_5'), selectedWeek)
 			: (selectedWeek === 'all' ? oddsBand?.seasonPerformance : oddsBand?.weeks[selectedWeek]);
 		if (!totals) continue;
 
@@ -94,6 +100,7 @@ export async function load({ url }: { url: URL }) {
 				seasonPerformance: null
 			}))
 		]
+			.filter((result) => result.bets >= minimumBetsForRanking)
 			.sort(
 				(left, right) =>
 					right.profit - left.profit ||

@@ -62,7 +62,7 @@
 					<div>
 						<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Over 2.5 strategy explorer</p>
 						<h2 class="mt-1 text-base font-semibold text-slate-950">Scoring and defensive filters</h2>
-					<p class="mt-1 text-xs leading-5 text-slate-600">League-rate and recent-form variations use flat £1 stakes and stored pre-match Over 2.5 odds. The smaller figures show the equivalent season-wide filter where available. Rows are ranked by profit for the chosen odds range.</p>
+					<p class="mt-1 text-xs leading-5 text-slate-600">League-rate and recent-form variations use flat £1 stakes and stored pre-match Over 2.5 odds. The smaller figures show the equivalent season-wide filter where available. Rows with fewer than 50 qualifying bets are excluded, then ranked by profit.</p>
 					</div>
 				<div class="mt-4 flex flex-wrap items-end gap-3">
 					<div>
@@ -77,6 +77,7 @@
 					<div>
 						<label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500" for="strategy-odds">Odds range</label>
 						<select id="strategy-odds" value={data.selectedOddsRange} onchange={selectOddsRange} disabled={isWeekLoading} class="mt-1 rounded-lg border border-slate-300 bg-white px-2 py-1.5 text-xs text-slate-800 disabled:cursor-wait disabled:opacity-60">
+							<option value="bettable">Your minimum · 1.70+</option>
 							<option value="all">All odds</option>
 							{#each data.oddsRanges as range}<option value={range.id}>{range.label}</option>{/each}
 						</select>

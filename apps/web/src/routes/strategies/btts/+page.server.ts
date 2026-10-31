@@ -2,10 +2,14 @@ import {
 	bttsStrategyVariations,
 	leagueRateStrategyVariations,
 	over2_5OddsRanges,
+	getBettableOddsBandIds,
+	sumOddsBandPerformance,
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
 import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+
+const minimumBetsForRanking = 50;
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -15,9 +19,9 @@ export async function load({ url }: { url: URL }) {
 	const oldestWeek = getUkWeekStartDateKey(oldest);
 	const requestedOddsRange = url.searchParams.get('odds');
 	const selectedOddsRange: StrategyOddsFilter =
-		requestedOddsRange === 'all' || over2_5OddsRanges.some((range) => range.id === requestedOddsRange)
+		requestedOddsRange === 'all' || requestedOddsRange === 'bettable' || over2_5OddsRanges.some((range) => range.id === requestedOddsRange)
 			? (requestedOddsRange as StrategyOddsFilter)
-			: 'all';
+			: 'bettable';
 	const storedPerformances = await getStrategyPerformanceSummaries(
 		[...bttsStrategyVariations, ...leagueRateStrategyVariations.filter((variation) => variation.market === 'btts')].map((variation) => variation.id),
 		selectedOddsRange === 'all' ? null : selectedOddsRange
@@ -30,9 +34,11 @@ export async function load({ url }: { url: URL }) {
 	const byStrategyId = new Map<string, { bets: number; wins: number; losses: number; profit: number }>();
 
 	for (const storedPerformance of storedPerformances) {
-		const oddsBand = selectedOddsRange === 'all' ? null : storedPerformance.oddsBands?.[selectedOddsRange];
+		const oddsBand = selectedOddsRange === 'all' || selectedOddsRange === 'bettable' ? null : storedPerformance.oddsBands?.[selectedOddsRange];
 		const totals = selectedOddsRange === 'all'
 			? (selectedWeek === 'all' ? storedPerformance.seasonPerformance : storedPerformance.weeks[selectedWeek])
+			: selectedOddsRange === 'bettable'
+				? sumOddsBandPerformance(storedPerformance.oddsBands, getBettableOddsBandIds('btts'), selectedWeek)
 			: (selectedWeek === 'all' ? oddsBand?.seasonPerformance : oddsBand?.weeks[selectedWeek]);
 		if (!totals) continue;
 		const current = byStrategyId.get(storedPerformance.strategyId) ?? { bets: 0, wins: 0, losses: 0, profit: 0 };
@@ -78,6 +84,7 @@ export async function load({ url }: { url: URL }) {
 				seasonPerformance: null
 			}))
 		]
+			.filter((result) => result.bets >= minimumBetsForRanking)
 			.sort(
 				(left, right) =>
 					right.profit - left.profit ||

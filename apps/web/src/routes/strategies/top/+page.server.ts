@@ -1,10 +1,13 @@
 import {
 	bttnsStrategyVariations,
+	getBettableMinimumOdds,
+	getBettableOddsBandIds,
 	bttsStrategyVariations,
 	leagueRateStrategyVariations,
 	over1_5StrategyVariations,
 	over2_5RateStrategyVariations,
-	teamFilterVariations
+	teamFilterVariations,
+	sumOddsBandPerformance
 } from '@black-diamond/core/strategies';
 import { getStrategyPerformanceSeasonTotals } from '@black-diamond/database/strategyPerformances';
 
@@ -25,6 +28,10 @@ const marketDetails = {
 
 const minimumBetsForRanking = 50;
 
+function getMarketKey(market: StrategyDefinition['market']) {
+	return market === 'Over 1.5 goals' ? 'over1_5' : market === 'BTTS' ? 'btts' : market === 'BTNTS' ? 'bttns' : 'over2_5';
+}
+
 const strategyDefinitions: StrategyDefinition[] = [
 	...teamFilterVariations.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
 	...over2_5RateStrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
@@ -36,15 +43,22 @@ const strategyDefinitions: StrategyDefinition[] = [
 
 export async function load() {
 	const summaries = await getStrategyPerformanceSeasonTotals(strategyDefinitions.map((strategy) => strategy.id));
-	const summariesById = new Map(summaries.map((summary) => [summary.strategyId, summary.seasonPerformance]));
+	const summariesById = new Map(summaries.map((summary) => [summary.strategyId, summary]));
 
 	const strategies = strategyDefinitions
 		.map((strategy) => {
-			const performance = summariesById.get(strategy.id);
+			const marketKey = getMarketKey(strategy.market);
+			const summary = summariesById.get(strategy.id);
+			const performance = sumOddsBandPerformance(
+				summary?.oddsBands,
+				getBettableOddsBandIds(marketKey),
+				'all'
+			);
 			const bets = performance?.bets ?? 0;
 			const profit = performance?.profit ?? 0;
 			return {
 				...strategy,
+				minimumOdds: getBettableMinimumOdds(marketKey),
 				bets,
 				wins: performance?.wins ?? 0,
 				losses: performance?.losses ?? 0,

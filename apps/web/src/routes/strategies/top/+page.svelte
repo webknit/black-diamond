@@ -26,7 +26,7 @@
 		<header class="mb-4 sm:mb-6">
 			<h1 class="text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Top strategies</h1>
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">
-				The ten strongest performers across every stored strategy with at least 50 bets. Ranked by ROI, then flat-stake profit.
+				The ten strongest performers with at least 50 bets, using your market-specific minimum odds. Ranked by ROI, then flat-stake profit.
 			</p>
 		</header>
 
@@ -45,6 +45,7 @@
 								<div class="flex flex-wrap items-center gap-x-2 gap-y-1">
 									<a class="text-sm font-semibold text-slate-950 underline decoration-slate-300 underline-offset-2 hover:decoration-slate-950" href={strategy.href}>{strategy.title}</a>
 									<span class="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">{strategy.market}</span>
+									<span class="text-[10px] text-slate-500">{strategy.minimumOdds.toFixed(2)}+ odds</span>
 								</div>
 								<p class="mt-1 text-xs leading-5 text-slate-600">{strategy.description}</p>
 								<div class="mt-3 grid grid-cols-4 gap-2 border-t border-slate-100 pt-3 text-center text-[10px] text-slate-500 sm:max-w-md">
