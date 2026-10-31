@@ -39,7 +39,7 @@ export async function getTopStrategyIds(strategies: readonly StrategyForRanking[
 					: (performance.profit / performance.bets) * 100,
 			};
 		})
-		.filter((summary) => summary.bets >= minimumBetsForRanking)
+		.filter((summary) => summary.bets >= minimumBetsForRanking && summary.profit > 0)
 		.sort((left, right) => right.returnOnInvestment - left.returnOnInvestment || right.profit - left.profit)
 		.slice(0, limit)
 		.map((summary) => summary.strategyId);

@@ -39,7 +39,7 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
       .map((fixture) => [fixture.fixture.id, fixture]),
   );
   const fixtures = [...fixturesById.values()];
-  const topStrategyIds = await getTopStrategyIds(botdStrategies, 3);
+  const topStrategyIds = await getTopStrategyIds(botdStrategies, 5);
   const topStrategies = botdStrategies.filter((strategy) => topStrategyIds.includes(strategy.id));
   const fixtureDates = [...new Set(fixtures.map((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000))))];
   const matchesByDate = new Map<string, BotdDayFixture[]>(fixtureDates.map((fixtureDate) => [fixtureDate, []]));

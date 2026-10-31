@@ -28,7 +28,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const botdDayStartedAt = performance.now();
 	const [botdDay, topStrategyIds] = await Promise.all([
 		getBotdDay(date),
-		getTopStrategyIds(botdStrategies, 3)
+		getTopStrategyIds(botdStrategies, 5)
 	]);
 	const strategies = topStrategyIds
 		.map((strategyId) => botdStrategies.find((strategy) => strategy.id === strategyId))

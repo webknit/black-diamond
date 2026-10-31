@@ -66,7 +66,7 @@ export async function load() {
 				returnOnInvestment: bets === 0 ? null : (profit / bets) * 100
 			};
 		})
-		.filter((strategy) => strategy.bets >= minimumBetsForRanking)
+		.filter((strategy) => strategy.bets >= minimumBetsForRanking && strategy.profit > 0)
 		.sort(
 			(left, right) =>
 				(right.returnOnInvestment ?? Number.NEGATIVE_INFINITY) -

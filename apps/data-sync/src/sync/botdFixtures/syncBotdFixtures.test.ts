@@ -45,7 +45,7 @@ describe("syncBotdFixtures", () => {
     expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-21", "2026-10-22");
     expect(mocks.getFixtureStatsSnapshots).toHaveBeenCalledWith([1]);
     expect(mocks.getFixtureOddsForFixtures).toHaveBeenCalledWith([1]);
-    expect(mocks.getTopStrategyIds).toHaveBeenCalledWith(expect.any(Array), 3);
+    expect(mocks.getTopStrategyIds).toHaveBeenCalledWith(expect.any(Array), 5);
     expect(mocks.upsertBotdDays).toHaveBeenCalledWith([{ fixtureDate: "2026-10-21", fixtures: [], updatedAt: now.toISOString() }]);
   });
 
