@@ -14,6 +14,9 @@ import {
 	getStrategyOddsRangeIds,
   getOver1_5ReferenceOdd,
   getOver2_5ReferenceOdd,
+	getUnder2_5ReferenceOdd,
+	getUnder1_5ReferenceOdd,
+	getOver0_5ReferenceOdd,
 	 matchesBttsStrategyVariation,
 	 matchesBttnsStrategyVariation,
 	 matchesOver2_5RateStrategyVariation,
@@ -24,6 +27,12 @@ import {
 	 bttsStrategyVariations,
 	 bttnsStrategyVariations,
 	 over2_5RateStrategyVariations,
+	 under2_5StrategyVariations,
+	 matchesUnder2_5StrategyVariation,
+	 under1_5StrategyVariations,
+	 matchesUnder1_5StrategyVariation,
+	 over0_5StrategyVariations,
+	 matchesOver0_5StrategyVariation,
 	 over1_5StrategyVariations,
 	strategyOddsRanges,
   teamFilterVariations,
@@ -43,6 +52,9 @@ const strategyVersion = 1;
 const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
   ...over2_5RateStrategyVariations.map((strategy) => strategy.id),
+  ...under2_5StrategyVariations.map((strategy) => strategy.id),
+  ...under1_5StrategyVariations.map((strategy) => strategy.id),
+  ...over0_5StrategyVariations.map((strategy) => strategy.id),
   ...over1_5StrategyVariations.map((strategy) => strategy.id),
   ...bttsStrategyVariations.map((strategy) => strategy.id),
   ...bttnsStrategyVariations.map((strategy) => strategy.id),
@@ -247,6 +259,32 @@ async function createStrategyPerformances(
         over2_5Won,
         over2_5ReferenceOdd,
       );
+    }
+
+    const under2_5Won =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home + fixture.goals.away < 3;
+    const under2_5ReferenceOdd = getUnder2_5ReferenceOdd(storedOdds.odds);
+    for (const variation of under2_5StrategyVariations) {
+      record(
+        variation.id,
+        matchesUnder2_5StrategyVariation(snapshot, variation),
+        under2_5Won,
+        under2_5ReferenceOdd,
+      );
+    }
+
+    const under1_5Won = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home + fixture.goals.away < 2;
+    const under1_5ReferenceOdd = getUnder1_5ReferenceOdd(storedOdds.odds);
+    for (const variation of under1_5StrategyVariations) {
+      record(variation.id, matchesUnder1_5StrategyVariation(snapshot, variation), under1_5Won, under1_5ReferenceOdd);
+    }
+
+    const over0_5Won = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home + fixture.goals.away > 0;
+    const over0_5ReferenceOdd = getOver0_5ReferenceOdd(storedOdds.odds);
+    for (const variation of over0_5StrategyVariations) {
+      record(variation.id, matchesOver0_5StrategyVariation(snapshot, variation), over0_5Won, over0_5ReferenceOdd);
     }
 
     const leagueRateContext = toLeagueRateContext(leagueRates);

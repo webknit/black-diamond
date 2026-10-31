@@ -75,6 +75,9 @@
 		const isGoalsMarket = marketNames.includes('goals over/under') || marketNames.includes('goals over under');
 		const isBttsMarket = marketNames.includes('both teams score');
 		return (recommendedMarket === 'over2_5' && isGoalsMarket && selectionValue === 'over 2.5') ||
+			(recommendedMarket === 'under2_5' && isGoalsMarket && selectionValue === 'under 2.5') ||
+			(recommendedMarket === 'under1_5' && isGoalsMarket && selectionValue === 'under 1.5') ||
+			(recommendedMarket === 'over0_5' && isGoalsMarket && selectionValue === 'over 0.5') ||
 			(recommendedMarket === 'over1_5' && isGoalsMarket && selectionValue === 'over 1.5') ||
 			(recommendedMarket === 'btts' && isBttsMarket && selectionValue === 'yes') ||
 			(recommendedMarket === 'bttns' && isBttsMarket && selectionValue === 'no');

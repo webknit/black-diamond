@@ -442,7 +442,7 @@
 										<div class="mt-2 text-[11px] tabular-nums text-slate-700">
 											<div class="flex items-center justify-between gap-x-2">
 												{#if bet.selections.length === 1}
-													<span>{bet.selections[0].market}</span>
+													<span>{bet.selections[0].marketName === 'Both Teams Score' ? (bet.selections[0].market === 'Yes' ? 'BTTS' : 'BTNTS') : bet.selections[0].market}</span>
 												{/if}
 												<span class:ml-auto={bet.selections.length === 1} class="whitespace-nowrap"><span class="text-slate-500">Odds</span> {bet.placedOdds}</span>
 											</div>

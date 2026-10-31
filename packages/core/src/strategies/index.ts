@@ -29,6 +29,13 @@ export {
   type Over2_5RateStrategyVariation,
 } from "./over2_5RateStrategies.js";
 export {
+  under2_5StrategyVariations,
+  matchesUnder2_5StrategyVariation,
+  type Under2_5StrategyVariation,
+} from "./under2_5Strategies.js";
+export { under1_5StrategyVariations, matchesUnder1_5StrategyVariation, type Under1_5StrategyVariation } from "./under1_5Strategies.js";
+export { over0_5StrategyVariations, matchesOver0_5StrategyVariation, type Over0_5StrategyVariation } from "./over0_5Strategies.js";
+export {
   matchesOver1_5StrategyVariation,
   over1_5StrategyVariations,
   type Over1_5StrategyVariation,
@@ -43,6 +50,8 @@ export {
 export {
   getStrategyOddsRangeIds,
   over1_5OddsRanges,
+
+  over0_5OddsRanges,
   over2_5OddsRanges,
   strategyOddsRanges,
   type StrategyOddsFilter,
@@ -61,6 +70,21 @@ type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
 export function getOver2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
   const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
   const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "over 2.5")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+export function getUnder2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "under 2.5")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+export function getUnder1_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "under 1.5")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+export function getOver0_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "over 0.5")?.odd);
   return Number.isFinite(odd) && odd > 1 ? odd : null;
 }
 

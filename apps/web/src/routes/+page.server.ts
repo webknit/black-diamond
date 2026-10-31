@@ -184,7 +184,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 				awayTeamName: fixture.teams.away.name,
 				homeGoals: fixture.goals.home,
 				awayGoals: fixture.goals.away,
-				market: selection.market.selection
+				market: selection.market.selection,
+				marketName: selection.market.name
 			}];
 		});
 		selections.sort((left, right) => left.timestamp - right.timestamp);

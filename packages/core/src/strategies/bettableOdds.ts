@@ -3,10 +3,12 @@ import type { StrategyPerformanceTotals } from "../types/strategyPerformance.js"
 
 export const bettableMinimumOdds = {
   over2_5: 1.7,
+  under2_5: 1.7,
   btts: 1.7,
   bttns: 1.7,
   over1_5: 1.2,
-  over0_5: 1.1,
+  under1_5: 1.2,
+  over0_5: 1.08,
 } as const;
 
 export type BettableOddsMarket = keyof typeof bettableMinimumOdds;
@@ -19,7 +21,9 @@ export function getBettableMinimumOdds(market: BettableOddsMarket): number {
 export function getBettableOddsBandIds(
   market: BotdMarket | "over0_5",
 ): string[] {
-  return market === "over1_5"
+  return market === "over0_5"
+    ? ["1.08-1.10", "1.11-1.15", "1.16-1.19", "1.20-1.39", "1.40-1.59", "1.60+"]
+    : market === "over1_5" || market === "under1_5"
     ? ["1.20-1.39", "1.40-1.59", "1.60+"]
     : ["1.70-1.99", "2.00-2.49", "2.50+"];
 }
