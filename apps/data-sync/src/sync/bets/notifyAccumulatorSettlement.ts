@@ -3,6 +3,7 @@ import type { Fixture } from "@black-diamond/core/fixture";
 import { getWatchingAccountIds } from "@black-diamond/database/fixtureWatchlist";
 import { getPushSubscriptionsByAccountIds } from "@black-diamond/database/pushSubscriptions";
 import webpush from "web-push";
+import { formatBetSelection } from "./formatBetSelection.js";
 
 export async function notifyAccumulatorSettlement(
   bet: Bet,
@@ -40,7 +41,7 @@ export async function notifyAccumulatorSettlement(
       const score = fixture
         ? `${fixture.teams.home.name} ${fixture.score?.fulltime.home ?? fixture.goals.home ?? 0}–${fixture.score?.fulltime.away ?? fixture.goals.away ?? 0} ${fixture.teams.away.name}`
         : `${selection.fixture.homeTeamName} v ${selection.fixture.awayTeamName}`;
-      return `${score} · ${selection.market.selection} · ${results[index] ? "Won" : "Lost"}`;
+      return `${score} · ${formatBetSelection(selection.market)} · ${results[index] ? "Won" : "Lost"}`;
     })
     .join("\n");
 

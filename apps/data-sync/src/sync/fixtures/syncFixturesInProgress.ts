@@ -10,6 +10,7 @@ import { getPushSubscriptionsByAccountIds } from "@black-diamond/database/pushSu
 import webpush from "web-push";
 import { getBetsForFixturesByAccountId } from "@black-diamond/database/bets";
 import { didBetSelectionWin } from "../bets/didBetSelectionWin.js";
+import { formatBetSelection } from "../bets/formatBetSelection.js";
 import type { Fixture } from "@black-diamond/core/fixture";
 
 export function didFixtureScoreIncrease(
@@ -94,12 +95,15 @@ async function notifyFixtureChanges(previous: Fixture[], refreshed: Fixture[]) {
         const result = selection
           ? didBetSelectionWin(selection, fixture)
           : null;
+        const selectionLabel = selection
+          ? formatBetSelection(selection.market)
+          : null;
         const title =
           fullTime && selection && result !== null
-            ? `Full time · ${selection.market.selection} · ${result ? "Won" : "Lost"}`
+            ? `Full time · ${selectionLabel} · ${result ? "Won" : "Lost"}`
             : fullTime
               ? "Full time"
-              : `⚽ Update${updateMinute ? ` · ${updateMinute}` : ""}${selection ? ` · ${selection.market.selection}` : ""}`;
+              : `⚽ Update${updateMinute ? ` · ${updateMinute}` : ""}${selectionLabel ? ` · ${selectionLabel}` : ""}`;
         return webpush
           .sendNotification(
             subscription,

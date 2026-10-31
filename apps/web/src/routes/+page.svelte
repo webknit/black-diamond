@@ -438,20 +438,19 @@
 												>{getWatchableFixtureIds(bet.selections).every((fixtureId) => watchlistedFixtureIds.includes(fixtureId)) ? '★' : '☆'}</button>
 											{/if}
 										</div>
-										<div class="mt-2">
-											<p class="flex items-center gap-x-2 whitespace-nowrap text-[11px] tabular-nums text-slate-700">
-											{#if bet.status !== 'pending' && bet.profit !== null}
-												<span class="whitespace-nowrap">
-													<span class="text-slate-500">P/L</span>
-													<span class:text-emerald-700={bet.profit > 0} class:text-rose-700={bet.profit < 0}>
-														<strong>{bet.profit > 0 ? '+' : ''}{formatMoney(bet.profit)}</strong>
-													</span>
-												</span>
-											{/if}
-											<span class="whitespace-nowrap"><span class="text-slate-500">Odds</span> <span class="text-slate-800">{bet.placedOdds}</span></span>
-											<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> <span>{formatMoney(bet.stake)}</span></span>
-										</p>
-											{#if bet.selections.length === 1}<p class="mt-1 text-[11px] font-bold">{bet.selections[0].market}</p>{/if}
+										<div class="mt-2 text-[11px] tabular-nums text-slate-700">
+											<div class="flex items-center justify-between gap-x-2">
+												{#if bet.selections.length === 1}
+													<span>{bet.selections[0].market}</span>
+												{/if}
+												<span class:ml-auto={bet.selections.length === 1} class="whitespace-nowrap"><span class="text-slate-500">Odds</span> {bet.placedOdds}</span>
+											</div>
+											<div class="mt-1 flex items-center justify-between gap-x-2">
+												<span class="whitespace-nowrap"><span class="text-slate-500">Stake</span> {formatMoney(bet.stake)}</span>
+												{#if bet.status !== 'pending' && bet.profit !== null}
+													<span class="whitespace-nowrap" class:text-emerald-700={bet.profit > 0} class:text-rose-700={bet.profit < 0}><span class="text-slate-500">P/L</span> {bet.profit > 0 ? '+' : ''}{formatMoney(bet.profit)}</span>
+												{/if}
+											</div>
 											{#each bet.selections as selection}
 											<div class="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-2 gap-y-1 text-xs">
 												<a class="min-w-0 rounded-sm text-slate-800 transition hover:bg-slate-50 hover:text-emerald-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600" class:row-start-2={bet.selections.length > 1} class:col-start-1={bet.selections.length > 1} href={`/fixtures/${selection.fixtureId}`} aria-label={`View ${selection.homeTeamName} versus ${selection.awayTeamName}`}>
