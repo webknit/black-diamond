@@ -5,12 +5,16 @@ const mocks = vi.hoisted(() => ({
   getUpcomingFixtures: vi.fn(),
   getFixtureOddsForFixtures: vi.fn(),
   getFixtureStatsSnapshots: vi.fn(),
+  getFixturesBetweenDates: vi.fn(),
   getLeaguesByIds: vi.fn(),
   getLeagueStats: vi.fn(),
   getTopStrategyIds: vi.fn(),
   upsertBotdDays: vi.fn(),
 }));
-vi.mock("@black-diamond/database/fixtures", () => ({ getUpcomingFixtures: mocks.getUpcomingFixtures }));
+vi.mock("@black-diamond/database/fixtures", () => ({
+  getFixturesBetweenDates: mocks.getFixturesBetweenDates,
+  getUpcomingFixtures: mocks.getUpcomingFixtures,
+}));
 vi.mock("@black-diamond/database/fixtureOdds", () => ({ getFixtureOddsForFixtures: mocks.getFixtureOddsForFixtures }));
 vi.mock("@black-diamond/database/fixtureStatsSnapshots", () => ({ getFixtureStatsSnapshots: mocks.getFixtureStatsSnapshots }));
 vi.mock("@black-diamond/database/leagues", () => ({ getLeaguesByIds: mocks.getLeaguesByIds }));
@@ -28,6 +32,7 @@ describe("syncBotdFixtures", () => {
     const now = new Date("2026-10-21T12:00:00.000Z");
     const included = fixture(1, now.getTime() / 1000 + 60 * 60);
     mocks.getUpcomingFixtures.mockResolvedValue([included]);
+    mocks.getFixturesBetweenDates.mockResolvedValue([]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([]);
     mocks.getFixtureOddsForFixtures.mockResolvedValue([]);
     mocks.getLeaguesByIds.mockResolvedValue([]);
@@ -37,6 +42,7 @@ describe("syncBotdFixtures", () => {
     await syncBotdFixtures(now);
 
     expect(mocks.getUpcomingFixtures).toHaveBeenCalledWith(now, 7);
+    expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-21", "2026-10-22");
     expect(mocks.getFixtureStatsSnapshots).toHaveBeenCalledWith([1]);
     expect(mocks.getFixtureOddsForFixtures).toHaveBeenCalledWith([1]);
     expect(mocks.getTopStrategyIds).toHaveBeenCalledWith(expect.any(Array), 3);
@@ -47,11 +53,12 @@ describe("syncBotdFixtures", () => {
     const now = new Date("2026-10-21T12:00:00.000Z");
     const included = fixture(1, now.getTime() / 1000 + 60 * 60);
     mocks.getUpcomingFixtures.mockResolvedValue([included]);
-    mocks.getTopStrategyIds.mockResolvedValue(["noTeamFilters"]);
+    mocks.getFixturesBetweenDates.mockResolvedValue([]);
+    mocks.getTopStrategyIds.mockResolvedValue(["score1.3-eitherTeam-last5"]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([{
       fixtureId: 1,
-      home: { fixtures: { home: { played: 1, goalsFor: 1, goalsAgainst: 1 } } },
-      away: { fixtures: { away: { played: 1, goalsFor: 1, goalsAgainst: 1 } } },
+      home: { last5Venue: { played: 5, goalsFor: 8, goalsAgainst: 4 } },
+      away: { last5Venue: { played: 5, goalsFor: 7, goalsAgainst: 5 } },
     }]);
     mocks.getFixtureOddsForFixtures.mockResolvedValue([{
       fixtureId: 1,
@@ -66,7 +73,7 @@ describe("syncBotdFixtures", () => {
       fixtureDate: "2026-10-21",
       fixtures: [{
         fixtureId: 1,
-        matches: [{ strategyId: "noTeamFilters", referenceOdd: 1.8 }],
+        matches: [{ strategyId: "score1.3-eitherTeam-last5", referenceOdd: 1.8 }],
         hasLeagueTable: true,
       }],
       updatedAt: now.toISOString(),

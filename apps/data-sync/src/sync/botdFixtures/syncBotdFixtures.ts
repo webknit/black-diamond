@@ -2,7 +2,7 @@ import { botdStrategies, getBotdReferenceOdd, matchesBotdStrategy } from "@black
 import { getUkDateKey } from "@black-diamond/core/time";
 import type { BotdDayFixture } from "@black-diamond/core/botdDay";
 import { upsertBotdDays } from "@black-diamond/database/botdDays";
-import { getUpcomingFixtures } from "@black-diamond/database/fixtures";
+import { getFixturesBetweenDates, getUpcomingFixtures } from "@black-diamond/database/fixtures";
 import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
 import { getFixtureStatsSnapshots } from "@black-diamond/database/fixtureStatsSnapshots";
 import { getLeaguesByIds } from "@black-diamond/database/leagues";
@@ -17,14 +17,33 @@ function splitIntoBatches<T>(values: T[]): T[][] {
   );
 }
 
-/** Precompute the upcoming fixtures that match each BotD strategy. */
+function getNextDateKey(dateKey: string): string {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + 1)).toISOString().slice(0, 10);
+}
+
+/**
+ * Precompute BotD candidates for the next seven days, including every fixture
+ * on the current UK date after it has kicked off. This preserves today's
+ * selections and results instead of dropping them on the next scheduled run.
+ */
 export async function syncBotdFixtures(now = new Date()): Promise<void> {
-  const upcoming = await getUpcomingFixtures(now, 7);
+  const today = getUkDateKey(now);
+  const [upcoming, todaysFixtures] = await Promise.all([
+    getUpcomingFixtures(now, 7),
+    getFixturesBetweenDates(today, getNextDateKey(today)),
+  ]);
+  const fixturesById = new Map(
+    [...upcoming, ...todaysFixtures]
+      .filter((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000)) === today || fixture.fixture.timestamp > now.getTime() / 1000)
+      .map((fixture) => [fixture.fixture.id, fixture]),
+  );
+  const fixtures = [...fixturesById.values()];
   const topStrategyIds = await getTopStrategyIds(botdStrategies.map((strategy) => strategy.id), 3);
   const topStrategies = botdStrategies.filter((strategy) => topStrategyIds.includes(strategy.id));
-  const fixtureDates = [...new Set(upcoming.map((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000))))];
+  const fixtureDates = [...new Set(fixtures.map((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000))))];
   const matchesByDate = new Map<string, BotdDayFixture[]>(fixtureDates.map((fixtureDate) => [fixtureDate, []]));
-  const leagueStats = await getLeagueStats([...new Set(upcoming.map((fixture) => fixture.league.id))]);
+  const leagueStats = await getLeagueStats([...new Set(fixtures.map((fixture) => fixture.league.id))]);
   const leagueStatsById = new Map(leagueStats.map((stats) => [stats.league.id, {
     fixturesPlayed: stats.fixturesPlayed,
     over1_5Percentage: stats.over1_5.percentage,
@@ -32,7 +51,7 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
     bttsPercentage: stats.btts.percentage,
   }]));
 
-  for (const batch of splitIntoBatches(upcoming)) {
+  for (const batch of splitIntoBatches(fixtures)) {
     const fixtureIds = batch.map((fixture) => fixture.fixture.id);
     const [snapshots, odds, leagues] = await Promise.all([
       getFixtureStatsSnapshots(fixtureIds),

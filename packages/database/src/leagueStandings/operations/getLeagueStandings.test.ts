@@ -20,9 +20,12 @@ describe("getLeagueStandings", () => {
 
     await expect(getLeagueStandings(39, 2026)).resolves.toBe(standings);
     expect(mocks.collection).toHaveBeenCalledWith("leagueStandings");
-    expect(mocks.findOne).toHaveBeenCalledWith({
-      "league.id": 39,
-      "league.season": 2026,
-    });
+    expect(mocks.findOne).toHaveBeenCalledWith(
+      {
+        "league.id": 39,
+        "league.season": 2026,
+      },
+      { projection: { _id: 0 } },
+    );
   });
 });

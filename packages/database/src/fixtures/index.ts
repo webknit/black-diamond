@@ -14,3 +14,4 @@ export { getRecentlyFinishedFixtures } from "./operations/getRecentlyFinishedFix
 export { getFixturesWithoutStatsSnapshots } from "./operations/getFixturesWithoutStatsSnapshots.js";
 export { getFixturesForStatsSnapshotBackfill } from "./operations/getFixturesForStatsSnapshotBackfill.js";
 export { getFixtureSeasonsForLeague } from "./operations/getFixtureSeasonsForLeague.js";
+export { getTeamFixtureResearch } from "./operations/getTeamFixtureResearch.js";

@@ -8,8 +8,11 @@ export async function getLeagueStandings(
 ): Promise<LeagueStandings | null> {
   const database = await getDatabase();
 
-  return database.collection<LeagueStandings>("leagueStandings").findOne({
-    "league.id": leagueId,
-    "league.season": season,
-  });
+  return database.collection<LeagueStandings>("leagueStandings").findOne(
+    {
+      "league.id": leagueId,
+      "league.season": season,
+    },
+    { projection: { _id: 0 } },
+  );
 }

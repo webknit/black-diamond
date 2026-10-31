@@ -27,7 +27,6 @@
 	let leagueStandingsOpen = $state(false);
 	let formRequestId = 0;
 	let formSelection = $state<{ requestId: number; teamId: number; teamName: string; scope: 'home' | 'away' | 'overall' } | null>(null);
-
 	function openLeagueStandings() {
 		leagueStandingsOpen = true;
 	}
@@ -116,9 +115,16 @@
 					alt=""
 					loading="lazy"
 				/>
-				<p class="mt-1 truncate text-xs font-semibold text-slate-900 sm:text-sm">
-					{fixture.homeTeamName}
-				</p>
+				<div class="mt-1 flex min-w-0 items-center justify-center gap-1">
+					<p class="min-w-0 select-text truncate text-xs font-semibold text-slate-900 sm:text-sm">
+						{fixture.homeTeamName}
+					</p>
+					<a
+						href={`/teams/${fixture.homeTeamId}?league=${fixture.leagueId}&season=${fixture.leagueSeason}`}
+						class="shrink-0 text-xs text-slate-400 hover:text-emerald-700"
+						aria-label={`Open ${fixture.homeTeamName} team research`}
+					>↗</a>
+				</div>
 			</div>
 
 			<div class="min-w-16 text-center">
@@ -174,9 +180,16 @@
 					alt=""
 					loading="lazy"
 				/>
-				<p class="mt-1 truncate text-xs font-semibold text-slate-900 sm:text-sm">
-					{fixture.awayTeamName}
-				</p>
+				<div class="mt-1 flex min-w-0 items-center justify-center gap-1">
+					<p class="min-w-0 select-text truncate text-xs font-semibold text-slate-900 sm:text-sm">
+						{fixture.awayTeamName}
+					</p>
+					<a
+						href={`/teams/${fixture.awayTeamId}?league=${fixture.leagueId}&season=${fixture.leagueSeason}`}
+						class="shrink-0 text-xs text-slate-400 hover:text-emerald-700"
+						aria-label={`Open ${fixture.awayTeamName} team research`}
+					>↗</a>
+				</div>
 			</div>
 		</div>
 
