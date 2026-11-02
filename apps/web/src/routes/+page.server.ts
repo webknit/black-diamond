@@ -290,6 +290,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 										stats.home.cleanSheets.away
 									)
 								},
+								last5Venue: {
+									played: stats.home.last5Venue.played,
+									goalsFor: stats.home.last5Venue.goalsFor,
+									goalsAgainst: stats.home.last5Venue.goalsAgainst
+								},
 								summary: {
 									wins: { percentage: stats.home.summary.wins.percentage },
 									draws: { percentage: stats.home.summary.draws.percentage }
@@ -330,6 +335,11 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 										stats.away.cleanSheets.home,
 										stats.away.cleanSheets.away
 									)
+								},
+								last5Venue: {
+									played: stats.away.last5Venue.played,
+									goalsFor: stats.away.last5Venue.goalsFor,
+									goalsAgainst: stats.away.last5Venue.goalsAgainst
 								},
 								summary: {
 									wins: { percentage: stats.away.summary.wins.percentage },

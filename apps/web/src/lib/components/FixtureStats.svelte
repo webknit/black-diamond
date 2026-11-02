@@ -45,6 +45,7 @@
 			form: stats.home.formHome,
 			overallForm: stats.home.form,
 			side: stats.home.fixtures.home,
+			last5Venue: stats.home.last5Venue,
 			cleanSheets: stats.home.cleanSheets.home
 		},
 		{
@@ -54,6 +55,7 @@
 			form: stats.away.formAway,
 			overallForm: stats.away.form,
 			side: stats.away.fixtures.away,
+			last5Venue: stats.away.last5Venue,
 			cleanSheets: stats.away.cleanSheets.away
 		}
 	] as panel}
@@ -154,12 +156,14 @@
 			</div>
 
 			<div class="mt-2 grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 gap-y-1 text-[10px] leading-tight text-slate-600">
-				<span>GF / GA avg ({panel.label === 'Home' ? 'H' : 'A'})</span>
+				<span>Last 5 {panel.label === 'Home' ? 'at Home' : 'Away'} · GF / GA</span>
+				<span class="whitespace-nowrap text-right tabular-nums">{average(panel.last5Venue.goalsFor, panel.last5Venue.played)} / {average(panel.last5Venue.goalsAgainst, panel.last5Venue.played)}</span>
+				<span>Season {panel.label === 'Home' ? 'at Home' : 'Away'} · GF / GA</span>
 				<span class="whitespace-nowrap text-right tabular-nums">
 					{average(panel.side.goalsFor, panel.side.played)} /
 					{average(panel.side.goalsAgainst, panel.side.played)}
 				</span>
-				<span class="text-[9px] text-slate-400">Overall</span>
+				<span class="text-[9px] text-slate-400">Season overall · GF / GA</span>
 				<span class="whitespace-nowrap text-right text-[9px] tabular-nums text-slate-400">
 					{average(panel.team.fixtures.total.goalsFor, panel.team.fixtures.total.played)} /
 					{average(panel.team.fixtures.total.goalsAgainst, panel.team.fixtures.total.played)}

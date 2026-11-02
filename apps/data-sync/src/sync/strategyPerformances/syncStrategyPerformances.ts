@@ -94,7 +94,7 @@ function addCompletedFixtureToLeagueRate(totals: LeagueRateAccumulator, fixture:
 const emptyTotals = (): StrategyPerformanceTotals => ({ bets: 0, wins: 0, losses: 0, profit: 0 });
 const emptyOddsBand = () => ({ seasonPerformance: emptyTotals(), weeks: {}, months: {} });
 
-function addResult(totals: StrategyPerformanceTotals, won: boolean, referenceOdd: number) {
+export function addStrategyResult(totals: StrategyPerformanceTotals, won: boolean, referenceOdd: number) {
   totals.bets++;
   if (won) totals.wins++;
   else totals.losses++;
@@ -228,14 +228,14 @@ async function createStrategyPerformances(
       const oddsRangeIds = referenceOdd === null ? [] : getStrategyOddsRangeIds(referenceOdd);
       if (!matches || referenceOdd === null || oddsRangeIds.length === 0) return;
       const performance = performances.get(strategyId)!;
-      addResult(performance.seasonPerformance, won, referenceOdd);
-      addResult(getPeriodTotals(performance.weeks, week), won, referenceOdd);
-      addResult(getPeriodTotals(performance.months, month), won, referenceOdd);
+      addStrategyResult(performance.seasonPerformance, won, referenceOdd);
+      addStrategyResult(getPeriodTotals(performance.weeks, week), won, referenceOdd);
+      addStrategyResult(getPeriodTotals(performance.months, month), won, referenceOdd);
       for (const oddsRangeId of oddsRangeIds) {
         const oddsBand = performance.oddsBands[oddsRangeId];
-        addResult(oddsBand.seasonPerformance, won, referenceOdd);
-        addResult(getPeriodTotals(oddsBand.weeks, week), won, referenceOdd);
-        addResult(getPeriodTotals(oddsBand.months, month), won, referenceOdd);
+        addStrategyResult(oddsBand.seasonPerformance, won, referenceOdd);
+        addStrategyResult(getPeriodTotals(oddsBand.weeks, week), won, referenceOdd);
+        addStrategyResult(getPeriodTotals(oddsBand.months, month), won, referenceOdd);
       }
     };
 

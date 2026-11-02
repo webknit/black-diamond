@@ -24,9 +24,11 @@ type VenueFixtureStats = Pick<
 >;
 type FixtureGoals = Pick<FixtureStatsRecord, "goalsFor" | "goalsAgainst">;
 type OverallFixtureStats = Pick<FixtureStatsRecord, "played" | "goalsFor" | "goalsAgainst">;
+type Last5VenueStats = Pick<FixtureStatsRecord, "played" | "goalsFor" | "goalsAgainst">;
 
 type HomeTeamStats = TeamStats & {
   formHome: string;
+	last5Venue: Last5VenueStats;
   fixtures: {
     home: VenueFixtureStats;
     away: FixtureGoals;
@@ -36,6 +38,7 @@ type HomeTeamStats = TeamStats & {
 
 type AwayTeamStats = TeamStats & {
   formAway: string;
+	last5Venue: Last5VenueStats;
   fixtures: {
     home: FixtureGoals;
     away: VenueFixtureStats;
@@ -59,6 +62,9 @@ export async function getFixtureCardSnapshots(fixtureIds: number[]) {
           "home.leagueTeams": 1,
           "home.form": 1,
           "home.formHome": 1,
+		  "home.last5Venue.played": 1,
+		  "home.last5Venue.goalsFor": 1,
+		  "home.last5Venue.goalsAgainst": 1,
           "home.fixtures.home.played": 1,
           "home.fixtures.home.wins": 1,
           "home.fixtures.home.draws": 1,
@@ -79,6 +85,9 @@ export async function getFixtureCardSnapshots(fixtureIds: number[]) {
           "away.leagueTeams": 1,
           "away.form": 1,
           "away.formAway": 1,
+		  "away.last5Venue.played": 1,
+		  "away.last5Venue.goalsFor": 1,
+		  "away.last5Venue.goalsAgainst": 1,
           "away.fixtures.home.goalsFor": 1,
           "away.fixtures.home.goalsAgainst": 1,
           "away.fixtures.away.played": 1,

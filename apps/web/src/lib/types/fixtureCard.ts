@@ -25,6 +25,7 @@ type FixtureStatsTeam = {
 		wins: { percentage: number };
 		draws: { percentage: number };
 	};
+	last5Venue: Pick<FixtureRecord, 'played' | 'goalsFor' | 'goalsAgainst'>;
 };
 
 export type FixtureStatsData = {

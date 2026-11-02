@@ -1,0 +1,10 @@
+import { describe, expect, it } from 'vitest';
+import { getOver0_5ReferenceOdd, matchesOver0_5StrategyVariation, over0_5StrategyVariations } from '@black-diamond/core/strategies';
+import { addStrategyResult } from './syncStrategyPerformances.js';
+function snapshot(homeRate = 100, awayRate = 100, homeGoals = 3, awayGoals = 3) { const venue = (goals: number, rate: number) => ({ played: 5, goalsFor: goals * 5, goalsAgainst: goals * 5, summary: { over0_5: { percentage: rate } } }); return { home: { last5Venue: venue(homeGoals, homeRate) }, away: { last5Venue: venue(awayGoals, awayRate) } } as never; }
+describe('Over 0.5 strategies', () => {
+	it('has unique variation ids', () => expect(new Set(over0_5StrategyVariations.map((s) => s.id)).size).toBe(over0_5StrategyVariations.length));
+	it.each(over0_5StrategyVariations)('qualifies a deliberately high-scoring fixture for $id', (strategy) => expect(matchesOver0_5StrategyVariation(snapshot(), strategy)).toBe(true));
+	it.each(over0_5StrategyVariations.filter((s) => s.threshold !== undefined))('accepts and rejects the rate boundary for $id', (strategy) => { expect(matchesOver0_5StrategyVariation(snapshot(strategy.threshold!, strategy.threshold!), strategy)).toBe(true); expect(matchesOver0_5StrategyVariation(snapshot(strategy.threshold!, strategy.threshold! - 20), strategy)).toBe(false); });
+	it('extracts valid Over 0.5 odds and calculates/ranks results', () => { expect(getOver0_5ReferenceOdd([{ name: 'Goals Over/Under', values: [{ value: 'Over 0.5', odd: '1.10' }] }])).toBe(1.1); const low = { bets: 0, wins: 0, losses: 0, profit: 0 }, high = { bets: 0, wins: 0, losses: 0, profit: 0 }; addStrategyResult(low, true, 1.1); addStrategyResult(low, false, 1.1); addStrategyResult(high, true, 1.8); addStrategyResult(high, false, 1.8); expect([['low', low], ['high', high]].sort((a, b) => b[1].profit - a[1].profit).map(([id]) => id)).toEqual(['high', 'low']); expect(high.profit).toBeCloseTo(-0.2, 10); expect(low.profit).toBeCloseTo(-0.9, 10); });
+});
