@@ -22,6 +22,7 @@
 			>
 				<option value="all">All time</option>
 				<option value="today">Today</option>
+				<option value="yesterday">Yesterday</option>
 				<option value="this-week">This week</option>
 				<option value="last-week">Last week</option>
 				<option value="this-month">This month</option>

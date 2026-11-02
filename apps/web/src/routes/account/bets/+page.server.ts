@@ -14,6 +14,7 @@ const pageSize = 25;
 const periods = [
 	'all',
 	'today',
+	'yesterday',
 	'this-week',
 	'last-week',
 	'this-month',
@@ -61,6 +62,9 @@ function getPeriodRange(period: Period, today: string): { from: string; to: stri
 	if (period === 'all') return undefined;
 	if (period === 'today') {
 		return { from: getUkMidnight(today), to: getUkMidnight(addDays(today, 1)) };
+	}
+	if (period === 'yesterday') {
+		return { from: getUkMidnight(addDays(today, -1)), to: getUkMidnight(today) };
 	}
 	const currentDay = new Date(`${today}T12:00:00.000Z`).getUTCDay();
 	const monday = addDays(today, -((currentDay + 6) % 7));
