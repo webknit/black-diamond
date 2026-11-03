@@ -28,6 +28,7 @@
 
 	let stake = $state('');
 	let isUnmatched = $state(false);
+	let watchFixtures = $state(true);
 	let placedOdds = $state('');
 	let hasEditedPlacedOdds = $state(false);
 	let betError = $state<string | null>(null);
@@ -114,6 +115,7 @@
 			</label>
 		</div>
 		<label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="isUnmatched" bind:checked={isUnmatched} disabled={isPlacing} /> Unmatched — do not settle yet</label>
+		<label class="flex items-center gap-2 text-xs text-slate-600"><input type="checkbox" name="watchFixtures" bind:checked={watchFixtures} disabled={isPlacing} /> Watch {selections.length === 1 ? 'this match' : 'these matches'}</label>
 		<div class="flex justify-between text-[11px] text-slate-500">
 			<span>Available {currencyFormatter.format(balance)}</span>
 			{#if potentialReturn !== null}<span>Return {currencyFormatter.format(potentialReturn)}</span>{/if}

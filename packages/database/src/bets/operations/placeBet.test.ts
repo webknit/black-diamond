@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   insertOne: vi.fn(),
   updateOne: vi.fn(),
   findOne: vi.fn(),
+  bulkWrite: vi.fn(),
 }));
 vi.mock("../../mongodb.js", () => ({ withDatabaseTransaction: mocks.withDatabaseTransaction }));
 
@@ -30,7 +31,7 @@ describe("placeBet", () => {
     );
     mocks.collection.mockImplementation((name: string) => name === "accounts"
       ? { updateOne: mocks.updateOne, findOne: mocks.findOne }
-      : { insertOne: mocks.insertOne });
+      : name === "fixtureWatchlist" ? { bulkWrite: mocks.bulkWrite } : { insertOne: mocks.insertOne });
     mocks.updateOne.mockResolvedValue({ modifiedCount: 1 });
     mocks.findOne.mockResolvedValue({ currentBalance: 90 });
 
@@ -42,6 +43,10 @@ describe("placeBet", () => {
       { session },
     );
     expect(mocks.insertOne).toHaveBeenCalledWith(bet, { session });
+    expect(mocks.bulkWrite).toHaveBeenCalledWith(
+      [{ updateOne: { filter: { accountId: "main", fixtureId: 1 }, update: { $setOnInsert: { accountId: "main", fixtureId: 1, savedAt: bet.placedAt } }, upsert: true } }],
+      { session },
+    );
     expect(mocks.insertOne).toHaveBeenCalledWith(
       expect.objectContaining({
         accountId: "main",
@@ -65,13 +70,28 @@ describe("placeBet", () => {
     await expect(placeBet(bet)).rejects.toMatchObject({ code: insufficientBalanceErrorCode });
   });
 
-  it("propagates ledger write errors so the transaction is aborted", async () => {
+  it("does not add fixtures to the watchlist when disabled", async () => {
     mocks.withDatabaseTransaction.mockImplementation((operation) =>
       operation({ collection: mocks.collection }, {}),
     );
     mocks.collection.mockImplementation((name: string) => name === "accounts"
       ? { updateOne: mocks.updateOne, findOne: mocks.findOne }
       : { insertOne: mocks.insertOne });
+    mocks.updateOne.mockResolvedValue({ modifiedCount: 1 });
+    mocks.findOne.mockResolvedValue({ currentBalance: 90 });
+
+    await placeBet(bet, false);
+
+    expect(mocks.collection).not.toHaveBeenCalledWith("fixtureWatchlist");
+  });
+
+  it("propagates ledger write errors so the transaction is aborted", async () => {
+    mocks.withDatabaseTransaction.mockImplementation((operation) =>
+      operation({ collection: mocks.collection }, {}),
+    );
+    mocks.collection.mockImplementation((name: string) => name === "accounts"
+      ? { updateOne: mocks.updateOne, findOne: mocks.findOne }
+      : name === "fixtureWatchlist" ? { bulkWrite: mocks.bulkWrite } : { insertOne: mocks.insertOne });
     mocks.updateOne.mockResolvedValue({ modifiedCount: 1 });
     mocks.findOne.mockResolvedValue({ currentBalance: 90 });
     mocks.insertOne.mockRejectedValue(new Error("Ledger write failed"));

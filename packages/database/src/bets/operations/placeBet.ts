@@ -1,4 +1,5 @@
 import type { Bet } from "@black-diamond/core/bet";
+import type { FixtureWatchlistEntry } from "@black-diamond/core/fixtureWatchlist";
 
 import { withDatabaseTransaction } from "../../mongodb.js";
 import { recordBalanceTransaction } from "../../balanceTransactions/recordBalanceTransaction.js";
@@ -11,7 +12,7 @@ function createInsufficientBalanceError() {
   });
 }
 
-export async function placeBet(bet: Bet): Promise<void> {
+export async function placeBet(bet: Bet, watchFixtures = true): Promise<void> {
   await withDatabaseTransaction(async (database, session) => {
     const accounts = database.collection("accounts");
     const balanceUpdate = await accounts.updateOne(
@@ -29,6 +30,19 @@ export async function placeBet(bet: Bet): Promise<void> {
     if (!account) throw new Error(`Account ${bet.accountId} disappeared while placing a bet`);
 
     await database.collection<Bet>("bets").insertOne(bet, { session });
+    if (watchFixtures) {
+      const fixtureIds = [...new Set(bet.selections.map((selection) => selection.fixture.id))];
+      await database.collection<FixtureWatchlistEntry>("fixtureWatchlist").bulkWrite(
+        fixtureIds.map((fixtureId) => ({
+          updateOne: {
+            filter: { accountId: bet.accountId, fixtureId },
+            update: { $setOnInsert: { accountId: bet.accountId, fixtureId, savedAt: bet.placedAt } },
+            upsert: true,
+          },
+        })),
+        { session },
+      );
+    }
     await recordBalanceTransaction(database, session, {
       accountId: bet.accountId,
       type: "bet_stake",

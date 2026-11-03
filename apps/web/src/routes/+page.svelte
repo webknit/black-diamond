@@ -301,6 +301,25 @@
 		}
 	}
 
+	async function unwatchAllTodaysBets() {
+		if (!data.account) return void goto('/login');
+		if (todaysBetFixtureIds.length === 0) return;
+		isWatchingAllTodaysBets = true;
+		try {
+			const response = await fetch('/api/watchlist', {
+				method: 'DELETE',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ fixtureIds: todaysBetFixtureIds })
+			});
+			if (!response.ok) return;
+			watchlistedFixtureIds = watchlistedFixtureIds.filter(
+				(fixtureId) => !todaysBetFixtureIds.includes(fixtureId)
+			);
+		} finally {
+			isWatchingAllTodaysBets = false;
+		}
+	}
+
 	async function toggleAccumulatorWatchlist(fixtureIds: number[]) {
 		if (!data.account) return void goto('/login');
 		const uniqueFixtureIds = [...new Set(fixtureIds)];
@@ -407,6 +426,13 @@
 								<button type="button" class="flex w-full items-center justify-between text-left text-[11px] font-medium text-slate-600 transition hover:text-amber-700 disabled:cursor-wait disabled:opacity-60" onclick={watchAllTodaysBets} disabled={isWatchingAllTodaysBets}>
 									<span>{isWatchingAllTodaysBets ? 'Watching fixtures…' : `Watch all ${unwatchedTodaysBetFixtureIds.length} fixtures`}</span>
 									<span class="flex size-4 items-center justify-center text-base leading-none text-slate-500">☆</span>
+								</button>
+							</div>
+						{:else if todaysBetFixtureIds.length > 0}
+							<div class="mb-2 border-b border-slate-100 pb-2">
+								<button type="button" class="flex w-full items-center justify-between text-left text-[11px] font-medium text-slate-600 transition hover:text-amber-700 disabled:cursor-wait disabled:opacity-60" onclick={unwatchAllTodaysBets} disabled={isWatchingAllTodaysBets}>
+									<span>{isWatchingAllTodaysBets ? 'Removing watched fixtures…' : 'Unwatch all fixtures'}</span>
+									<span class="flex size-4 items-center justify-center text-base leading-none text-amber-500">★</span>
 								</button>
 							</div>
 						{/if}

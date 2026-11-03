@@ -40,6 +40,7 @@ export async function placeBetAction({ request, locals }: Pick<RequestEvent, 're
 	const stake = Number(getTextField(formData, 'stake'));
 	const placedOdds = Number(getTextField(formData, 'placedOdds'));
 	const matchStatus = formData.get('isUnmatched') === 'on' ? 'unmatched' : 'matched';
+	const watchFixtures = formData.get('watchFixtures') === 'on';
 
 	if (!submittedSelections || !Number.isFinite(stake) || stake <= 0 || !Number.isFinite(placedOdds) || placedOdds <= 1) {
 		return fail(400, { betError: 'Choose valid selections, odds greater than 1.00, and a stake greater than £0.' });
@@ -106,7 +107,7 @@ export async function placeBetAction({ request, locals }: Pick<RequestEvent, 're
 			profit: null,
 			placedAt: new Date().toISOString(),
 			settledAt: null
-		});
+		}, watchFixtures);
 	} catch (error) {
 		if ((error as { code?: unknown }).code === insufficientBalanceErrorCode) {
 			return fail(400, { betError: 'Your available balance is too low for that stake.' });
