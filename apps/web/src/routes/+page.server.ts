@@ -180,12 +180,14 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 				fixtureId: fixture.fixture.id,
 				timestamp: fixture.fixture.timestamp,
 				status: fixture.fixture.status.short,
+				elapsed: fixture.fixture.status.elapsed,
 				homeTeamName: fixture.teams.home.name,
 				awayTeamName: fixture.teams.away.name,
 				homeGoals: fixture.goals.home,
 				awayGoals: fixture.goals.away,
 				market: selection.market.selection,
-				marketName: selection.market.name
+				marketName: selection.market.name,
+				result: selection.result ?? null
 			}];
 		});
 		selections.sort((left, right) => left.timestamp - right.timestamp);

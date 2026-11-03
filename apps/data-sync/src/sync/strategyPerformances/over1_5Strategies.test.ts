@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getOver1_5ReferenceOdd, matchesOver1_5StrategyVariation, over1_5StrategyVariations } from '@black-diamond/core/strategies';
+import { getOver1_5ReferenceOdd, leagueRateStrategyVariations, matchesLeagueRateStrategyVariation, matchesOver1_5StrategyVariation, over1_5StrategyVariations } from '@black-diamond/core/strategies';
 import { addStrategyResult } from './syncStrategyPerformances.js';
 
 function snapshot(homeRate = 60, awayRate = 60, homeGoals = 1.5, awayGoals = 1.5) {
@@ -24,6 +24,11 @@ describe('Over 1.5 strategies', () => {
 		const threshold = strategy.over1_5RateThreshold!;
 		expect(matchesOver1_5StrategyVariation(snapshot(threshold, threshold), strategy)).toBe(true);
 		expect(matchesOver1_5StrategyVariation(snapshot(threshold, threshold - 20), strategy)).toBe(false);
+	});
+	it.each(leagueRateStrategyVariations.filter((strategy) => strategy.market === 'over1_5'))('qualifies and rejects the league threshold for $id', (strategy) => {
+		const league = { fixturesPlayed: 10, over1_5Percentage: strategy.leagueThreshold, over2_5Percentage: 80, bttsPercentage: 80 };
+		expect(matchesLeagueRateStrategyVariation(snapshot(100, 100, 3, 3), league, strategy)).toBe(true);
+		expect(matchesLeagueRateStrategyVariation(snapshot(100, 100, 3, 3), { ...league, over1_5Percentage: strategy.leagueThreshold - 1 }, strategy)).toBe(false);
 	});
 	it('calculates and ranks controlled in-memory results', () => {
 		const first = { id: 'first', totals: { bets: 0, wins: 0, losses: 0, profit: 0 } };

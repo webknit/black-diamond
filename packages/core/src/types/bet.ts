@@ -27,6 +27,8 @@ export type Bet = {
 };
 
 export type BetSelection = {
+	/** Set once the fixture is settled; absent while the selection is pending. */
+	result?: "won" | "lost";
   fixture: {
     id: number;
     date: string;

@@ -1,12 +1,23 @@
 import type { Bet } from "@black-diamond/core/bet";
 import { withDatabaseTransaction } from "../../mongodb.js";
 import { recordBalanceTransaction } from "../../balanceTransactions/recordBalanceTransaction.js";
-export async function settleBet(bet: Bet, status: "won" | "lost", settledAt: string) {
+export async function settleBet(bet: Bet, status: "won" | "lost", settledAt: string, selectionResults: boolean[]) {
   const returnAmount = status === "won" ? Number((bet.stake * bet.placedOdds).toFixed(2)) : 0;
   return withDatabaseTransaction(async (database, session) => {
     const result = await database.collection<Bet>("bets").updateOne(
       { id: bet.id, status: "pending" },
-      { $set: { status, returnAmount, profit: Number((returnAmount - bet.stake).toFixed(2)), settledAt } },
+      {
+        $set: {
+          status,
+          selections: bet.selections.map((selection, index) => ({
+            ...selection,
+            result: selectionResults[index] ? "won" : "lost",
+          })),
+          returnAmount,
+          profit: Number((returnAmount - bet.stake).toFixed(2)),
+          settledAt,
+        },
+      },
       { session },
     );
     if (result.modifiedCount !== 1 || returnAmount === 0) return result.modifiedCount === 1;

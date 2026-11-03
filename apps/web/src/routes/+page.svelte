@@ -137,6 +137,16 @@
 		return ['1H', 'HT', '2H', 'ET', 'P', 'LIVE', 'BT'].includes(status);
 	}
 
+	function formatFixtureStatus(status: string, elapsed: number | null): string | null {
+		if (status === 'NS') return null;
+		return isFixtureLive(status) && elapsed !== null ? `${elapsed}'` : status;
+	}
+
+	function formatBetType(marketName: string, selection: string) {
+		if (marketName === 'Both Teams Score') return selection === 'Yes' ? 'BTTS' : selection === 'No' ? 'BTNTS' : selection;
+		return selection;
+	}
+
 	function isFixtureCompleted(status: string) {
 		return ['FT', 'AET', 'PEN'].includes(status);
 	}
@@ -410,7 +420,7 @@
 											<div class="flex flex-wrap items-center gap-1.5 text-[10px] text-slate-600">
 												{#if bet.selections.length === 1}
 													<span class="font-semibold tabular-nums text-slate-800">{formatBetTime(bet.selections[0].timestamp)}</span>
-													<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold">{bet.selections[0].status}</span>
+													{#if formatFixtureStatus(bet.selections[0].status, bet.selections[0].elapsed)}<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold">{formatFixtureStatus(bet.selections[0].status, bet.selections[0].elapsed)}</span>{/if}
 												{:else}
 													<span class="font-semibold text-slate-800">{bet.selections.length}-fold</span>
 												{/if}
@@ -469,7 +479,9 @@
 												{#if bet.selections.length > 1}
 													<span class="col-span-2 row-start-1 flex items-center gap-1.5 text-[10px] tabular-nums text-slate-500">
 														<span class="font-semibold text-slate-800">{formatBetTime(selection.timestamp)}</span>
-														<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold text-slate-600">{selection.status}</span>
+														{#if formatFixtureStatus(selection.status, selection.elapsed)}<span class="rounded bg-slate-100 px-1 py-0.5 font-semibold text-slate-600">{formatFixtureStatus(selection.status, selection.elapsed)}</span>{/if}
+														<span class="text-slate-600">{formatBetType(selection.marketName, selection.market)}</span>
+														{#if selection.result}<span class:text-emerald-700={selection.result === 'won'} class:text-rose-700={selection.result === 'lost'}>{selection.result === 'won' ? 'Won' : 'Lost'}</span>{/if}
 													</span>
 												{/if}
 												{#if bet.selections.length === 1}

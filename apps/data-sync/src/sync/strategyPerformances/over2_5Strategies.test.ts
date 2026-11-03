@@ -62,4 +62,20 @@ describe('Over 2.5 strategies', () => {
 		expect(ranked[0].totals.profit).toBeCloseTo(0.8, 10);
 		expect(ranked[1].totals.profit).toBeCloseTo(0.2, 10);
 	});
+	it('matches the audited real-fixture golden set for the 60% rate strategy', () => {
+		const strategy = over2_5RateStrategyVariations.find((item) => item.id === 'over2_5-rate60-last5')!;
+		const fixtures = [
+			{ id: 1557438, name: 'Aston Villa v Manchester City', homeRate: 60, awayRate: 60, goals: 3, odd: 1.53, won: true },
+			{ id: 1557441, name: 'Crystal Palace v Newcastle', homeRate: 80, awayRate: 80, goals: 2, odd: 1.62, won: false },
+			{ id: 1557442, name: 'Hull City v Brentford', homeRate: 60, awayRate: 80, goals: 2, odd: 1.67, won: false }
+		];
+		const totals = { bets: 0, wins: 0, losses: 0, profit: 0 };
+		for (const fixture of fixtures) {
+			expect(matchesOver2_5RateStrategyVariation(snapshot(fixture.homeRate, fixture.awayRate), strategy), fixture.name).toBe(true);
+			expect(fixture.goals > 2, fixture.name).toBe(fixture.won);
+			addStrategyResult(totals, fixture.won, fixture.odd);
+		}
+		expect(totals).toMatchObject({ bets: 3, wins: 1, losses: 2 });
+		expect(totals.profit).toBeCloseTo(-1.47, 10);
+	});
 });

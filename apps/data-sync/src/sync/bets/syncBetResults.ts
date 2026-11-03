@@ -38,7 +38,7 @@ export async function syncBetResults() {
     });
     if (results.some((result) => result === null)) continue;
     const status = results.every(Boolean) ? "won" : "lost";
-    if (await settleBet(bet, status, new Date().toISOString())) {
+    if (await settleBet(bet, status, new Date().toISOString(), results as boolean[])) {
       settled++;
       await notifyAccumulatorSettlement(
         bet,
