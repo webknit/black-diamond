@@ -28,11 +28,18 @@
 		void updateQuery({ market: input.value || null });
 	}
 
-	async function updateQuery(values: { date?: string; market?: string | null }) {
+	function changeEvidence(event: Event) {
+		const input = event.currentTarget;
+		if (!(input instanceof HTMLSelectElement)) return;
+		void updateQuery({ evidence: input.value });
+	}
+
+	async function updateQuery(values: { date?: string; market?: string | null; evidence?: string }) {
 		const url = new URL(page.url.href);
 		if (values.date) url.searchParams.set('date', values.date);
 		if (values.market === null) url.searchParams.delete('market');
 		if (typeof values.market === 'string') url.searchParams.set('market', values.market);
+		if (values.evidence) url.searchParams.set('evidence', values.evidence);
 		isLoading = true;
 		try {
 			await goto(`${url.pathname}${url.search}`);
@@ -83,6 +90,7 @@
 				<h1 class="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Bet of the day</h1>
 				<p class="mt-1 text-sm text-slate-600">League-aware candidates only. {data.totalFixtureCount} {data.totalFixtureCount === 1 ? 'fixture has' : 'fixtures have'} a league-qualified recommendation.</p>
 				<p class="mt-1 text-xs text-slate-500">In All markets, each fixture appears once and BOTD highlights its strongest locally supported strategy.</p>
+				<p class="mt-1 text-xs text-slate-500">Evidence bands: <span class="text-rose-700">Low confidence 20–29</span> · <span class="text-orange-700">Eligible 30–49</span> · <span class="text-emerald-700">Strong 50–99</span> · <span class="text-indigo-700">High confidence 100+</span> local qualifying bets.</p>
 			</div>
 			<div class="flex flex-wrap items-end gap-3">
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
@@ -90,6 +98,7 @@
 					<label for="botd-market" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Market</label>
 					<select id="botd-market" value={data.selectedMarket ?? ''} onchange={changeMarket} disabled={isLoading} class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-wait disabled:opacity-60"><option value="">All markets</option><option value="over2_5">Over 2.5</option><option value="over1_5">Over 1.5</option><option value="over0_5">Over 0.5</option><option disabled>────────</option><option value="under2_5">Under 2.5</option><option value="under1_5">Under 1.5</option><option disabled>────────</option><option value="btts">BTTS</option><option value="bttns">BTNTS</option></select>
 				</div>
+				<div><label for="botd-evidence" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Evidence</label><select id="botd-evidence" value={data.selectedEvidence} onchange={changeEvidence} disabled={isLoading} class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-wait disabled:opacity-60"><option value="top">Top picks</option><option value="eligible">Eligible+</option><option value="strong">Strong+</option><option value="all">All recommendations</option></select></div>
 			</div>
 		</header>
 

@@ -17,6 +17,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const botdDayStartedAt = performance.now();
 	const botdDay = await getBotdDay(date);
 	const selectedMarket = markets.includes(url.searchParams.get('market') as BotdMarket) ? url.searchParams.get('market') as BotdMarket : null;
+	const selectedEvidence = ['top', 'eligible', 'strong', 'all'].includes(url.searchParams.get('evidence') ?? '') ? url.searchParams.get('evidence')! : 'top';
 	console.info('[botd] botdDays lookup', {
 		date,
 		milliseconds: Math.round(performance.now() - botdDayStartedAt),
@@ -32,8 +33,12 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		}).sort((left, right) => tierScore[right.tier] - tierScore[left.tier] || (right.leaguePerformance.profit / (right.leaguePerformance.bets + 30)) - (left.leaguePerformance.profit / (left.leaguePerformance.bets + 30)));
 		return matches[0] ? [{ fixtureId: fixture.fixtureId, recommendation: matches[0] }] : [];
 	});
-	const fixtureIds = recommendations.map((item) => item.fixtureId);
-	const recommendationByFixtureId = Object.fromEntries(recommendations.map((item) => [item.fixtureId, item.recommendation]));
+	const filteredRecommendations = recommendations
+		.filter((item) => selectedEvidence === 'all' || tierScore[item.recommendation.tier] >= (selectedEvidence === 'strong' ? 3 : 2))
+		.sort((left, right) => tierScore[right.recommendation.tier] - tierScore[left.recommendation.tier] || (right.recommendation.leaguePerformance.profit / (right.recommendation.leaguePerformance.bets + 30)) - (left.recommendation.leaguePerformance.profit / (left.recommendation.leaguePerformance.bets + 30)));
+	const displayedRecommendations = selectedEvidence === 'top' ? filteredRecommendations.slice(0, 10) : filteredRecommendations;
+	const fixtureIds = displayedRecommendations.map((item) => item.fixtureId);
+	const recommendationByFixtureId = Object.fromEntries(displayedRecommendations.map((item) => [item.fixtureId, item.recommendation]));
 	const fixtureUrl = new URL(url);
 	fixtureUrl.searchParams.set('date', date);
 	fixtureUrl.searchParams.set('fixtureIds', fixtureIds.join(','));
@@ -52,6 +57,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		...fixturePage,
 		totalFixtureCount: fixturePage.fixtures.length,
 		selectedMarket,
+		selectedEvidence,
 		markets,
 		recommendedMarket: null,
 		recommendationByFixtureId
