@@ -8,7 +8,7 @@ const mocks = vi.hoisted(() => ({
   getFixturesBetweenDates: vi.fn(),
   getLeaguesByIds: vi.fn(),
   getLeagueStats: vi.fn(),
-  getTopStrategyIds: vi.fn(),
+  getStrategyPerformanceSeasonTotals: vi.fn(),
   upsertBotdDays: vi.fn(),
 }));
 vi.mock("@black-diamond/database/fixtures", () => ({
@@ -19,7 +19,7 @@ vi.mock("@black-diamond/database/fixtureOdds", () => ({ getFixtureOddsForFixture
 vi.mock("@black-diamond/database/fixtureStatsSnapshots", () => ({ getFixtureStatsSnapshots: mocks.getFixtureStatsSnapshots }));
 vi.mock("@black-diamond/database/leagues", () => ({ getLeaguesByIds: mocks.getLeaguesByIds }));
 vi.mock("@black-diamond/database/leagueStats", () => ({ getLeagueStats: mocks.getLeagueStats }));
-vi.mock("@black-diamond/database/strategyPerformances", () => ({ getTopStrategyIds: mocks.getTopStrategyIds }));
+vi.mock("@black-diamond/database/strategyPerformances", () => ({ getStrategyPerformanceSeasonTotals: mocks.getStrategyPerformanceSeasonTotals }));
 vi.mock("@black-diamond/database/botdDays", () => ({ upsertBotdDays: mocks.upsertBotdDays }));
 import { syncBotdFixtures } from "./syncBotdFixtures.js";
 
@@ -37,7 +37,7 @@ describe("syncBotdFixtures", () => {
     mocks.getFixtureOddsForFixtures.mockResolvedValue([]);
     mocks.getLeaguesByIds.mockResolvedValue([]);
     mocks.getLeagueStats.mockResolvedValue([]);
-    mocks.getTopStrategyIds.mockResolvedValue([]);
+    mocks.getStrategyPerformanceSeasonTotals.mockResolvedValue([]);
 
     await syncBotdFixtures(now);
 
@@ -45,7 +45,7 @@ describe("syncBotdFixtures", () => {
     expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-21", "2026-10-22");
     expect(mocks.getFixtureStatsSnapshots).toHaveBeenCalledWith([1]);
     expect(mocks.getFixtureOddsForFixtures).toHaveBeenCalledWith([1]);
-    expect(mocks.getTopStrategyIds).toHaveBeenCalledWith(expect.any(Array), 5);
+    expect(mocks.getStrategyPerformanceSeasonTotals).toHaveBeenCalledWith(expect.any(Array));
     expect(mocks.upsertBotdDays).toHaveBeenCalledWith([{ fixtureDate: "2026-10-21", fixtures: [], updatedAt: now.toISOString() }]);
   });
 
@@ -54,7 +54,10 @@ describe("syncBotdFixtures", () => {
     const included = fixture(1, now.getTime() / 1000 + 60 * 60);
     mocks.getUpcomingFixtures.mockResolvedValue([included]);
     mocks.getFixturesBetweenDates.mockResolvedValue([]);
-    mocks.getTopStrategyIds.mockResolvedValue(["score1.3-eitherTeam-last5"]);
+    mocks.getStrategyPerformanceSeasonTotals.mockResolvedValue([{
+      strategyId: "score1.3-eitherTeam-last5",
+      leaguePerformances: [{ leagueId: 39, oddsBands: { "1.70-1.99": { seasonPerformance: { bets: 30, wins: 20, losses: 10, profit: 5 } } } }],
+    }]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([{
       fixtureId: 1,
       home: { last5Venue: { played: 5, goalsFor: 8, goalsAgainst: 4 } },
@@ -73,7 +76,7 @@ describe("syncBotdFixtures", () => {
       fixtureDate: "2026-10-21",
       fixtures: [{
         fixtureId: 1,
-        matches: [{ strategyId: "score1.3-eitherTeam-last5", referenceOdd: 1.8 }],
+        matches: [{ strategyId: "score1.3-eitherTeam-last5", referenceOdd: 1.8, tier: "eligible", leaguePerformance: { bets: 30, wins: 20, losses: 10, profit: 5 } }],
         hasLeagueTable: true,
       }],
       updatedAt: now.toISOString(),

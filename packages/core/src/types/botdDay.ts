@@ -1,6 +1,11 @@
 export type BotdDayFixture = {
   fixtureId: number;
-  matches: Array<{ strategyId: string; referenceOdd: number | null }>;
+  matches: Array<{
+    strategyId: string;
+    referenceOdd: number | null;
+    tier: "lowConfidence" | "eligible" | "strong" | "highConfidence";
+    leaguePerformance: { bets: number; wins: number; losses: number; profit: number };
+  }>;
   hasLeagueTable: boolean;
 };
 

@@ -88,7 +88,7 @@
 		<header class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
 			<div>
 				<h1 class="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Bet of the day</h1>
-				<p class="mt-1 text-sm text-slate-600">{data.totalFixtureCount} {data.totalFixtureCount === 1 ? 'fixture' : 'fixtures'} match this strategy.</p>
+				<p class="mt-1 text-sm text-slate-600">League-aware candidates only. {data.totalFixtureCount} {data.totalFixtureCount === 1 ? 'fixture' : 'fixtures'} match this strategy.</p>
 			</div>
 			<div class="flex flex-wrap items-end gap-3">
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
@@ -120,6 +120,10 @@
 			<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Selected strategy</p>
 			<h2 class="mt-1 text-sm font-semibold text-slate-950">{data.selectedStrategy.title}</h2>
 			<p class="mt-1 text-xs text-slate-600">{data.selectedStrategy.description}</p>
+			<details class="mt-3 border-t border-slate-100 pt-3">
+				<summary class="cursor-pointer text-xs font-medium text-slate-600 hover:text-slate-950">League performance ({data.selectedStrategyLeaguePerformances.length})</summary>
+				<div class="mt-2 overflow-x-auto rounded-lg border border-slate-200"><table class="w-full min-w-[31rem] text-left text-xs"><thead class="border-b border-slate-200 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500"><tr><th class="px-3 py-2 font-medium">League</th><th class="px-3 py-2 text-right font-medium">Bets</th><th class="px-3 py-2 text-right font-medium">W / L</th><th class="px-3 py-2 text-right font-medium">P / L</th><th class="px-3 py-2 text-right font-medium">ROI</th></tr></thead><tbody class="divide-y divide-slate-100">{#each data.selectedStrategyLeaguePerformances as league (league.leagueId)}<tr><td class="px-3 py-2"><p class="font-medium text-slate-800">{league.name}</p><p class="text-[10px] text-slate-500">{league.country}</p></td><td class="px-3 py-2 text-right tabular-nums">{league.bets}</td><td class="px-3 py-2 text-right tabular-nums">{league.wins} / {league.losses}</td><td class="px-3 py-2 text-right font-medium tabular-nums" class:text-emerald-700={league.profit > 0} class:text-rose-700={league.profit < 0}>{league.profit > 0 ? '+' : ''}£{league.profit.toFixed(2)}</td><td class="px-3 py-2 text-right tabular-nums">{league.returnOnInvestment?.toFixed(1)}%</td></tr>{/each}</tbody></table></div>
+			</details>
 		</section>
 		{/if}
 
@@ -131,6 +135,7 @@
 			placedSelectionKeys={data.placedBetSelectionKeys}
 			onSelectOdd={chooseOdd}
 			{watchlistedFixtureIds}
+			recommendationByFixtureId={data.recommendationByFixtureId}
 			onToggleWatchlist={data.account ? toggleWatchlist : undefined}
 		/>
 	</div>

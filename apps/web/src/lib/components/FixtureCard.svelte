@@ -10,7 +10,7 @@
 	let {
 		fixture,
 		placedSelectionKeys = [],
-		onSelectOdd, isWatchlisted = false, onToggleWatchlist, recommendedMarket
+		onSelectOdd, isWatchlisted = false, onToggleWatchlist, recommendedMarket, recommendation
 	}: {
 		fixture: FixtureCardData;
 		placedSelectionKeys?: string[];
@@ -18,6 +18,7 @@
 		isWatchlisted?: boolean;
 		onToggleWatchlist?: (fixtureId: number) => void;
 		recommendedMarket?: string | null;
+		recommendation?: { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } };
 	} = $props();
 
 	const ukTimeZone = 'Europe/London';
@@ -90,6 +91,9 @@
 </script>
 
 <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+	{#if recommendation?.leaguePerformance}
+		<div class="border-b px-4 py-2 text-[10px]" class:border-rose-100={recommendation.tier === 'lowConfidence'} class:bg-rose-50={recommendation.tier === 'lowConfidence'} class:text-rose-900={recommendation.tier === 'lowConfidence'} class:border-orange-100={recommendation.tier === 'eligible'} class:bg-orange-50={recommendation.tier === 'eligible'} class:text-orange-900={recommendation.tier === 'eligible'} class:border-emerald-100={recommendation.tier === 'strong'} class:bg-emerald-50={recommendation.tier === 'strong'} class:text-emerald-900={recommendation.tier === 'strong'} class:border-amber-200={recommendation.tier === 'highConfidence'} class:bg-amber-50={recommendation.tier === 'highConfidence'} class:text-amber-900={recommendation.tier === 'highConfidence'}><span class="font-bold uppercase tracking-wide">{recommendation.tier === 'highConfidence' ? 'High confidence' : recommendation.tier === 'strong' ? 'Strong evidence' : recommendation.tier === 'eligible' ? 'Eligible' : 'Low confidence'}</span><span class="mx-1 opacity-40">·</span>{recommendation.leaguePerformance.bets} league bets <span class="mx-1 opacity-40">·</span>{recommendation.leaguePerformance.wins} / {recommendation.leaguePerformance.losses} <span class="mx-1 opacity-40">·</span><span class="font-semibold">{recommendation.leaguePerformance.profit > 0 ? '+' : ''}£{recommendation.leaguePerformance.profit.toFixed(2)}</span></div>
+	{/if}
 	<header class="flex items-center gap-3 border-b border-slate-100 px-4 py-2.5">
 		{#if fixture.leagueLogo}
 			<img

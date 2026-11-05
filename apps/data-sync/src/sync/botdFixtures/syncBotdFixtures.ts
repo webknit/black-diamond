@@ -1,4 +1,4 @@
-import { botdStrategies, getBotdReferenceOdd, matchesBotdStrategy } from "@black-diamond/core/strategies";
+import { botdStrategies, getBettableOddsBandIds, getBotdReferenceOdd, matchesBotdStrategy, sumOddsBandPerformance } from "@black-diamond/core/strategies";
 import { getUkDateKey } from "@black-diamond/core/time";
 import type { BotdDayFixture } from "@black-diamond/core/botdDay";
 import { upsertBotdDays } from "@black-diamond/database/botdDays";
@@ -7,9 +7,10 @@ import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
 import { getFixtureStatsSnapshots } from "@black-diamond/database/fixtureStatsSnapshots";
 import { getLeaguesByIds } from "@black-diamond/database/leagues";
 import { getLeagueStats } from "@black-diamond/database/leagueStats";
-import { getTopStrategyIds } from "@black-diamond/database/strategyPerformances";
+import { getStrategyPerformanceSeasonTotals } from "@black-diamond/database/strategyPerformances";
 
 const fixtureBatchSize = 100;
+const emergingMinimumBets = 20;
 
 function splitIntoBatches<T>(values: T[]): T[][] {
   return Array.from({ length: Math.ceil(values.length / fixtureBatchSize) }, (_, index) =>
@@ -39,8 +40,8 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
       .map((fixture) => [fixture.fixture.id, fixture]),
   );
   const fixtures = [...fixturesById.values()];
-  const topStrategyIds = await getTopStrategyIds(botdStrategies, 5);
-  const topStrategies = botdStrategies.filter((strategy) => topStrategyIds.includes(strategy.id));
+  const performanceSummaries = await getStrategyPerformanceSeasonTotals(botdStrategies.map((strategy) => strategy.id));
+  const performanceByStrategyId = new Map(performanceSummaries.map((summary) => [summary.strategyId, summary]));
   const fixtureDates = [...new Set(fixtures.map((fixture) => getUkDateKey(new Date(fixture.fixture.timestamp * 1000))))];
   const matchesByDate = new Map<string, BotdDayFixture[]>(fixtureDates.map((fixtureDate) => [fixtureDate, []]));
   const leagueStats = await getLeagueStats([...new Set(fixtures.map((fixture) => fixture.league.id))]);
@@ -65,16 +66,29 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
     for (const fixture of batch) {
       const snapshot = snapshotsByFixtureId.get(fixture.fixture.id);
       if (!snapshot) continue;
-      const matchingStrategies = topStrategies.filter((strategy) =>
-        matchesBotdStrategy(snapshot, leagueStatsById.get(fixture.league.id), strategy),
-      );
+      const matchingStrategies = botdStrategies.flatMap((strategy) => {
+        const league = performanceByStrategyId.get(strategy.id)?.leaguePerformances.find((item) => item.leagueId === fixture.league.id);
+        if (!league || !matchesBotdStrategy(snapshot, leagueStatsById.get(fixture.league.id), strategy)) return [];
+        const totals = sumOddsBandPerformance(league?.oddsBands, getBettableOddsBandIds(strategy.market), "all");
+        if (totals.bets < emergingMinimumBets || totals.profit <= 0) return [];
+        const tier: "lowConfidence" | "eligible" | "strong" | "highConfidence" = totals.bets >= 100
+          ? "highConfidence"
+          : totals.bets >= 50
+            ? "strong"
+            : totals.bets >= 30
+              ? "eligible"
+              : "lowConfidence";
+        return [{ strategy, tier, totals }];
+      });
       if (matchingStrategies.length === 0) continue;
       const fixtureDate = getUkDateKey(new Date(fixture.fixture.timestamp * 1000));
       matchesByDate.get(fixtureDate)?.push({
         fixtureId: fixture.fixture.id,
-        matches: matchingStrategies.map((strategy) => ({
+        matches: matchingStrategies.map(({ strategy, tier, totals }) => ({
           strategyId: strategy.id,
           referenceOdd: getBotdReferenceOdd(oddsByFixtureId.get(fixture.fixture.id)?.odds ?? [], strategy.market),
+          tier,
+          leaguePerformance: totals,
         })),
         hasLeagueTable: leaguesById.get(fixture.league.id)?.league.type !== "Cup",
       });
