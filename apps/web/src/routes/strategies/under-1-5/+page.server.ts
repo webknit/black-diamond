@@ -1,8 +1,9 @@
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
 import { getBettableOddsBandIds, over1_5OddsRanges, sumOddsBandPerformance, type StrategyOddsFilter, under1_5StrategyVariations } from '@black-diamond/core/strategies';
 import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+import { minimumStrategyBetsForRanking } from '@black-diamond/core/strategies';
 
-const minimumBetsForRanking = 50;
+const minimumBetsForRanking = minimumStrategyBetsForRanking;
 export async function load({ url }: { url: URL }) {
 	const now = new Date(); const oldest = new Date(now); oldest.setUTCDate(oldest.getUTCDate() - 28);
 	const requestedOddsRange = url.searchParams.get('odds');
@@ -15,5 +16,5 @@ export async function load({ url }: { url: URL }) {
 		const totals = selectedOddsRange === 'all' ? (selectedWeek === 'all' ? performance?.seasonPerformance : performance?.weeks[selectedWeek]) : selectedOddsRange === 'bettable' ? sumOddsBandPerformance(performance?.oddsBands, getBettableOddsBandIds('under1_5'), selectedWeek) : (selectedWeek === 'all' ? oddsBand?.seasonPerformance : oddsBand?.weeks[selectedWeek]);
 		const bets = totals?.bets ?? 0; return { ...variation, bets, wins: totals?.wins ?? 0, losses: totals?.losses ?? 0, profit: totals?.profit ?? 0, returnOnInvestment: bets === 0 ? null : ((totals?.profit ?? 0) / bets) * 100 };
 	}).filter((result) => result.bets >= minimumBetsForRanking).sort((left, right) => right.profit - left.profit || (right.returnOnInvestment ?? -Infinity) - (left.returnOnInvestment ?? -Infinity));
-	return { selectedWeek, selectedOddsRange, oddsRanges: over1_5OddsRanges, availableWeeks, results };
+	return { selectedWeek, selectedOddsRange, oddsRanges: over1_5OddsRanges, availableWeeks, minimumBetsForRanking, results };
 }

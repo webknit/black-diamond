@@ -64,6 +64,7 @@ export {
   sumOddsBandPerformance,
   type BettableOddsMarket,
 } from "./bettableOdds.js";
+export { minimumStrategyBetsForRanking } from "./strategyEligibility.js";
 
 type OddsMarket = Pick<FixtureOdds["odds"][number], "name" | "values">;
 

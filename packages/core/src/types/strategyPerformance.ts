@@ -23,6 +23,19 @@ export type StrategyPerformance = {
   recalculatedAt: string;
 };
 
+export type StrategyLeaguePerformance = {
+  leagueId: number;
+  name: string;
+  country: string;
+  bets: number;
+  wins: number;
+  losses: number;
+  profit: number;
+  oddsBands: Record<string, { seasonPerformance: StrategyPerformanceTotals }>;
+};
+
 // A compact all-selected-leagues view. The web app reads these rather than
 // combining the per-league records in a request.
-export type StrategyPerformanceSummary = Omit<StrategyPerformance, 'league' | 'season'>;
+export type StrategyPerformanceSummary = Omit<StrategyPerformance, 'league' | 'season'> & {
+  leaguePerformances: StrategyLeaguePerformance[];
+};

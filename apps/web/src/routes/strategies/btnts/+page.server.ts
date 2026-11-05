@@ -8,8 +8,9 @@ import {
 } from '@black-diamond/core/strategies';
 import { getUkWeekStartDateKey } from '@black-diamond/core/time';
 import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+import { minimumStrategyBetsForRanking } from '@black-diamond/core/strategies';
 
-const minimumBetsForRanking = 50;
+const minimumBetsForRanking = minimumStrategyBetsForRanking;
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -76,6 +77,7 @@ export async function load({ url }: { url: URL }) {
 		selectedWeek,
 		selectedOddsRange,
 		oddsRanges: over2_5OddsRanges,
+		minimumBetsForRanking,
 		availableWeeks,
 		bttnsResults: [...bttnsStrategyVariations, ...leagueRateStrategyVariations.filter((variation) => variation.market === 'bttns')]
 			.map((variation) => ({ ...variation, ...performance(variation.id) }))

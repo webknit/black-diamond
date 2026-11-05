@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getOver2_5ReferenceOdd, leagueRateStrategyVariations, matchesLeagueRateStrategyVariation, matchesOver2_5RateStrategyVariation, matchesTeamFilterVariation, over2_5RateStrategyVariations, teamFilterVariations } from '@black-diamond/core/strategies';
-import { addStrategyResult } from './syncStrategyPerformances.js';
+import { addStrategyResult, mergeIntoSummary } from './syncStrategyPerformances.js';
 
 function snapshot(homeRate = 60, awayRate = 60, homeGoals = 1.5, awayGoals = 1.5) {
 	const venue = (goals: number, rate: number) => ({ played: 5, goalsFor: goals * 5, goalsAgainst: goals * 5, summary: { over2_5: { percentage: rate } } });
@@ -19,9 +19,31 @@ describe('Over 2.5 strategies', () => {
 		expect(matchesTeamFilterVariation(snapshot(60, 60, 1.5, 1.2), either)).toBe(false);
 		expect(matchesTeamFilterVariation(snapshot(60, 60, 1.5, 1.2), both)).toBe(true);
 	});
+	it('uses season venue figures for the season counterpart', () => {
+		const strategy = teamFilterVariations.find((item) => item.id === 'defend1.5-eitherTeam-season')!;
+		const fixture: any = snapshot(60, 60, 2, 2);
+		fixture.home.last5Venue.goalsAgainst = 5;
+		fixture.away.last5Venue.goalsAgainst = 5;
+		expect(matchesTeamFilterVariation(fixture, strategy)).toBe(true);
+	});
 	it('uses only a valid stored Over 2.5 price', () => {
 		expect(getOver2_5ReferenceOdd([{ name: 'Goals Over/Under', values: [{ value: 'Over 2.5', odd: '1.80' }] }])).toBe(1.8);
 		expect(getOver2_5ReferenceOdd([{ name: 'Goals Over/Under', values: [{ value: 'Over 2.5', odd: '—' }] }])).toBeNull();
+	});
+	it('combines multiple seasons into a league performance summary', () => {
+		const summary: any = {
+			seasonPerformance: { bets: 0, wins: 0, losses: 0, profit: 0 },
+			weeks: {}, months: {}, oddsBands: {}, leaguePerformances: []
+		};
+		const performance = (season: number, bets: number, profit: number) => ({
+			league: { id: 39, name: 'Premier League', country: 'England' }, season,
+			seasonPerformance: { bets, wins: bets - 1, losses: 1, profit }, weeks: {}, months: {}, oddsBands: {}
+		});
+		mergeIntoSummary(summary, performance(2025, 20, 4) as any);
+		mergeIntoSummary(summary, performance(2026, 15, 3) as any);
+		expect(summary.leaguePerformances).toEqual([
+			expect.objectContaining({ leagueId: 39, name: 'Premier League', country: 'England', bets: 35, wins: 33, losses: 2, profit: 7 })
+		]);
 	});
 	it('calculates an in-memory three-fixture 60% strategy result correctly', () => {
 		const strategy = over2_5RateStrategyVariations.find((item) => item.id === 'over2_5-rate60-last5')!;

@@ -51,19 +51,25 @@ export const teamFilterVariations: TeamFilterVariation[] = [
   },
   // Recent form is listed first because it is the primary filter set in BOTD.
   ...thresholds.flatMap((threshold) =>
-    (["eitherTeam", "bothTeams"] as const).map((mode) =>
-      createVariation(threshold, undefined, mode, "last5"),
+    (["eitherTeam", "bothTeams"] as const).flatMap((mode) =>
+      (["last5", "season"] as const).map((sample) =>
+        createVariation(threshold, undefined, mode, sample),
+      ),
     ),
   ),
   ...thresholds.flatMap((threshold) =>
-    (["eitherTeam", "bothTeams"] as const).map((mode) =>
-      createVariation(undefined, threshold, mode, "last5"),
+    (["eitherTeam", "bothTeams"] as const).flatMap((mode) =>
+      (["last5", "season"] as const).map((sample) =>
+        createVariation(undefined, threshold, mode, sample),
+      ),
     ),
   ),
   ...thresholds.flatMap((scoring) =>
     thresholds.flatMap((defensive) =>
-      (["eitherTeam", "bothTeams"] as const).map((mode) =>
-        createVariation(scoring, defensive, mode, "last5"),
+      (["eitherTeam", "bothTeams"] as const).flatMap((mode) =>
+        (["last5", "season"] as const).map((sample) =>
+          createVariation(scoring, defensive, mode, sample),
+        ),
       ),
     ),
   ),

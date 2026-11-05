@@ -49,7 +49,7 @@
 				<div>
 					<p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">BTTS strategy explorer</p>
 					<h2 class="mt-1 text-base font-semibold text-slate-950">Scoring and conceding filters</h2>
-					<p class="mt-1 text-xs leading-5 text-slate-600">League-rate and recent-form variations use flat £1 stakes and stored pre-match BTTS odds. Smaller figures show the equivalent season-wide filter where available. Rows with fewer than 50 qualifying bets are excluded.</p>
+					<p class="mt-1 text-xs leading-5 text-slate-600">League-rate and recent-form variations use flat £1 stakes and stored pre-match BTTS odds. Smaller figures show the equivalent season-wide filter where available. Rows with fewer than {data.minimumBetsForRanking} qualifying bets are excluded.</p>
 				</div>
 				<div class="mt-4 flex flex-wrap items-end gap-3">
 					<div>

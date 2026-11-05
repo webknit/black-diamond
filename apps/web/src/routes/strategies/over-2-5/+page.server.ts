@@ -9,8 +9,9 @@ import {
 	type StrategyOddsFilter
 } from '@black-diamond/core/strategies';
 import { getStrategyPerformanceSummaries } from '@black-diamond/database/strategyPerformances';
+import { minimumStrategyBetsForRanking } from '@black-diamond/core/strategies';
 
-const minimumBetsForRanking = 50;
+const minimumBetsForRanking = minimumStrategyBetsForRanking;
 
 export async function load({ url }: { url: URL }) {
 	const now = new Date();
@@ -81,6 +82,7 @@ export async function load({ url }: { url: URL }) {
 		selectedOddsRange,
 		oddsRanges: over2_5OddsRanges,
 		availableWeeks,
+		minimumBetsForRanking,
 		teamFilterResults: [
 			...teamFilterVariations
 				.filter((variation) => variation.sample === 'last5')

@@ -123,6 +123,7 @@ function createSummary(strategyId: string, recalculatedAt: string): StrategyPerf
     weeks: {},
     months: {},
     oddsBands: Object.fromEntries(strategyOddsRanges.map((range) => [range.id, emptyOddsBand()])),
+    leaguePerformances: [],
     recalculatedAt,
   };
 }
@@ -136,8 +137,28 @@ function mergePeriods(
   }
 }
 
-function mergeIntoSummary(summary: StrategyPerformanceSummary, performance: StrategyPerformance) {
+export function mergeIntoSummary(summary: StrategyPerformanceSummary, performance: StrategyPerformance) {
   addTotals(summary.seasonPerformance, performance.seasonPerformance);
+  let leaguePerformance = summary.leaguePerformances.find(
+    (item) => item.leagueId === performance.league.id,
+  );
+  if (!leaguePerformance) {
+    leaguePerformance = {
+      leagueId: performance.league.id,
+      name: performance.league.name,
+      country: performance.league.country,
+      ...emptyTotals(),
+		oddsBands: Object.fromEntries(
+			strategyOddsRanges.map((range) => [range.id, { seasonPerformance: emptyTotals() }]),
+		),
+    };
+    summary.leaguePerformances.push(leaguePerformance);
+  }
+  addTotals(leaguePerformance, performance.seasonPerformance);
+	for (const [rangeId, totals] of Object.entries(performance.oddsBands)) {
+		const target = leaguePerformance.oddsBands[rangeId];
+		if (target) addTotals(target.seasonPerformance, totals.seasonPerformance);
+	}
   mergePeriods(summary.weeks, performance.weeks);
   mergePeriods(summary.months, performance.months);
   for (const [rangeId, totals] of Object.entries(performance.oddsBands)) {

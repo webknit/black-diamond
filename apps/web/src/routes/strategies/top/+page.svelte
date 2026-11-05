@@ -26,7 +26,7 @@
 		<header class="mb-4 sm:mb-6">
 			<h1 class="text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Top strategies</h1>
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">
-				The ten strongest profitable performers with at least 50 bets, using your market-specific minimum odds. Ranked by ROI, then flat-stake profit.
+				The ten strongest profitable performers with at least {data.minimumBetsForRanking} bets, using your market-specific minimum odds. Ranked by ROI, then flat-stake profit.
 			</p>
 		</header>
 
@@ -54,6 +54,31 @@
 									<div><p class="uppercase tracking-wide">P / L</p><p class="mt-0.5 text-xs font-semibold tabular-nums" class:text-emerald-700={strategy.profit > 0} class:text-rose-700={strategy.profit < 0}>{formatCurrency(strategy.profit)}</p></div>
 									<div><p class="uppercase tracking-wide">ROI</p><p class="mt-0.5 text-xs font-medium tabular-nums text-slate-900">{formatPercentage(strategy.returnOnInvestment)}</p></div>
 								</div>
+								<details class="mt-3 border-t border-slate-100 pt-3">
+									<summary class="cursor-pointer text-xs font-medium text-slate-600 hover:text-slate-950">League performance{strategy.leaguePerformances.length > 0 ? ` (${strategy.leaguePerformances.length})` : ''}</summary>
+									{#if strategy.leaguePerformances.length === 0}
+										<p class="mt-2 text-xs text-slate-500">League results will appear after the strategy-performance backfill completes.</p>
+									{:else}
+										<div class="mt-2 overflow-x-auto rounded-lg border border-slate-200">
+											<table class="w-full min-w-[31rem] text-left text-xs">
+												<thead class="border-b border-slate-200 bg-slate-50 text-[10px] uppercase tracking-wide text-slate-500">
+													<tr><th class="px-3 py-2 font-medium">League</th><th class="px-3 py-2 text-right font-medium">Bets</th><th class="px-3 py-2 text-right font-medium">W / L</th><th class="px-3 py-2 text-right font-medium">P / L</th><th class="px-3 py-2 text-right font-medium">ROI</th></tr>
+												</thead>
+												<tbody class="divide-y divide-slate-100">
+													{#each strategy.leaguePerformances as league (league.leagueId)}
+														<tr>
+															<td class="px-3 py-2"><p class="font-medium text-slate-800">{league.name}</p><p class="text-[10px] text-slate-500">{league.country}</p></td>
+															<td class="px-3 py-2 text-right tabular-nums text-slate-700">{league.bets}</td>
+															<td class="px-3 py-2 text-right tabular-nums text-slate-700">{league.wins} / {league.losses}</td>
+															<td class="px-3 py-2 text-right font-medium tabular-nums" class:text-emerald-700={league.profit > 0} class:text-rose-700={league.profit < 0}>{formatCurrency(league.profit)}</td>
+															<td class="px-3 py-2 text-right tabular-nums text-slate-700">{formatPercentage(league.returnOnInvestment)}</td>
+														</tr>
+													{/each}
+												</tbody>
+											</table>
+										</div>
+									{/if}
+								</details>
 							</div>
 						</div>
 					</li>
