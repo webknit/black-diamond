@@ -250,9 +250,9 @@
 						{/if}
 						<div class="my-1 border-t border-slate-100"></div>
 						{#if page.url.pathname === '/strategies/top'}
-							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Top strategies</span>
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Top strategies · overall</span>
 						{:else}
-							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/top" onclick={() => (strategiesMenuOpen = false)}>Top strategies</a>
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/top" onclick={() => (strategiesMenuOpen = false)}>Top strategies · overall</a>
 						{/if}
 						{#if page.url.pathname === '/strategies/by-league'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Top by league</span>
