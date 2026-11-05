@@ -19,7 +19,7 @@
 		watchlistedFixtureIds?: number[];
 		onToggleWatchlist?: (fixtureId: number) => void;
 		recommendedMarket?: string | null;
-		recommendationByFixtureId?: Record<number, { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } }>;
+		recommendationByFixtureId?: Record<number, { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; market: string; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } }>;
 	} = $props();
 </script>
 
@@ -46,7 +46,7 @@
 {:else}
 	<div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 min-[1300px]:!grid-cols-3 min-[1536px]:grid-cols-5 2xl:gap-5">
 		{#each fixtures as fixture (fixture.id)}
-			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} {recommendedMarket} recommendation={recommendationByFixtureId[fixture.id]} isWatchlisted={watchlistedFixtureIds.includes(fixture.id)} {onToggleWatchlist} />
+			<FixtureCard {fixture} {placedSelectionKeys} {onSelectOdd} recommendedMarket={recommendationByFixtureId[fixture.id]?.market ?? recommendedMarket} recommendation={recommendationByFixtureId[fixture.id]} isWatchlisted={watchlistedFixtureIds.includes(fixture.id)} {onToggleWatchlist} />
 		{/each}
 	</div>
 {/if}

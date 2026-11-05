@@ -18,7 +18,7 @@
 		isWatchlisted?: boolean;
 		onToggleWatchlist?: (fixtureId: number) => void;
 		recommendedMarket?: string | null;
-		recommendation?: { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } };
+		recommendation?: { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; market: string; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } };
 	} = $props();
 
 	const ukTimeZone = 'Europe/London';
