@@ -254,6 +254,11 @@
 						{:else}
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/top" onclick={() => (strategiesMenuOpen = false)}>Top strategies</a>
 						{/if}
+						{#if page.url.pathname === '/strategies/by-league'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Top by league</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/by-league" onclick={() => (strategiesMenuOpen = false)}>Top by league</a>
+						{/if}
 					</div>
 				{/if}
 			</div>
