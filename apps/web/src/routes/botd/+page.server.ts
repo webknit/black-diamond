@@ -1,5 +1,5 @@
 import { getBotdDay } from '@black-diamond/database/botdDays';
-import { botdStrategies, getBettableMinimumOdds, type BotdMarket } from '@black-diamond/core/strategies';
+import { botdStrategies, getBettableMinimumOdds, getBotdMarketLabel, type BotdMarket } from '@black-diamond/core/strategies';
 import { getUkDateKey } from '@black-diamond/core/time';
 import { actions, load as loadFixtures } from '../+page.server.js';
 
@@ -9,6 +9,12 @@ const markets: BotdMarket[] = ['over2_5', 'over1_5', 'over0_5', 'under2_5', 'und
 
 function getSelectedDate(value: string | null) {
 	return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : getUkDateKey(new Date());
+}
+
+function getStrategyBannerTitle(title: string, marketLabel: string) {
+	let result = title;
+	while (result.startsWith(`${marketLabel} · `)) result = result.slice(marketLabel.length + 3);
+	return result;
 }
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
@@ -29,7 +35,8 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			const strategy = botdStrategies.find((item) => item.id === match.strategyId);
 			if (!strategy || !match.leaguePerformance || (selectedMarket !== null && strategy.market !== selectedMarket)) return [];
 			if (match.referenceOdd === null || match.referenceOdd < getBettableMinimumOdds(strategy.market)) return [];
-			return [{ ...match, market: strategy.market, strategyTitle: strategy.title }];
+			const marketLabel = getBotdMarketLabel(strategy.market);
+			return [{ ...match, market: strategy.market, marketLabel, strategyTitle: getStrategyBannerTitle(strategy.title, marketLabel) }];
 		}).sort((left, right) => tierScore[right.tier] - tierScore[left.tier] || (right.leaguePerformance.profit / (right.leaguePerformance.bets + 30)) - (left.leaguePerformance.profit / (left.leaguePerformance.bets + 30)));
 		return matches[0] ? [{ fixtureId: fixture.fixtureId, recommendation: matches[0] }] : [];
 	});

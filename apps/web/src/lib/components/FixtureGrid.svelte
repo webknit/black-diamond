@@ -19,7 +19,7 @@
 		watchlistedFixtureIds?: number[];
 		onToggleWatchlist?: (fixtureId: number) => void;
 		recommendedMarket?: string | null;
-		recommendationByFixtureId?: Record<number, { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; market: string; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } }>;
+		recommendationByFixtureId?: Record<number, { tier: 'lowConfidence' | 'eligible' | 'strong' | 'highConfidence'; market: string; marketLabel: string; strategyTitle: string; leaguePerformance: { bets: number; wins: number; losses: number; profit: number } }>;
 	} = $props();
 </script>
 
