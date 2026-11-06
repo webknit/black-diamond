@@ -25,6 +25,7 @@
 	const liveStatuses = new Set(['1H', '2H', 'ET', 'P', 'LIVE', 'HT', 'BT']);
 	const completedStatuses = new Set(['FT', 'AET', 'PEN']);
 	const hasLeagueTable = $derived(fixture.hasLeagueTable ?? true);
+	const canViewLeagueTable = $derived(hasLeagueTable && !completedStatuses.has(fixture.status.short));
 	let leagueStandingsOpen = $state(false);
 	let formRequestId = 0;
 	let formSelection = $state<{ requestId: number; teamId: number; teamName: string; scope: 'home' | 'away' | 'overall' } | null>(null);
@@ -219,6 +220,7 @@
 					homeTeamId={fixture.homeTeamId}
 					awayTeamId={fixture.awayTeamId}
 					{hasLeagueTable}
+					canOpenLeagueTable={canViewLeagueTable}
 					onOpenLeagueStandings={openLeagueStandings}
 					onOpenTeamForm={openTeamForm}
 				/>
@@ -246,7 +248,7 @@
 
 		<FixtureOdds odds={fixture.odds} fixtureId={fixture.id} {placedSelectionKeys} {recommendedMarket} onSelectOdd={(selection) => onSelectOdd?.(fixture, selection)} />
 	</div>
-	{#if hasLeagueTable}
+	{#if canViewLeagueTable}
 		<LeagueStandingsModal
 			leagueId={fixture.leagueId}
 			season={fixture.leagueSeason}
