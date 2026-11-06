@@ -1,4 +1,4 @@
-import { botdStrategies, getBettableOddsBandIds, getBotdReferenceOdd, matchesBotdStrategy, sumOddsBandPerformance } from "@black-diamond/core/strategies";
+import { botdStrategies, getBotdReferenceOdd, matchesBotdStrategy } from "@black-diamond/core/strategies";
 import { getUkDateKey } from "@black-diamond/core/time";
 import type { BotdDayFixture } from "@black-diamond/core/botdDay";
 import { upsertBotdDays } from "@black-diamond/database/botdDays";
@@ -69,7 +69,7 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
       const matchingStrategies = botdStrategies.flatMap((strategy) => {
         const league = performanceByStrategyId.get(strategy.id)?.leaguePerformances.find((item) => item.leagueId === fixture.league.id);
         if (!league || !matchesBotdStrategy(snapshot, leagueStatsById.get(fixture.league.id), strategy)) return [];
-        const totals = sumOddsBandPerformance(league?.oddsBands, getBettableOddsBandIds(strategy.market), "all");
+		const totals = league?.bettablePerformance ?? { bets: 0, wins: 0, losses: 0, profit: 0 };
         if (totals.bets < emergingMinimumBets || totals.profit <= 0) return [];
         const tier: "lowConfidence" | "eligible" | "strong" | "highConfidence" = totals.bets >= 100
           ? "highConfidence"

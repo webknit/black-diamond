@@ -56,7 +56,7 @@ describe("syncBotdFixtures", () => {
     mocks.getFixturesBetweenDates.mockResolvedValue([]);
     mocks.getStrategyPerformanceSeasonTotals.mockResolvedValue([{
       strategyId: "score1.3-eitherTeam-last5",
-      leaguePerformances: [{ leagueId: 39, oddsBands: { "1.70-1.99": { seasonPerformance: { bets: 30, wins: 20, losses: 10, profit: 5 } } } }],
+      leaguePerformances: [{ leagueId: 39, bettablePerformance: { bets: 30, wins: 20, losses: 10, profit: 5 } }],
     }]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([{
       fixtureId: 1,

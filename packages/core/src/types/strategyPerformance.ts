@@ -31,7 +31,8 @@ export type StrategyLeaguePerformance = {
   wins: number;
   losses: number;
   profit: number;
-  oddsBands: Record<string, { seasonPerformance: StrategyPerformanceTotals }>;
+  /** Totals at this strategy's configured minimum/bettable odds. */
+  bettablePerformance: StrategyPerformanceTotals;
 };
 
 // A compact all-selected-leagues view. The web app reads these rather than

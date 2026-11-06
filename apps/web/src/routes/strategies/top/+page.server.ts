@@ -79,7 +79,7 @@ export async function load() {
 				returnOnInvestment: bets === 0 ? null : (profit / bets) * 100,
 				leaguePerformances: (summary?.leaguePerformances ?? [])
 					.map((league) => {
-						const leagueTotals = sumOddsBandPerformance(league.oddsBands, oddsBandIds, 'all');
+						const leagueTotals = league.bettablePerformance;
 						const leagueBets = leagueTotals?.bets ?? 0;
 						const leagueProfit = leagueTotals?.profit ?? 0;
 						return {

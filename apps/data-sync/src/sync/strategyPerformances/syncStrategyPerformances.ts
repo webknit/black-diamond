@@ -17,6 +17,7 @@ import {
 	getUnder2_5ReferenceOdd,
 	getUnder1_5ReferenceOdd,
 	getOver0_5ReferenceOdd,
+	getBettableOddsBandIds,
 	 matchesBttsStrategyVariation,
 	 matchesBttnsStrategyVariation,
 	 matchesOver2_5RateStrategyVariation,
@@ -60,6 +61,19 @@ const strategyIds = [
   ...bttnsStrategyVariations.map((strategy) => strategy.id),
   ...leagueRateStrategyVariations.map((strategy) => strategy.id),
 ];
+const strategyMarkets = new Map<string, "over2_5" | "under2_5" | "over1_5" | "under1_5" | "over0_5" | "btts" | "bttns">(
+	[
+		...teamFilterVariations.map((strategy) => [strategy.id, "over2_5"] as const),
+		...over2_5RateStrategyVariations.map((strategy) => [strategy.id, "over2_5"] as const),
+		...under2_5StrategyVariations.map((strategy) => [strategy.id, "under2_5"] as const),
+		...under1_5StrategyVariations.map((strategy) => [strategy.id, "under1_5"] as const),
+		...over0_5StrategyVariations.map((strategy) => [strategy.id, "over0_5"] as const),
+		...over1_5StrategyVariations.map((strategy) => [strategy.id, "over1_5"] as const),
+		...bttsStrategyVariations.map((strategy) => [strategy.id, "btts"] as const),
+		...bttnsStrategyVariations.map((strategy) => [strategy.id, "bttns"] as const),
+		...leagueRateStrategyVariations.map((strategy) => [strategy.id, strategy.market] as const),
+	],
+);
 
 type LeagueRateAccumulator = {
   fixturesPlayed: number;
@@ -148,16 +162,14 @@ export function mergeIntoSummary(summary: StrategyPerformanceSummary, performanc
       name: performance.league.name,
       country: performance.league.country,
       ...emptyTotals(),
-		oddsBands: Object.fromEntries(
-			strategyOddsRanges.map((range) => [range.id, { seasonPerformance: emptyTotals() }]),
-		),
+		bettablePerformance: emptyTotals(),
     };
     summary.leaguePerformances.push(leaguePerformance);
   }
   addTotals(leaguePerformance, performance.seasonPerformance);
-	for (const [rangeId, totals] of Object.entries(performance.oddsBands)) {
-		const target = leaguePerformance.oddsBands[rangeId];
-		if (target) addTotals(target.seasonPerformance, totals.seasonPerformance);
+	const market = strategyMarkets.get(performance.strategyId);
+	if (market) for (const rangeId of getBettableOddsBandIds(market)) {
+		addTotals(leaguePerformance.bettablePerformance, performance.oddsBands[rangeId].seasonPerformance);
 	}
   mergePeriods(summary.weeks, performance.weeks);
   mergePeriods(summary.months, performance.months);
