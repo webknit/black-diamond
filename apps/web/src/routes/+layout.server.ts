@@ -4,7 +4,6 @@ import { getPendingBetSummaryByAccountId } from '@black-diamond/database/bets';
 type LayoutAccount = {
 	id: string;
 	email: string;
-	startingBalance: number;
 	totalDeposits: number;
 	currentBalance: number;
 	currency: string;
@@ -23,7 +22,6 @@ export async function load({ locals }: { locals: App.Locals }): Promise<{ accoun
 		account: {
 			id: account.id,
 			email: account.email,
-			startingBalance: account.startingBalance,
 			totalDeposits: account.totalDeposits ?? 0,
 			currentBalance: account.currentBalance,
 			currency: account.currency,

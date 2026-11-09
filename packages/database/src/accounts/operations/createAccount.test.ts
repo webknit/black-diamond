@@ -20,7 +20,7 @@ describe("createAccount", () => {
 
   it("stores the account and opening balance transaction", async () => {
     const account = {
-      id: "main", email: "me@example.com", passwordHash: "hash", startingBalance: 100, totalDeposits: 0,
+      id: "main", email: "me@example.com", passwordHash: "hash", totalDeposits: 100,
       currentBalance: 100, currency: "GBP" as const, createdAt: "2026-10-22T00:00:00.000Z", updatedAt: "2026-10-22T00:00:00.000Z",
     };
     await createAccount(account);

@@ -3,14 +3,14 @@ import { withDatabaseTransaction } from '../../mongodb.js';
 
 export async function resetAccount(
 	accountId: string,
-	startingBalance: number,
+	initialDeposit: number,
 	updatedAt: string
 ): Promise<boolean> {
-	if (!Number.isFinite(startingBalance) || startingBalance < 0) {
-		throw new Error('Starting balance must be a non-negative finite number');
+	if (!Number.isFinite(initialDeposit) || initialDeposit < 0) {
+		throw new Error('Initial deposit must be a non-negative finite number');
 	}
-	if (Math.round(startingBalance * 100) / 100 !== startingBalance) {
-		throw new Error('Starting balance must have no more than two decimal places');
+	if (Math.round(initialDeposit * 100) / 100 !== initialDeposit) {
+		throw new Error('Initial deposit must have no more than two decimal places');
 	}
 
 	return withDatabaseTransaction(async (database, session) => {
@@ -24,9 +24,11 @@ export async function resetAccount(
 			{ id: accountId },
 			{
 				$set: {
-					startingBalance,
-					totalDeposits: startingBalance,
-					currentBalance: startingBalance,
+					// Kept as a legacy mirror for older deployments. New code uses only
+					// `totalDeposits` as the canonical funding value.
+					startingBalance: initialDeposit,
+					totalDeposits: initialDeposit,
+					currentBalance: initialDeposit,
 					updatedAt
 				}
 			},
@@ -35,8 +37,8 @@ export async function resetAccount(
 		await recordBalanceTransaction(database, session, {
 			accountId,
 			type: 'opening_balance',
-			amount: startingBalance,
-			balanceAfter: startingBalance,
+			amount: initialDeposit,
+			balanceAfter: initialDeposit,
 			occurredAt: updatedAt,
 			referenceId: null
 		});

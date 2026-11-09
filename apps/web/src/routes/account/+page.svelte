@@ -13,9 +13,7 @@
 	}
 
 	const profitLoss = $derived(data.realizedProfitLoss);
-	const contributedCapital = $derived(
-		data.account ? data.account.startingBalance + data.account.totalDeposits : 0
-	);
+	const contributedCapital = $derived(data.account?.totalDeposits ?? 0);
 	const bankroll = $derived(
 		data.account ? data.account.currentBalance + data.pendingBetSummary.totalStake : 0
 	);
@@ -111,10 +109,7 @@
 					{/if}
 				</p>
 				<p class="mt-3 text-sm text-slate-600">
-					Starting balance: {formatCurrency(data.account.startingBalance, data.account.currency)}
-				</p>
-				<p class="mt-1 text-sm text-slate-600">
-					Deposits: {formatCurrency(data.account.totalDeposits, data.account.currency)}
+					Total deposits: {formatCurrency(data.account.totalDeposits, data.account.currency)}
 				</p>
 				<p class="mt-1 text-sm text-slate-600">
 					Outstanding bets: {data.pendingBetSummary.count} · {formatCurrency(data.pendingBetSummary.totalStake, data.account.currency)} staked

@@ -59,13 +59,13 @@ if (existingAccount) {
 
 const readline = createInterface({ input, output });
 const email = (await readline.question('Email: ')).trim().toLowerCase();
-const startingBalanceInput = await readline.question('Starting balance (GBP): ');
+const initialDepositInput = await readline.question('Initial deposit (GBP): ');
 readline.close();
 
-const startingBalance = Number(startingBalanceInput);
+const initialDeposit = Number(initialDepositInput);
 if (!email || !email.includes('@')) throw new Error('Enter a valid email address.');
-if (!Number.isFinite(startingBalance) || startingBalance < 0) {
-	throw new Error('Starting balance must be a positive number or zero.');
+if (!Number.isFinite(initialDeposit) || initialDeposit < 0) {
+	throw new Error('Initial deposit must be a positive number or zero.');
 }
 
 const password = await promptForPassword('Password: ');
@@ -79,12 +79,11 @@ await createAccount({
 	id: accountId,
 	email,
 	passwordHash: await hashPassword(password),
-	startingBalance,
-	totalDeposits: 0,
-	currentBalance: startingBalance,
+	totalDeposits: initialDeposit,
+	currentBalance: initialDeposit,
 	currency: 'GBP',
 	createdAt: now,
 	updatedAt: now
 });
 
-console.info(`Created account for ${email} with a £${startingBalance.toFixed(2)} balance.`);
+console.info(`Created account for ${email} with a £${initialDeposit.toFixed(2)} bankroll.`);
