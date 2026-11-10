@@ -49,7 +49,7 @@ import {
   upsertStrategyPerformanceSummaries,
 } from "@black-diamond/database/strategyPerformances";
 
-const strategyVersion = 1;
+const strategyVersion = 2;
 const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
   ...over2_5RateStrategyVariations.map((strategy) => strategy.id),

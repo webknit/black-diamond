@@ -14,6 +14,12 @@
 		<header class="mb-4 sm:mb-6">
 			<h1 class="text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Top strategies by league</h1>
 			<p class="mt-1 text-xs text-slate-600 sm:mt-2 sm:text-sm">League-specific results at each market’s minimum odds. Rows need at least {data.minimumLeagueBets} qualifying bets and are ranked by ROI, then profit.</p>
+			<div class="mt-2 flex flex-wrap items-center gap-y-1 text-xs text-slate-500">
+				<span class="mr-3 font-semibold uppercase tracking-wide text-slate-400">Minimum odds</span>
+				{#each data.marketMinimumOdds as market}
+					<span class="mr-3 inline-flex items-baseline gap-1.5 border-l border-slate-200 pl-3"><span class="font-semibold tabular-nums text-slate-800">{market.minimumOdds.toFixed(2)}+</span><span>{market.label}</span></span>
+				{/each}
+			</div>
 		</header>
 		{#if data.results.length === 0}
 			<section class="rounded-xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center text-sm text-slate-600">No league results meet the current sample threshold yet.</section>

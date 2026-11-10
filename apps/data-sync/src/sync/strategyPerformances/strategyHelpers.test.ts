@@ -6,13 +6,15 @@ describe('strategy odds helpers', () => {
 		expect(getBettableMinimumOdds('over0_5')).toBe(1.08);
 		expect(getBettableMinimumOdds('over1_5')).toBe(1.2);
 		expect(getBettableMinimumOdds('over2_5')).toBe(1.7);
+		expect(getBettableMinimumOdds('under1_5')).toBe(3);
 		expect(getBettableOddsBandIds('over0_5')).toContain('1.08-1.10');
-		expect(getBettableOddsBandIds('under1_5')).toEqual(['1.20-1.39', '1.40-1.59', '1.60+']);
+		expect(getBettableOddsBandIds('under1_5')).toEqual(['3.00+']);
 	});
 	it('handles odds-range boundaries and invalid prices', () => {
 		expect(getStrategyOddsRangeIds(1)).toEqual([]);
 		expect(getStrategyOddsRangeIds(1.08)).toContain('1.08-1.10');
 		expect(getStrategyOddsRangeIds(1.7)).toContain('1.70-1.99');
+		expect(getStrategyOddsRangeIds(3)).toContain('3.00+');
 		expect(getStrategyOddsRangeIds(Number.NaN)).toEqual([]);
 	});
 	it('sums selected season and week bands without counting missing bands', () => {

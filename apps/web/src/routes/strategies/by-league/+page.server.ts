@@ -112,5 +112,12 @@ export async function load() {
         right.profit - left.profit,
     );
 
-  return { results, minimumLeagueBets };
+  const marketMinimumOdds = [
+    { label: "Over/Under 2.5, BTTS & BTNTS", minimumOdds: getBettableMinimumOdds("over2_5") },
+    { label: "Over 1.5", minimumOdds: getBettableMinimumOdds("over1_5") },
+    { label: "Over 0.5", minimumOdds: getBettableMinimumOdds("over0_5") },
+    { label: "Under 1.5", minimumOdds: getBettableMinimumOdds("under1_5") },
+  ];
+
+  return { results, minimumLeagueBets, marketMinimumOdds };
 }

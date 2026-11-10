@@ -7,7 +7,7 @@ export const bettableMinimumOdds = {
   btts: 1.7,
   bttns: 1.7,
   over1_5: 1.2,
-  under1_5: 1.2,
+  under1_5: 3,
   over0_5: 1.08,
 } as const;
 
@@ -23,9 +23,11 @@ export function getBettableOddsBandIds(
 ): string[] {
   return market === "over0_5"
     ? ["1.08-1.10", "1.11-1.15", "1.16-1.19", "1.20-1.39", "1.40-1.59", "1.60+"]
-    : market === "over1_5" || market === "under1_5"
+    : market === "over1_5"
     ? ["1.20-1.39", "1.40-1.59", "1.60+"]
-    : ["1.70-1.99", "2.00-2.49", "2.50+"];
+    : market === "under1_5"
+    ? ["3.00+"]
+    : ["1.70-1.99", "2.00-2.49", "2.50-2.99", "3.00+"];
 }
 
 export function sumOddsBandPerformance(

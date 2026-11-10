@@ -50,6 +50,7 @@ export {
 export {
   getStrategyOddsRangeIds,
   over1_5OddsRanges,
+	under1_5OddsRanges,
 
   over0_5OddsRanges,
   over2_5OddsRanges,

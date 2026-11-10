@@ -9,7 +9,8 @@ const ranges = [
 	{ id: '1-1.69', label: '1.00 – 1.69', minimum: 1, maximum: 1.7 },
 	{ id: '1.70-1.99', label: '1.70 – 1.99', minimum: 1.7, maximum: 2 },
 	{ id: '2.00-2.49', label: '2.00 – 2.49', minimum: 2, maximum: 2.5 },
-	{ id: '2.50+', label: '2.50+', minimum: 2.5, maximum: Number.POSITIVE_INFINITY }
+	{ id: '2.50-2.99', label: '2.50 – 2.99', minimum: 2.5, maximum: 3 },
+	{ id: '3.00+', label: '3.00+', minimum: 3, maximum: Number.POSITIVE_INFINITY }
 ] as const;
 
 /** Display groups for Over 0.5. The final group aggregates all prices of 1.21 or above. */
@@ -22,6 +23,7 @@ export const over0_5OddsRanges = [
 ] as const;
 export const over1_5OddsRanges = ranges.slice(4, 7);
 export const over2_5OddsRanges = ranges.slice(7);
+export const under1_5OddsRanges = ranges.slice(11);
 export const strategyOddsRanges = ranges;
 export type StrategyOddsRangeId = (typeof ranges)[number]['id'];
 export type StrategyOddsFilter = 'all' | 'bettable' | StrategyOddsRangeId;
