@@ -12,7 +12,6 @@ export async function upsertStrategyPerformances(
       replaceOne: {
         filter: {
           strategyId: performance.strategyId,
-          strategyVersion: performance.strategyVersion,
           "league.id": performance.league.id,
           season: performance.season,
         },

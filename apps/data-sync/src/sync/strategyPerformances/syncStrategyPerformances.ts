@@ -49,7 +49,6 @@ import {
   upsertStrategyPerformanceSummaries,
 } from "@black-diamond/database/strategyPerformances";
 
-const strategyVersion = 2;
 const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
   ...over2_5RateStrategyVariations.map((strategy) => strategy.id),
@@ -132,7 +131,6 @@ function addTotals(target: StrategyPerformanceTotals, source: StrategyPerformanc
 function createSummary(strategyId: string, recalculatedAt: string): StrategyPerformanceSummary {
   return {
     strategyId,
-    strategyVersion,
     seasonPerformance: emptyTotals(),
     weeks: {},
     months: {},
@@ -224,7 +222,6 @@ async function createStrategyPerformances(
   const performances = new Map<string, StrategyPerformance>(
     strategyIds.map((strategyId) => [strategyId, {
       strategyId,
-      strategyVersion,
       league,
       season,
       seasonPerformance: emptyTotals(),

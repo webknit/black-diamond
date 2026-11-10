@@ -14,7 +14,7 @@ export async function getStrategyPerformanceSeasonTotals(
 	return (await getDatabase())
 		.collection<StrategyPerformanceSeasonTotals>('strategyPerformanceSummaries')
 		.find(
-			{ strategyVersion: 1, strategyId: { $in: strategyIds } },
+			{ strategyId: { $in: strategyIds } },
 		{ projection: { _id: 0, strategyId: 1, seasonPerformance: 1, oddsBands: 1, leaguePerformances: 1 } }
 		)
 		.toArray();

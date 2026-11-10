@@ -111,11 +111,11 @@ export async function ensureDatabaseIndexes(): Promise<void> {
     { accountId: 1 }, { name: "account_push_subscriptions" },
   );
   await database.collection("strategyPerformances").createIndex(
-    { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
+    { strategyId: 1, "league.id": 1, season: 1 },
     { name: "unique_strategy_league_season", unique: true },
   );
   await database.collection("strategyPerformanceSummaries").createIndex(
-    { strategyId: 1, strategyVersion: 1 },
+    { strategyId: 1 },
     { name: "unique_strategy_summary", unique: true },
   );
   await database.collection("botdDays").createIndex(

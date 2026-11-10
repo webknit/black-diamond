@@ -16,6 +16,6 @@ export async function getStrategyPerformanceSummaries(
 
 	return database
 		.collection<StrategyPerformanceSummary>('strategyPerformanceSummaries')
-		.find({ strategyVersion: 1, strategyId: { $in: strategyIds } }, { projection })
+		.find({ strategyId: { $in: strategyIds } }, { projection })
 		.toArray();
 }

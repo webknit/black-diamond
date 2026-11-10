@@ -10,7 +10,7 @@ export async function upsertStrategyPerformanceSummaries(
 	await database.collection<StrategyPerformanceSummary>('strategyPerformanceSummaries').bulkWrite(
 		summaries.map((summary) => ({
 			replaceOne: {
-				filter: { strategyId: summary.strategyId, strategyVersion: summary.strategyVersion },
+				filter: { strategyId: summary.strategyId },
 				replacement: summary,
 				upsert: true
 			}

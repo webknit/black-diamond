@@ -13,7 +13,6 @@ export type StrategyPerformanceOddsBand = {
 
 export type StrategyPerformance = {
   strategyId: string;
-  strategyVersion: number;
   league: { id: number; name: string; country: string };
   season: number;
   seasonPerformance: StrategyPerformanceTotals;

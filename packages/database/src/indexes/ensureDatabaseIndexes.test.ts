@@ -50,7 +50,7 @@ describe("ensureDatabaseIndexes", () => {
       { name: "unique_league_season_round", unique: true },
     );
     expect(mocks.createIndex).toHaveBeenCalledWith(
-      { strategyId: 1, strategyVersion: 1, "league.id": 1, season: 1 },
+      { strategyId: 1, "league.id": 1, season: 1 },
       { name: "unique_strategy_league_season", unique: true },
     );
     expect(mocks.createIndex).toHaveBeenCalledWith(

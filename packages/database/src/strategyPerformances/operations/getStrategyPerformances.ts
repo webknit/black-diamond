@@ -24,7 +24,6 @@ export async function getStrategyPerformances({
   return database
     .collection<StrategyPerformance>("strategyPerformances")
     .find({
-      strategyVersion: 1,
       ...(strategyIds === undefined ? {} : { strategyId: { $in: strategyIds } }),
     }, { projection })
     .toArray();
