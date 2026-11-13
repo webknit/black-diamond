@@ -6,3 +6,4 @@ export {
   getFinishedFixturesWithStatsSnapshots,
   type FinishedFixtureWithStatsSnapshot,
 } from "./operations/getFinishedFixturesWithStatsSnapshots.js";
+export { getFinishedFixturesWithStatsSnapshotsForLeagues } from "./operations/getFinishedFixturesWithStatsSnapshotsForLeagues.js";

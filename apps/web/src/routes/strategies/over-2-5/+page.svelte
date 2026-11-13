@@ -99,7 +99,7 @@
 						<tbody class="divide-y divide-slate-100">
 							{#each data.teamFilterResults as result (result.id)}
 								<tr class="text-slate-700">
-									<td class="px-3 py-2"><p class="font-medium text-slate-950">{result.title}</p><p class="mt-0.5 text-[11px] text-slate-500">{result.description}</p></td>
+									<td class="px-3 py-2"><a href={`/strategies/listings?query=${result.id}`} class="font-medium text-slate-950 hover:underline">{result.title}</a><p class="mt-0.5 text-[11px] text-slate-500">{result.description}</p></td>
 									<td class="px-3 py-2 text-right tabular-nums"><p>{result.bets}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.bets}</p>{/if}</td>
 									<td class="px-3 py-2 text-right tabular-nums"><p>{result.wins} / {result.losses}</p><p class="mt-0.5 text-[10px] text-slate-400">{result.bets ? formatPercentage((result.wins / result.bets) * 100) : '—'}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] text-slate-400">Season: {result.seasonPerformance.wins} / {result.seasonPerformance.losses}</p>{/if}</td>
 									<td class="px-3 py-2 text-right font-semibold tabular-nums" class:text-emerald-700={result.profit > 0} class:text-rose-700={result.profit < 0}><p>{formatCurrency(result.profit)}</p>{#if result.seasonPerformance}<p class="mt-0.5 text-[10px] font-medium text-slate-400">Season: {formatCurrency(result.seasonPerformance.profit)}</p>{/if}</td>
