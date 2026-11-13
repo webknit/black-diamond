@@ -4,41 +4,41 @@ import type {
   StrategyPerformanceSummary,
   StrategyPerformanceTotals,
 } from "@black-diamond/core/strategyPerformance";
+import { getUkDateKey, getUkWeekStartDateKey } from "@black-diamond/core/time";
 import {
-  getUkDateKey,
-  getUkWeekStartDateKey,
-} from "@black-diamond/core/time";
-import {
-	getBttsYesReferenceOdd,
-	getBttsNoReferenceOdd,
-	getStrategyOddsRangeIds,
+  getBttsYesReferenceOdd,
+  getBttsNoReferenceOdd,
+  getStrategyOddsRangeIds,
   getOver1_5ReferenceOdd,
   getOver2_5ReferenceOdd,
-	getUnder2_5ReferenceOdd,
-	getUnder3_5ReferenceOdd,
-	getUnder1_5ReferenceOdd,
-	getOver0_5ReferenceOdd,
-	getBettableOddsBandIds,
-	 matchesBttsStrategyVariation,
-	 matchesBttnsStrategyVariation,
-	 matchesOver2_5RateStrategyVariation,
-	 matchesOver1_5StrategyVariation,
+  getOver3_5ReferenceOdd,
+  getUnder2_5ReferenceOdd,
+  getUnder3_5ReferenceOdd,
+  getUnder1_5ReferenceOdd,
+  getOver0_5ReferenceOdd,
+  getBettableOddsBandIds,
+  matchesBttsStrategyVariation,
+  matchesBttnsStrategyVariation,
+  matchesOver2_5RateStrategyVariation,
+  matchesOver1_5StrategyVariation,
   leagueRateStrategyVariations,
-	 matchesLeagueRateStrategyVariation,
+  matchesLeagueRateStrategyVariation,
   matchesTeamFilterVariation,
-	 bttsStrategyVariations,
-	 bttnsStrategyVariations,
-	 over2_5RateStrategyVariations,
-	 under2_5StrategyVariations,
-	 matchesUnder2_5StrategyVariation,
-	under3_5StrategyVariations,
-	matchesUnder3_5StrategyVariation,
-	 under1_5StrategyVariations,
-	 matchesUnder1_5StrategyVariation,
-	 over0_5StrategyVariations,
-	 matchesOver0_5StrategyVariation,
-	 over1_5StrategyVariations,
-	strategyOddsRanges,
+  bttsStrategyVariations,
+  bttnsStrategyVariations,
+  over2_5RateStrategyVariations,
+	 over3_5StrategyVariations,
+	 matchesOver3_5StrategyVariation,
+  under2_5StrategyVariations,
+  matchesUnder2_5StrategyVariation,
+  under3_5StrategyVariations,
+  matchesUnder3_5StrategyVariation,
+  under1_5StrategyVariations,
+  matchesUnder1_5StrategyVariation,
+  over0_5StrategyVariations,
+  matchesOver0_5StrategyVariation,
+  over1_5StrategyVariations,
+  strategyOddsRanges,
   teamFilterVariations,
 } from "@black-diamond/core/strategies";
 import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
@@ -55,6 +55,7 @@ import {
 const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
   ...over2_5RateStrategyVariations.map((strategy) => strategy.id),
+	...over3_5StrategyVariations.map((strategy) => strategy.id),
   ...under2_5StrategyVariations.map((strategy) => strategy.id),
   ...under3_5StrategyVariations.map((strategy) => strategy.id),
   ...under1_5StrategyVariations.map((strategy) => strategy.id),
@@ -64,20 +65,46 @@ const strategyIds = [
   ...bttnsStrategyVariations.map((strategy) => strategy.id),
   ...leagueRateStrategyVariations.map((strategy) => strategy.id),
 ];
-const strategyMarkets = new Map<string, "over2_5" | "under3_5" | "under2_5" | "over1_5" | "under1_5" | "over0_5" | "btts" | "bttns">(
-	[
-		...teamFilterVariations.map((strategy) => [strategy.id, "over2_5"] as const),
-		...over2_5RateStrategyVariations.map((strategy) => [strategy.id, "over2_5"] as const),
-		...under2_5StrategyVariations.map((strategy) => [strategy.id, "under2_5"] as const),
-		...under3_5StrategyVariations.map((strategy) => [strategy.id, "under3_5"] as const),
-		...under1_5StrategyVariations.map((strategy) => [strategy.id, "under1_5"] as const),
-		...over0_5StrategyVariations.map((strategy) => [strategy.id, "over0_5"] as const),
-		...over1_5StrategyVariations.map((strategy) => [strategy.id, "over1_5"] as const),
-		...bttsStrategyVariations.map((strategy) => [strategy.id, "btts"] as const),
-		...bttnsStrategyVariations.map((strategy) => [strategy.id, "bttns"] as const),
-		...leagueRateStrategyVariations.map((strategy) => [strategy.id, strategy.market] as const),
-	],
-);
+const strategyMarkets = new Map<
+  string,
+  | "over2_5"
+	| "over3_5"
+  | "under3_5"
+  | "under2_5"
+  | "over1_5"
+  | "under1_5"
+  | "over0_5"
+  | "btts"
+  | "bttns"
+>([
+  ...teamFilterVariations.map((strategy) => [strategy.id, "over2_5"] as const),
+  ...over2_5RateStrategyVariations.map(
+    (strategy) => [strategy.id, "over2_5"] as const,
+  ),
+	...over3_5StrategyVariations.map(
+		(strategy) => [strategy.id, "over3_5"] as const,
+	),
+  ...under2_5StrategyVariations.map(
+    (strategy) => [strategy.id, "under2_5"] as const,
+  ),
+  ...under3_5StrategyVariations.map(
+    (strategy) => [strategy.id, "under3_5"] as const,
+  ),
+  ...under1_5StrategyVariations.map(
+    (strategy) => [strategy.id, "under1_5"] as const,
+  ),
+  ...over0_5StrategyVariations.map(
+    (strategy) => [strategy.id, "over0_5"] as const,
+  ),
+  ...over1_5StrategyVariations.map(
+    (strategy) => [strategy.id, "over1_5"] as const,
+  ),
+  ...bttsStrategyVariations.map((strategy) => [strategy.id, "btts"] as const),
+  ...bttnsStrategyVariations.map((strategy) => [strategy.id, "bttns"] as const),
+  ...leagueRateStrategyVariations.map(
+    (strategy) => [strategy.id, strategy.market] as const,
+  ),
+]);
 
 type LeagueRateAccumulator = {
   fixturesPlayed: number;
@@ -91,7 +118,8 @@ function createLeagueRateAccumulator(): LeagueRateAccumulator {
 }
 
 function toLeagueRateContext(totals: LeagueRateAccumulator) {
-  const percentage = (count: number) => totals.fixturesPlayed === 0 ? 0 : (count / totals.fixturesPlayed) * 100;
+  const percentage = (count: number) =>
+    totals.fixturesPlayed === 0 ? 0 : (count / totals.fixturesPlayed) * 100;
   return {
     fixturesPlayed: totals.fixturesPlayed,
     over1_5Percentage: percentage(totals.over1_5),
@@ -100,7 +128,10 @@ function toLeagueRateContext(totals: LeagueRateAccumulator) {
   };
 }
 
-function addCompletedFixtureToLeagueRate(totals: LeagueRateAccumulator, fixture: FinishedFixtureWithStatsSnapshot) {
+function addCompletedFixtureToLeagueRate(
+  totals: LeagueRateAccumulator,
+  fixture: FinishedFixtureWithStatsSnapshot,
+) {
   if (fixture.goals.home === null || fixture.goals.away === null) return;
   const goals = fixture.goals.home + fixture.goals.away;
   totals.fixturesPlayed++;
@@ -109,10 +140,23 @@ function addCompletedFixtureToLeagueRate(totals: LeagueRateAccumulator, fixture:
   if (fixture.goals.home > 0 && fixture.goals.away > 0) totals.btts++;
 }
 
-const emptyTotals = (): StrategyPerformanceTotals => ({ bets: 0, wins: 0, losses: 0, profit: 0 });
-const emptyOddsBand = () => ({ seasonPerformance: emptyTotals(), weeks: {}, months: {} });
+const emptyTotals = (): StrategyPerformanceTotals => ({
+  bets: 0,
+  wins: 0,
+  losses: 0,
+  profit: 0,
+});
+const emptyOddsBand = () => ({
+  seasonPerformance: emptyTotals(),
+  weeks: {},
+  months: {},
+});
 
-export function addStrategyResult(totals: StrategyPerformanceTotals, won: boolean, referenceOdd: number) {
+export function addStrategyResult(
+  totals: StrategyPerformanceTotals,
+  won: boolean,
+  referenceOdd: number,
+) {
   totals.bets++;
   if (won) totals.wins++;
   else totals.losses++;
@@ -126,20 +170,28 @@ function getPeriodTotals(
   return (periods[key] ??= emptyTotals());
 }
 
-function addTotals(target: StrategyPerformanceTotals, source: StrategyPerformanceTotals) {
+function addTotals(
+  target: StrategyPerformanceTotals,
+  source: StrategyPerformanceTotals,
+) {
   target.bets += source.bets;
   target.wins += source.wins;
   target.losses += source.losses;
   target.profit += source.profit;
 }
 
-function createSummary(strategyId: string, recalculatedAt: string): StrategyPerformanceSummary {
+function createSummary(
+  strategyId: string,
+  recalculatedAt: string,
+): StrategyPerformanceSummary {
   return {
     strategyId,
     seasonPerformance: emptyTotals(),
     weeks: {},
     months: {},
-    oddsBands: Object.fromEntries(strategyOddsRanges.map((range) => [range.id, emptyOddsBand()])),
+    oddsBands: Object.fromEntries(
+      strategyOddsRanges.map((range) => [range.id, emptyOddsBand()]),
+    ),
     leaguePerformances: [],
     recalculatedAt,
   };
@@ -154,7 +206,10 @@ function mergePeriods(
   }
 }
 
-export function mergeIntoSummary(summary: StrategyPerformanceSummary, performance: StrategyPerformance) {
+export function mergeIntoSummary(
+  summary: StrategyPerformanceSummary,
+  performance: StrategyPerformance,
+) {
   addTotals(summary.seasonPerformance, performance.seasonPerformance);
   let leaguePerformance = summary.leaguePerformances.find(
     (item) => item.leagueId === performance.league.id,
@@ -165,15 +220,19 @@ export function mergeIntoSummary(summary: StrategyPerformanceSummary, performanc
       name: performance.league.name,
       country: performance.league.country,
       ...emptyTotals(),
-		bettablePerformance: emptyTotals(),
+      bettablePerformance: emptyTotals(),
     };
     summary.leaguePerformances.push(leaguePerformance);
   }
   addTotals(leaguePerformance, performance.seasonPerformance);
-	const market = strategyMarkets.get(performance.strategyId);
-	if (market) for (const rangeId of getBettableOddsBandIds(market)) {
-		addTotals(leaguePerformance.bettablePerformance, performance.oddsBands[rangeId].seasonPerformance);
-	}
+  const market = strategyMarkets.get(performance.strategyId);
+  if (market)
+    for (const rangeId of getBettableOddsBandIds(market)) {
+      addTotals(
+        leaguePerformance.bettablePerformance,
+        performance.oddsBands[rangeId].seasonPerformance,
+      );
+    }
   mergePeriods(summary.weeks, performance.weeks);
   mergePeriods(summary.months, performance.months);
   for (const [rangeId, totals] of Object.entries(performance.oddsBands)) {
@@ -186,10 +245,15 @@ export function mergeIntoSummary(summary: StrategyPerformanceSummary, performanc
 }
 
 export async function syncStrategyPerformances(): Promise<number> {
-  const leagueStats = await getLeagueStats(selectedLeagues.map((league) => league.id));
+  const leagueStats = await getLeagueStats(
+    selectedLeagues.map((league) => league.id),
+  );
   const recalculatedAt = new Date().toISOString();
   const summaries = new Map<string, StrategyPerformanceSummary>(
-    strategyIds.map((strategyId) => [strategyId, createSummary(strategyId, recalculatedAt)]),
+    strategyIds.map((strategyId) => [
+      strategyId,
+      createSummary(strategyId, recalculatedAt),
+    ]),
   );
   let performanceCount = 0;
 
@@ -225,24 +289,36 @@ async function createStrategyPerformances(
 ): Promise<StrategyPerformance[]> {
   const now = new Date().toISOString();
   const performances = new Map<string, StrategyPerformance>(
-    strategyIds.map((strategyId) => [strategyId, {
+    strategyIds.map((strategyId) => [
       strategyId,
-      league,
-      season,
-      seasonPerformance: emptyTotals(),
-      weeks: {},
-      months: {},
-      oddsBands: Object.fromEntries(strategyOddsRanges.map((range) => [range.id, emptyOddsBand()])),
-      recalculatedAt: now,
-    }]),
+      {
+        strategyId,
+        league,
+        season,
+        seasonPerformance: emptyTotals(),
+        weeks: {},
+        months: {},
+        oddsBands: Object.fromEntries(
+          strategyOddsRanges.map((range) => [range.id, emptyOddsBand()]),
+        ),
+        recalculatedAt: now,
+      },
+    ]),
   );
-  const odds = await getFixtureOddsForFixtures(fixtures.map((fixture) => fixture.fixture.id));
-  const oddsByFixtureId = new Map(odds.map((fixtureOdds) => [fixtureOdds.fixtureId, fixtureOdds]));
+  const odds = await getFixtureOddsForFixtures(
+    fixtures.map((fixture) => fixture.fixture.id),
+  );
+  const oddsByFixtureId = new Map(
+    odds.map((fixtureOdds) => [fixtureOdds.fixtureId, fixtureOdds]),
+  );
   const leagueRates = createLeagueRateAccumulator();
   let currentKickoffTimestamp: number | null = null;
   let fixturesAtCurrentKickoff: FinishedFixtureWithStatsSnapshot[] = [];
   for (const fixture of fixtures) {
-    if (currentKickoffTimestamp !== null && fixture.fixture.timestamp !== currentKickoffTimestamp) {
+    if (
+      currentKickoffTimestamp !== null &&
+      fixture.fixture.timestamp !== currentKickoffTimestamp
+    ) {
       for (const completedFixture of fixturesAtCurrentKickoff) {
         addCompletedFixtureToLeagueRate(leagueRates, completedFixture);
       }
@@ -259,18 +335,41 @@ async function createStrategyPerformances(
     const date = new Date(fixture.fixture.timestamp * 1000);
     const week = getUkWeekStartDateKey(date);
     const month = getUkDateKey(date).slice(0, 7);
-    const record = (strategyId: string, matches: boolean, won: boolean, referenceOdd: number | null) => {
-      const oddsRangeIds = referenceOdd === null ? [] : getStrategyOddsRangeIds(referenceOdd);
-      if (!matches || referenceOdd === null || oddsRangeIds.length === 0) return;
+    const record = (
+      strategyId: string,
+      matches: boolean,
+      won: boolean,
+      referenceOdd: number | null,
+    ) => {
+      const oddsRangeIds =
+        referenceOdd === null ? [] : getStrategyOddsRangeIds(referenceOdd);
+      if (!matches || referenceOdd === null || oddsRangeIds.length === 0)
+        return;
       const performance = performances.get(strategyId)!;
       addStrategyResult(performance.seasonPerformance, won, referenceOdd);
-      addStrategyResult(getPeriodTotals(performance.weeks, week), won, referenceOdd);
-      addStrategyResult(getPeriodTotals(performance.months, month), won, referenceOdd);
+      addStrategyResult(
+        getPeriodTotals(performance.weeks, week),
+        won,
+        referenceOdd,
+      );
+      addStrategyResult(
+        getPeriodTotals(performance.months, month),
+        won,
+        referenceOdd,
+      );
       for (const oddsRangeId of oddsRangeIds) {
         const oddsBand = performance.oddsBands[oddsRangeId];
         addStrategyResult(oddsBand.seasonPerformance, won, referenceOdd);
-        addStrategyResult(getPeriodTotals(oddsBand.weeks, week), won, referenceOdd);
-        addStrategyResult(getPeriodTotals(oddsBand.months, month), won, referenceOdd);
+        addStrategyResult(
+          getPeriodTotals(oddsBand.weeks, week),
+          won,
+          referenceOdd,
+        );
+        addStrategyResult(
+          getPeriodTotals(oddsBand.months, month),
+          won,
+          referenceOdd,
+        );
       }
     };
 
@@ -295,6 +394,20 @@ async function createStrategyPerformances(
         over2_5ReferenceOdd,
       );
     }
+
+		const over3_5Won =
+			fixture.goals.home !== null &&
+			fixture.goals.away !== null &&
+			fixture.goals.home + fixture.goals.away > 3;
+		const over3_5ReferenceOdd = getOver3_5ReferenceOdd(storedOdds.odds);
+		for (const variation of over3_5StrategyVariations) {
+			record(
+				variation.id,
+				matchesOver3_5StrategyVariation(snapshot, variation),
+				over3_5Won,
+				over3_5ReferenceOdd,
+			);
+		}
 
     const under2_5Won =
       fixture.goals.home !== null &&
@@ -324,21 +437,48 @@ async function createStrategyPerformances(
       );
     }
 
-    const under1_5Won = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home + fixture.goals.away < 2;
+    const under1_5Won =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home + fixture.goals.away < 2;
     const under1_5ReferenceOdd = getUnder1_5ReferenceOdd(storedOdds.odds);
     for (const variation of under1_5StrategyVariations) {
-      record(variation.id, matchesUnder1_5StrategyVariation(snapshot, variation), under1_5Won, under1_5ReferenceOdd);
+      record(
+        variation.id,
+        matchesUnder1_5StrategyVariation(snapshot, variation),
+        under1_5Won,
+        under1_5ReferenceOdd,
+      );
     }
 
-    const over0_5Won = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home + fixture.goals.away > 0;
+    const over0_5Won =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home + fixture.goals.away > 0;
     const over0_5ReferenceOdd = getOver0_5ReferenceOdd(storedOdds.odds);
     for (const variation of over0_5StrategyVariations) {
-      record(variation.id, matchesOver0_5StrategyVariation(snapshot, variation), over0_5Won, over0_5ReferenceOdd);
+      record(
+        variation.id,
+        matchesOver0_5StrategyVariation(snapshot, variation),
+        over0_5Won,
+        over0_5ReferenceOdd,
+      );
     }
 
     const leagueRateContext = toLeagueRateContext(leagueRates);
-    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'over2_5')) {
-      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), over2_5Won, over2_5ReferenceOdd);
+    for (const variation of leagueRateStrategyVariations.filter(
+      (item) => item.market === "over2_5",
+    )) {
+      record(
+        variation.id,
+        matchesLeagueRateStrategyVariation(
+          snapshot,
+          leagueRateContext,
+          variation,
+        ),
+        over2_5Won,
+        over2_5ReferenceOdd,
+      );
     }
 
     const over1_5Won =
@@ -354,11 +494,26 @@ async function createStrategyPerformances(
         over1_5ReferenceOdd,
       );
     }
-    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'over1_5')) {
-      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), over1_5Won, over1_5ReferenceOdd);
+    for (const variation of leagueRateStrategyVariations.filter(
+      (item) => item.market === "over1_5",
+    )) {
+      record(
+        variation.id,
+        matchesLeagueRateStrategyVariation(
+          snapshot,
+          leagueRateContext,
+          variation,
+        ),
+        over1_5Won,
+        over1_5ReferenceOdd,
+      );
     }
 
-    const bttsWon = fixture.goals.home !== null && fixture.goals.away !== null && fixture.goals.home > 0 && fixture.goals.away > 0;
+    const bttsWon =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home > 0 &&
+      fixture.goals.away > 0;
     const bttsReferenceOdd = getBttsYesReferenceOdd(storedOdds.odds);
     for (const variation of bttsStrategyVariations) {
       record(
@@ -368,11 +523,25 @@ async function createStrategyPerformances(
         bttsReferenceOdd,
       );
     }
-    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'btts')) {
-      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), bttsWon, bttsReferenceOdd);
+    for (const variation of leagueRateStrategyVariations.filter(
+      (item) => item.market === "btts",
+    )) {
+      record(
+        variation.id,
+        matchesLeagueRateStrategyVariation(
+          snapshot,
+          leagueRateContext,
+          variation,
+        ),
+        bttsWon,
+        bttsReferenceOdd,
+      );
     }
 
-    const bttnsWon = fixture.goals.home !== null && fixture.goals.away !== null && (fixture.goals.home === 0 || fixture.goals.away === 0);
+    const bttnsWon =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      (fixture.goals.home === 0 || fixture.goals.away === 0);
     const bttnsReferenceOdd = getBttsNoReferenceOdd(storedOdds.odds);
     for (const variation of bttnsStrategyVariations) {
       record(
@@ -382,8 +551,19 @@ async function createStrategyPerformances(
         bttnsReferenceOdd,
       );
     }
-    for (const variation of leagueRateStrategyVariations.filter((item) => item.market === 'bttns')) {
-      record(variation.id, matchesLeagueRateStrategyVariation(snapshot, leagueRateContext, variation), bttnsWon, bttnsReferenceOdd);
+    for (const variation of leagueRateStrategyVariations.filter(
+      (item) => item.market === "bttns",
+    )) {
+      record(
+        variation.id,
+        matchesLeagueRateStrategyVariation(
+          snapshot,
+          leagueRateContext,
+          variation,
+        ),
+        bttnsWon,
+        bttnsReferenceOdd,
+      );
     }
 
     fixturesAtCurrentKickoff.push(fixture);

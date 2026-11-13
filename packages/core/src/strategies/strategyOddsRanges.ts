@@ -10,6 +10,7 @@ const ranges = [
 	{ id: '1-1.69', label: '1.00 – 1.69', minimum: 1, maximum: 1.7 },
 	{ id: '1.70-1.99', label: '1.70 – 1.99', minimum: 1.7, maximum: 2 },
 	{ id: '2.00-2.49', label: '2.00 – 2.49', minimum: 2, maximum: 2.5 },
+	{ id: '2.20-2.49', label: '2.20 – 2.49', minimum: 2.2, maximum: 2.5 },
 	{ id: '2.50-2.99', label: '2.50 – 2.99', minimum: 2.5, maximum: 3 },
 	{ id: '3.00+', label: '3.00+', minimum: 3, maximum: Number.POSITIVE_INFINITY }
 ] as const;
@@ -24,6 +25,11 @@ export const over0_5OddsRanges = [
 ] as const;
 export const over1_5OddsRanges = ranges.slice(4, 8);
 export const under3_5OddsRanges = ranges.slice(5, 8);
+export const over3_5OddsRanges = [
+	{ id: '2.20-2.49', label: '2.20 – 2.49' },
+	{ id: '2.50-2.99', label: '2.50 – 2.99' },
+	{ id: '3.00+', label: '3.00+' },
+] as const;
 export const over2_5OddsRanges = ranges.slice(8);
 export const under1_5OddsRanges = ranges.slice(12);
 export const strategyOddsRanges = ranges;

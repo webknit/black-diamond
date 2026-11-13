@@ -7,6 +7,7 @@ import {
   over0_5StrategyVariations,
   over1_5StrategyVariations,
   over2_5RateStrategyVariations,
+	over3_5StrategyVariations,
   sumOddsBandPerformance,
   teamFilterVariations,
   under1_5StrategyVariations,
@@ -19,6 +20,7 @@ const minimumLeagueBets = 20;
 
 type MarketKey =
   | "over2_5"
+	| "over3_5"
   | "under2_5"
 	| "under3_5"
   | "over1_5"
@@ -39,6 +41,7 @@ const marketDetails: Record<
   Pick<StrategyDefinition, "market" | "href">
 > = {
   over2_5: { market: "Over 2.5 goals", href: "/strategies/over-2-5" },
+	over3_5: { market: "Over 3.5 goals", href: "/strategies/over-3-5" },
   under2_5: { market: "Under 2.5 goals", href: "/strategies/under-2-5" },
 	under3_5: { market: "Under 3.5 goals", href: "/strategies/under-3-5" },
   over1_5: { market: "Over 1.5 goals", href: "/strategies/over-1-5" },
@@ -65,6 +68,7 @@ const strategyDefinitions: StrategyDefinition[] = [
     "over2_5",
   ),
   ...withMarket(over2_5RateStrategyVariations, "over2_5"),
+	...withMarket(over3_5StrategyVariations, "over3_5"),
   ...withMarket(under2_5StrategyVariations, "under2_5"),
 	...withMarket(under3_5StrategyVariations, "under3_5"),
   ...withMarket(under1_5StrategyVariations, "under1_5"),
@@ -118,6 +122,7 @@ export async function load() {
 
   const marketMinimumOdds = [
     { label: "Over/Under 2.5, BTTS & BTNTS", minimumOdds: getBettableMinimumOdds("over2_5") },
+		{ label: "Over 3.5", minimumOdds: getBettableMinimumOdds("over3_5") },
     { label: "Over 1.5", minimumOdds: getBettableMinimumOdds("over1_5") },
     { label: "Over 0.5", minimumOdds: getBettableMinimumOdds("over0_5") },
 		{ label: "Under 3.5", minimumOdds: getBettableMinimumOdds("under3_5") },

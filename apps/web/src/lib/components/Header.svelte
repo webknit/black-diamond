@@ -216,6 +216,11 @@
 						{:else}
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/over-2-5" onclick={() => (strategiesMenuOpen = false)}>Over 2.5 goals</a>
 						{/if}
+						{#if page.url.pathname === '/strategies/over-3-5'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Over 3.5 goals</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/over-3-5" onclick={() => (strategiesMenuOpen = false)}>Over 3.5 goals</a>
+						{/if}
 						{#if page.url.pathname === '/strategies/over-1-5'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Over 1.5 goals</span>
 						{:else}
@@ -283,7 +288,7 @@
 					</svg>
 				</button>
 				{#if leaguesMenuOpen}
-					<div class="absolute left-0 top-full z-20 mt-2 w-40 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+					<div class="absolute left-0 top-full z-20 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
 					{#if page.url.pathname === '/league-standings'}
 						<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">
 							League standings
@@ -309,6 +314,14 @@
 						>
 							League stats
 						</a>
+					{/if}
+					{#if page.data.account}
+						<div class="my-1 border-t border-slate-100"></div>
+						{#if page.url.pathname === '/league-bets'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">League bets</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/league-bets" onclick={() => (leaguesMenuOpen = false)}>League bets</a>
+						{/if}
 					{/if}
 					</div>
 				{/if}

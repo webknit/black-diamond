@@ -5,6 +5,8 @@
 	type BetSummary = {
 		id: string;
 		stake: number;
+		status: 'pending' | 'won' | 'lost' | 'void';
+		profit: number | null;
 		placedAt: string;
 		settledAt: string | null;
 		selections: { homeTeamName: string; awayTeamName: string; market: string }[];
@@ -24,7 +26,7 @@
 		currency: string;
 	} = $props();
 
-	let period = $state<'week' | 'year'>('week');
+	let period = $state<'days' | 'weeks' | 'month' | 'year'>('days');
 	let selectedKey = $state(getUkDateKey(new Date()));
 
 	function formatCurrency(value: number) {
@@ -35,9 +37,48 @@
 		}).format(value);
 	}
 
-	function getBucketKey(date: Date, view: 'week' | 'year'): string {
+	function ordinal(day: number) {
+		const remainder = day % 100;
+		if (remainder >= 11 && remainder <= 13) return `${day}th`;
+		return `${day}${day % 10 === 1 ? 'st' : day % 10 === 2 ? 'nd' : day % 10 === 3 ? 'rd' : 'th'}`;
+	}
+
+	function formatDayLabel(date: Date) {
+		const weekday = new Intl.DateTimeFormat('en-GB', {
+			timeZone: 'Europe/London',
+			weekday: 'short'
+		}).format(date);
+		const month = new Intl.DateTimeFormat('en-GB', {
+			timeZone: 'Europe/London',
+			month: 'short'
+		}).format(date);
+		return `${weekday} ${ordinal(date.getUTCDate())} ${month}`;
+	}
+
+	function getWeekStartKey(date: Date) {
 		const dateKey = getUkDateKey(date);
-		return view === 'week' ? dateKey : dateKey.slice(0, 7);
+		const weekStart = new Date(`${dateKey}T12:00:00.000Z`);
+		weekStart.setUTCDate(weekStart.getUTCDate() - ((weekStart.getUTCDay() + 6) % 7));
+		return weekStart.toISOString().slice(0, 10);
+	}
+
+	function formatWeekRange(weekStart: Date) {
+		const weekEnd = new Date(weekStart);
+		weekEnd.setUTCDate(weekEnd.getUTCDate() + 6);
+		const formatter = new Intl.DateTimeFormat('en-GB', {
+			timeZone: 'Europe/London',
+			day: 'numeric',
+			month: 'short'
+		});
+		return `${formatter.format(weekStart)} – ${formatter.format(weekEnd)}`;
+	}
+
+	function getBucketKey(date: Date, view: 'days' | 'weeks' | 'month' | 'year'): string {
+		const dateKey = getUkDateKey(date);
+		if (view === 'days') return dateKey;
+		if (view === 'weeks') return getWeekStartKey(date);
+		if (view === 'month') return dateKey.slice(0, 7);
+		return dateKey.slice(0, 4);
 	}
 
 	function getBankrollAt(balance: number, asOf: string): number {
@@ -51,24 +92,31 @@
 		return balance + outstandingStake;
 	}
 
-	function buildPoints(view: 'week' | 'year'): Point[] {
+	function buildPoints(view: 'days' | 'weeks' | 'month' | 'year'): Point[] {
 		const today = getUkDateKey(new Date());
 		const buckets: { key: string; label: string }[] = [];
-		if (view === 'week') {
+		if (view === 'days') {
 			const date = new Date(`${today}T12:00:00.000Z`);
 			date.setUTCDate(date.getUTCDate() - 6);
 			for (let day = 0; day < 7; day++) {
 				const key = date.toISOString().slice(0, 10);
 				buckets.push({
 					key,
-					label: new Intl.DateTimeFormat('en-GB', {
-						timeZone: 'Europe/London',
-						weekday: 'short'
-					}).format(date)
+					label: formatDayLabel(date)
 				});
 				date.setUTCDate(date.getUTCDate() + 1);
 			}
-		} else {
+		} else if (view === 'weeks') {
+			const date = new Date(`${getWeekStartKey(new Date())}T12:00:00.000Z`);
+			date.setUTCDate(date.getUTCDate() - 9 * 7);
+			for (let week = 0; week < 10; week++) {
+				buckets.push({
+					key: date.toISOString().slice(0, 10),
+					label: formatWeekRange(date)
+				});
+				date.setUTCDate(date.getUTCDate() + 7);
+			}
+		} else if (view === 'month') {
 			const currentMonth = new Date(`${today.slice(0, 7)}-01T12:00:00.000Z`);
 			currentMonth.setUTCMonth(currentMonth.getUTCMonth() - 11);
 			for (let month = 0; month < 12; month++) {
@@ -83,10 +131,18 @@
 				});
 				currentMonth.setUTCMonth(currentMonth.getUTCMonth() + 1);
 			}
+		} else {
+			const firstYear = transactions[0]
+				? Number(getUkDateKey(new Date(transactions[0].occurredAt)).slice(0, 4))
+				: Number(today.slice(0, 4));
+			const currentYear = Number(today.slice(0, 4));
+			for (let year = firstYear; year <= currentYear; year++) {
+				buckets.push({ key: String(year), label: String(year) });
+			}
 		}
 
 		if (transactions.length === 0) {
-			const currentKey = view === 'week' ? today : today.slice(0, 7);
+			const currentKey = view === 'days' ? today : view === 'weeks' ? getWeekStartKey(new Date()) : view === 'month' ? today.slice(0, 7) : today.slice(0, 4);
 			return buckets.map((bucket) => ({
 				...bucket,
 				balance: bucket.key === currentKey ? getBankrollAt(currentBalance, new Date().toISOString()) : null,
@@ -154,12 +210,27 @@
 			(transaction) => getBucketKey(new Date(transaction.occurredAt), period) === selectedKey
 		)
 	);
+	const selectedBets = $derived(
+		bets.filter((bet) => getBucketKey(new Date(bet.placedAt), period) === selectedKey)
+	);
+	const selectedStake = $derived(selectedBets.reduce((total, bet) => total + bet.stake, 0));
+	const selectedSettledBets = $derived(
+		bets.filter(
+			(bet) =>
+				bet.settledAt !== null &&
+				getBucketKey(new Date(bet.settledAt), period) === selectedKey &&
+				bet.profit !== null
+		)
+	);
+	const selectedProfit = $derived(
+		selectedSettledBets.reduce((total, bet) => total + (bet.profit ?? 0), 0)
+	);
 	const betsById = $derived(new Map(bets.map((bet) => [bet.id, bet])));
 
-	function selectPeriod(nextPeriod: 'week' | 'year') {
+	function selectPeriod(nextPeriod: 'days' | 'weeks' | 'month' | 'year') {
 		period = nextPeriod;
 		const today = getUkDateKey(new Date());
-		selectedKey = nextPeriod === 'week' ? today : today.slice(0, 7);
+		selectedKey = nextPeriod === 'days' ? today : nextPeriod === 'weeks' ? getWeekStartKey(new Date()) : nextPeriod === 'month' ? today.slice(0, 7) : today.slice(0, 4);
 	}
 
 	function transactionLabel(transaction: BalanceTransaction): string {
@@ -191,11 +262,29 @@
 			<button
 				type="button"
 				class="rounded-md px-3 py-1.5 text-xs font-semibold"
-				class:bg-white={period === 'week'}
-				class:text-slate-950={period === 'week'}
-				class:text-slate-600={period !== 'week'}
-				aria-pressed={period === 'week'}
-				onclick={() => selectPeriod('week')}>Week</button
+				class:bg-white={period === 'days'}
+				class:text-slate-950={period === 'days'}
+				class:text-slate-600={period !== 'days'}
+				aria-pressed={period === 'days'}
+				onclick={() => selectPeriod('days')}>Days</button
+			>
+			<button
+				type="button"
+				class="rounded-md px-3 py-1.5 text-xs font-semibold"
+				class:bg-white={period === 'weeks'}
+				class:text-slate-950={period === 'weeks'}
+				class:text-slate-600={period !== 'weeks'}
+				aria-pressed={period === 'weeks'}
+				onclick={() => selectPeriod('weeks')}>Weeks</button
+			>
+			<button
+				type="button"
+				class="rounded-md px-3 py-1.5 text-xs font-semibold"
+				class:bg-white={period === 'month'}
+				class:text-slate-950={period === 'month'}
+				class:text-slate-600={period !== 'month'}
+				aria-pressed={period === 'month'}
+				onclick={() => selectPeriod('month')}>Month</button
 			>
 			<button
 				type="button"
@@ -219,7 +308,7 @@
 				<circle cx={point.x} cy={point.y} r="4" fill="#047857" />
 			{/each}
 		</svg>
-		<div class="grid gap-1" class:grid-cols-7={period === 'week'} class:grid-cols-6={period === 'year'}>
+		<div class="grid gap-1" class:grid-cols-7={period === 'days'} class:grid-cols-5={period === 'weeks'} class:grid-cols-6={period === 'month'} class:grid-cols-4={period === 'year'}>
 			{#each points as point (point.key)}
 				<button
 					type="button"
@@ -241,8 +330,22 @@
 
 	<div class="mt-4 border-t border-slate-100 pt-3">
 		<h3 class="text-xs font-semibold text-slate-800">
-			{period === 'week' ? 'Activity on selected day' : 'Activity in selected month'}
+			{period === 'days' ? 'Activity on selected day' : period === 'weeks' ? 'Activity in selected week' : period === 'month' ? 'Activity in selected month' : 'Activity in selected year'}
 		</h3>
+		<div class="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-3" aria-label="Selected period summary">
+			<div class="rounded-md bg-slate-50 px-2.5 py-2">
+				<p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Bets placed</p>
+				<p class="mt-0.5 text-sm font-semibold tabular-nums text-slate-950">{selectedBets.length}</p>
+			</div>
+			<div class="rounded-md bg-slate-50 px-2.5 py-2">
+				<p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Staked</p>
+				<p class="mt-0.5 text-sm font-semibold tabular-nums text-slate-950">{formatCurrency(selectedStake)}</p>
+			</div>
+			<div class="rounded-md bg-slate-50 px-2.5 py-2">
+				<p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Settled P/L</p>
+				<p class="mt-0.5 text-sm font-semibold tabular-nums" class:text-emerald-700={selectedProfit >= 0} class:text-rose-700={selectedProfit < 0}>{selectedSettledBets.length === 0 ? '–' : formatCurrency(selectedProfit)}</p>
+			</div>
+		</div>
 		{#if selectedTransactions.length > 0}
 			<ul class="mt-2 space-y-2">
 				{#each selectedTransactions as transaction (transaction.id)}

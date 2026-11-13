@@ -6,6 +6,7 @@ import {
 	leagueRateStrategyVariations,
 	over1_5StrategyVariations,
 	over2_5RateStrategyVariations,
+	over3_5StrategyVariations,
 	under2_5StrategyVariations,
 	under3_5StrategyVariations,
 	under1_5StrategyVariations,
@@ -20,12 +21,13 @@ type StrategyDefinition = {
 	id: string;
 	title: string;
 	description: string;
-	market: 'Over 2.5 goals' | 'Under 3.5 goals' | 'Under 2.5 goals' | 'Over 1.5 goals' | 'Under 1.5 goals' | 'Over 0.5 goals' | 'BTTS' | 'BTNTS';
+	market: 'Over 2.5 goals' | 'Over 3.5 goals' | 'Under 3.5 goals' | 'Under 2.5 goals' | 'Over 1.5 goals' | 'Under 1.5 goals' | 'Over 0.5 goals' | 'BTTS' | 'BTNTS';
 	href: string;
 };
 
 const marketDetails = {
 	over2_5: { market: 'Over 2.5 goals', href: '/strategies/over-2-5' },
+	over3_5: { market: 'Over 3.5 goals', href: '/strategies/over-3-5' },
 	under2_5: { market: 'Under 2.5 goals', href: '/strategies/under-2-5' },
 	under3_5: { market: 'Under 3.5 goals', href: '/strategies/under-3-5' },
 	under1_5: { market: 'Under 1.5 goals', href: '/strategies/under-1-5' },
@@ -38,7 +40,7 @@ const marketDetails = {
 const minimumBetsForRanking = minimumStrategyBetsForRanking;
 
 function getMarketKey(market: StrategyDefinition['market']) {
-	return market === 'Over 0.5 goals' ? 'over0_5' : market === 'Over 1.5 goals' ? 'over1_5' : market === 'Under 1.5 goals' ? 'under1_5' : market === 'Under 2.5 goals' ? 'under2_5' : market === 'Under 3.5 goals' ? 'under3_5' : market === 'BTTS' ? 'btts' : market === 'BTNTS' ? 'bttns' : 'over2_5';
+	return market === 'Over 0.5 goals' ? 'over0_5' : market === 'Over 1.5 goals' ? 'over1_5' : market === 'Over 3.5 goals' ? 'over3_5' : market === 'Under 1.5 goals' ? 'under1_5' : market === 'Under 2.5 goals' ? 'under2_5' : market === 'Under 3.5 goals' ? 'under3_5' : market === 'BTTS' ? 'btts' : market === 'BTNTS' ? 'bttns' : 'over2_5';
 }
 
 const strategyDefinitions: StrategyDefinition[] = [
@@ -46,6 +48,7 @@ const strategyDefinitions: StrategyDefinition[] = [
 		.filter((strategy) => strategy.sample === 'last5')
 		.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
 	...over2_5RateStrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.over2_5 })),
+	...over3_5StrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.over3_5 })),
 	...under2_5StrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.under2_5 })),
 	...under3_5StrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.under3_5 })),
 	...under1_5StrategyVariations.map((strategy) => ({ ...strategy, ...marketDetails.under1_5 })),

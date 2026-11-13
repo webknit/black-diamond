@@ -1,7 +1,7 @@
 import type { FixtureStatsSnapshot } from '../types/fixtureStatsSnapshot.js';
 type Mode = 'bothTeams' | 'atLeastOneTeam';
 export type Over3_5StrategyVariation = { id: string; title: string; description: string; scoringThreshold?: number; defensiveThreshold?: number; mode?: Mode; over3_5RateThreshold?: number };
-const thresholds = [1.3, 1.5, 1.7] as const;
+const thresholds = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7] as const;
 const label = (mode: Mode) => mode === 'bothTeams' ? 'Both teams' : 'At least one team';
 const variation = (score: number | undefined, concede: number | undefined, mode: Mode): Over3_5StrategyVariation => {
 	const parts = [score === undefined ? null : `${label(mode)}: score >= ${score}`, concede === undefined ? null : `${label(mode)}: concede >= ${concede}`].filter((part): part is string => part !== null);

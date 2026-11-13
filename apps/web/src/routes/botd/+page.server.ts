@@ -5,7 +5,7 @@ import { actions, load as loadFixtures } from '../+page.server.js';
 
 export { actions };
 
-const markets: BotdMarket[] = ['over2_5', 'over1_5', 'over0_5', 'under3_5', 'under2_5', 'under1_5', 'btts', 'bttns'];
+const markets: BotdMarket[] = ['over2_5', 'over3_5', 'over1_5', 'over0_5', 'under3_5', 'under2_5', 'under1_5', 'btts', 'bttns'];
 
 function getSelectedDate(value: string | null) {
 	return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : getUkDateKey(new Date());

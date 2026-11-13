@@ -1,10 +1,9 @@
 import {
-	getBalanceHistoryByAccountId,
+	getBalanceTransactionsByAccountId,
 	getBalanceTransactionsPage
 } from '@black-diamond/database/balanceTransactions';
 import { getBetsByAccountId } from '@black-diamond/database/bets';
 import { redirect } from '@sveltejs/kit';
-import { getUkDateKey } from '#lib/utils/time/getUkDateKey.js';
 
 const pageSize = 25;
 
@@ -13,10 +12,8 @@ export async function load({ locals, url }: { locals: App.Locals; url: URL }) {
 
 	const requestedPage = Number(url.searchParams.get('page') ?? '1');
 	const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
-	const yearStart = new Date(`${getUkDateKey(new Date()).slice(0, 7)}-01T00:00:00.000Z`);
-	yearStart.setUTCMonth(yearStart.getUTCMonth() - 11);
 	const [historyTransactions, transactionPage, bets] = await Promise.all([
-		getBalanceHistoryByAccountId(locals.accountId, yearStart.toISOString()),
+		getBalanceTransactionsByAccountId(locals.accountId),
 		getBalanceTransactionsPage(locals.accountId, page, pageSize),
 		getBetsByAccountId(locals.accountId)
 	]);
@@ -46,6 +43,8 @@ export async function load({ locals, url }: { locals: App.Locals; url: URL }) {
 		bets: bets.map((bet) => ({
 			id: bet.id,
 			stake: bet.stake,
+			status: bet.status,
+			profit: bet.profit,
 			placedAt: bet.placedAt,
 			settledAt: bet.settledAt,
 			selections: bet.selections.map((selection) => ({
