@@ -5,13 +5,16 @@ import { getFixtureOddsForFixtures } from '@black-diamond/database/fixtureOdds';
 import { getFinishedFixturesWithStatsSnapshotsForLeagues } from '@black-diamond/database/fixtureStatsSnapshots';
 
 const batchSize = 2_000;
+const recentListingFixtureLimit = 500;
 type LeagueRate = { fixturesPlayed: number; over1_5Percentage: number; over2_5Percentage: number; bttsPercentage: number };
 type StrategyBet = { fixtureId: number; date: string; league: string; homeTeam: string; awayTeam: string; homeGoals: number | null; awayGoals: number | null; referenceOdd: number; won: boolean; profit: number };
 
 async function oddsInBatches(ids: number[]) {
-	const result = [];
-	for (let index = 0; index < ids.length; index += batchSize) result.push(...await getFixtureOddsForFixtures(ids.slice(index, index + batchSize)));
-	return result;
+	const batches = Array.from(
+		{ length: Math.ceil(ids.length / batchSize) },
+		(_, index) => ids.slice(index * batchSize, (index + 1) * batchSize)
+	);
+	return (await Promise.all(batches.map(getFixtureOddsForFixtures))).flat();
 }
 function rate(totals: { played: number; over15: number; over25: number; btts: number }): LeagueRate {
 	const percentage = (value: number) => totals.played ? value / totals.played * 100 : 0;
@@ -27,7 +30,10 @@ export async function load({ params }: { params: { market: string; strategyId: s
 	const strategy = botdStrategies.find((item) => item.id === params.strategyId && item.market.replaceAll('_', '-') === params.market);
 	if (!strategy) throw error(404, 'Strategy not found');
 	const minimumOdds = getBettableMinimumOdds(strategy.market);
-	const fixtures = await getFinishedFixturesWithStatsSnapshotsForLeagues(selectedLeagues.map((league) => league.id));
+	const fixtures = await getFinishedFixturesWithStatsSnapshotsForLeagues(
+		selectedLeagues.map((league) => league.id),
+		strategy.market === 'over3_5' ? recentListingFixtureLimit : undefined
+	);
 	const odds = await oddsInBatches(fixtures.map((fixture) => fixture.fixture.id));
 	const oddsById = new Map(odds.map((item) => [item.fixtureId, item]));
 	const bets: StrategyBet[] = [];

@@ -4,7 +4,7 @@ import { addStrategyResult, mergeIntoSummary } from './syncStrategyPerformances'
 
 function snapshot(homeRate = 60, awayRate = 60, homeGoals = 1.5, awayGoals = 1.5) {
 	const venue = (goals: number, rate: number) => ({ played: 5, goalsFor: goals * 5, goalsAgainst: goals * 5, summary: { over2_5: { percentage: rate } } });
-	return { home: { last5: { over2_5: { percentage: homeRate } }, last5Venue: venue(homeGoals, homeRate), fixtures: { home: venue(homeGoals, homeRate) } }, away: { last5: { over2_5: { percentage: awayRate } }, last5Venue: venue(awayGoals, awayRate), fixtures: { away: venue(awayGoals, awayRate) } } } as never;
+	return { home: { last5: { over2_5: { percentage: homeRate } }, last5Venue: venue(homeGoals, homeRate), last3Venue: venue(homeGoals, homeRate), fixtures: { home: venue(homeGoals, homeRate) } }, away: { last5: { over2_5: { percentage: awayRate } }, last5Venue: venue(awayGoals, awayRate), last3Venue: venue(awayGoals, awayRate), fixtures: { away: venue(awayGoals, awayRate) } } } as never;
 }
 
 describe('Over 2.5 strategies', () => {

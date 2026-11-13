@@ -29,6 +29,7 @@ export function matchesOver2_5RateStrategyVariation(
 	const sample = variation.rateSample ?? 'allLast5';
 	if (sample === 'allLast5') return snapshot.home.last5.over2_5.percentage >= variation.over2_5RateThreshold && snapshot.away.last5.over2_5.percentage >= variation.over2_5RateThreshold;
 	const home = snapshot.home[sample]; const away = snapshot.away[sample];
+	if (!home || !away) return false;
 	if (home.played < (sample === 'last3Venue' ? 3 : 5) || away.played < (sample === 'last3Venue' ? 3 : 5)) return false;
 	return home.summary.over2_5.percentage >= variation.over2_5RateThreshold && away.summary.over2_5.percentage >= variation.over2_5RateThreshold;
 }

@@ -6,15 +6,11 @@ import { getFixtureStatsSnapshots } from "./getFixtureStatsSnapshots.js";
 const snapshotBatchSize = 2_000;
 
 async function getSnapshotsInBatches(fixtureIds: number[]) {
-  const snapshots: FixtureStatsSnapshot[] = [];
-  for (let index = 0; index < fixtureIds.length; index += snapshotBatchSize) {
-    snapshots.push(
-      ...(await getFixtureStatsSnapshots(
-        fixtureIds.slice(index, index + snapshotBatchSize),
-      )),
-    );
-  }
-  return snapshots;
+  const batches = Array.from(
+    { length: Math.ceil(fixtureIds.length / snapshotBatchSize) },
+    (_, index) => fixtureIds.slice(index * snapshotBatchSize, (index + 1) * snapshotBatchSize),
+  );
+  return (await Promise.all(batches.map(getFixtureStatsSnapshots))).flat();
 }
 
 export type FinishedFixtureWithStatsSnapshot = Fixture & {

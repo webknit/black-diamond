@@ -20,8 +20,11 @@ describe('Over 3.5 strategies', () => {
 		expect(matchesOver3_5StrategyVariation(snapshot(), strategy)).toBe(true);
 	});
 
-	it('uses all of the Under 3.5 threshold values as high-goal cut-offs', () => {
-		expect(over3_5StrategyVariations.map((strategy) => strategy.scoringThreshold).filter(Boolean)).toEqual(expect.arrayContaining([0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7]));
+	it('uses meaningful scoring, conceding, and total-goals thresholds', () => {
+		expect(over3_5StrategyVariations).toHaveLength(58);
+		expect(over3_5StrategyVariations.map((strategy) => strategy.scoringThreshold).filter(Boolean)).toEqual(expect.arrayContaining([1.5, 1.7, 2, 2.25, 2.5]));
+		expect(over3_5StrategyVariations.map((strategy) => strategy.defensiveThreshold).filter(Boolean)).toEqual(expect.arrayContaining([1.25, 1.5, 1.75]));
+		expect(over3_5StrategyVariations.map((strategy) => strategy.totalGoalsThreshold).filter(Boolean)).toEqual(expect.arrayContaining([2.5, 2.75, 3]));
 	});
 
 	it('requires both teams to meet an Over 3.5 hit-rate threshold', () => {
