@@ -3,7 +3,7 @@ import type { StrategyPerformanceTotals } from "../types/strategyPerformance.js"
 
 export const bettableMinimumOdds = {
   over2_5: 1.7,
-	 over3_5: 2.2,
+  over3_5: 2.2,
   under2_5: 1.7,
   under3_5: 1.3,
   btts: 1.7,
@@ -37,11 +37,11 @@ export function getBettableOddsBandIds(
       ? ["1.20-1.29", "1.30-1.39", "1.40-1.59", "1.60+"]
       : market === "under3_5"
         ? ["1.30-1.39", "1.40-1.59", "1.60+"]
-			: market === "over3_5"
-				? ["2.20-2.49", "2.50-2.99", "3.00+"]
-        : market === "under1_5"
-          ? ["3.00+"]
-          : ["1.70-1.99", "2.00-2.49", "2.50-2.99", "3.00+"];
+        : market === "over3_5"
+          ? ["2.20-2.49", "2.50-2.99", "3.00+"]
+          : market === "under1_5"
+            ? ["3.00+"]
+            : ["1.70-1.99", "2.00-2.49", "2.50-2.99", "3.00+"];
 }
 
 export function sumOddsBandPerformance(

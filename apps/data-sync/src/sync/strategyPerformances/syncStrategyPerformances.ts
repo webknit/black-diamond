@@ -27,8 +27,8 @@ import {
   bttsStrategyVariations,
   bttnsStrategyVariations,
   over2_5RateStrategyVariations,
-	 over3_5StrategyVariations,
-	 matchesOver3_5StrategyVariation,
+  over3_5StrategyVariations,
+  matchesOver3_5StrategyVariation,
   under2_5StrategyVariations,
   matchesUnder2_5StrategyVariation,
   under3_5StrategyVariations,
@@ -55,7 +55,7 @@ import {
 const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
   ...over2_5RateStrategyVariations.map((strategy) => strategy.id),
-	...over3_5StrategyVariations.map((strategy) => strategy.id),
+  ...over3_5StrategyVariations.map((strategy) => strategy.id),
   ...under2_5StrategyVariations.map((strategy) => strategy.id),
   ...under3_5StrategyVariations.map((strategy) => strategy.id),
   ...under1_5StrategyVariations.map((strategy) => strategy.id),
@@ -68,7 +68,7 @@ const strategyIds = [
 const strategyMarkets = new Map<
   string,
   | "over2_5"
-	| "over3_5"
+  | "over3_5"
   | "under3_5"
   | "under2_5"
   | "over1_5"
@@ -81,9 +81,9 @@ const strategyMarkets = new Map<
   ...over2_5RateStrategyVariations.map(
     (strategy) => [strategy.id, "over2_5"] as const,
   ),
-	...over3_5StrategyVariations.map(
-		(strategy) => [strategy.id, "over3_5"] as const,
-	),
+  ...over3_5StrategyVariations.map(
+    (strategy) => [strategy.id, "over3_5"] as const,
+  ),
   ...under2_5StrategyVariations.map(
     (strategy) => [strategy.id, "under2_5"] as const,
   ),
@@ -395,19 +395,19 @@ async function createStrategyPerformances(
       );
     }
 
-		const over3_5Won =
-			fixture.goals.home !== null &&
-			fixture.goals.away !== null &&
-			fixture.goals.home + fixture.goals.away > 3;
-		const over3_5ReferenceOdd = getOver3_5ReferenceOdd(storedOdds.odds);
-		for (const variation of over3_5StrategyVariations) {
-			record(
-				variation.id,
-				matchesOver3_5StrategyVariation(snapshot, variation),
-				over3_5Won,
-				over3_5ReferenceOdd,
-			);
-		}
+    const over3_5Won =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home + fixture.goals.away > 3;
+    const over3_5ReferenceOdd = getOver3_5ReferenceOdd(storedOdds.odds);
+    for (const variation of over3_5StrategyVariations) {
+      record(
+        variation.id,
+        matchesOver3_5StrategyVariation(snapshot, variation),
+        over3_5Won,
+        over3_5ReferenceOdd,
+      );
+    }
 
     const under2_5Won =
       fixture.goals.home !== null &&
