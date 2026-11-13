@@ -154,11 +154,11 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
         .sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
         .slice(-5),
     );
-		const last3Venue = record(
-			[...(venue === "home" ? home : away)]
-				.sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
-				.slice(-3),
-		);
+    const last3Venue = record(
+      [...(venue === "home" ? home : away)]
+        .sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)
+        .slice(-3),
+    );
     return {
       team: { id: team.id, name: team.name, logo: team.logo },
       leaguePosition: leaguePositions.get(team.id) ?? null,
@@ -169,7 +169,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
       formAway: form(away),
       fixtures: { home: h, away: a, total },
       last5Venue,
-			last3Venue,
+      last3Venue,
       cleanSheets: { home: h.cs, away: a.cs, total: total.cs },
       failedToScore: { home: h.fts, away: a.fts, total: total.fts },
       summary: total.summary,

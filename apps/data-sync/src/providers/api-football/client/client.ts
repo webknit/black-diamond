@@ -3,7 +3,7 @@ import { createRateLimiter } from "./rateLimiter.js";
 const API_FOOTBALL_BASE_URL = "https://v3.football.api-sports.io";
 // Leave room below the provider limit for another scheduled job that happens
 // to overlap briefly with this process.
-const REQUEST_INTERVAL_MS = 1000 / 4;
+const REQUEST_INTERVAL_MS = 1000 / 3;
 const MAX_RATE_LIMIT_RETRIES = 3;
 const DEFAULT_RATE_LIMIT_RETRY_MS = 10_000;
 
