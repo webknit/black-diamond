@@ -33,6 +33,11 @@ export {
   matchesUnder2_5StrategyVariation,
   type Under2_5StrategyVariation,
 } from "./under2_5Strategies.js";
+export {
+	under3_5StrategyVariations,
+	matchesUnder3_5StrategyVariation,
+	type Under3_5StrategyVariation,
+} from "./under3_5Strategies.js";
 export { under1_5StrategyVariations, matchesUnder1_5StrategyVariation, type Under1_5StrategyVariation } from "./under1_5Strategies.js";
 export { over0_5StrategyVariations, matchesOver0_5StrategyVariation, type Over0_5StrategyVariation } from "./over0_5Strategies.js";
 export {
@@ -51,6 +56,7 @@ export {
   getStrategyOddsRangeIds,
   over1_5OddsRanges,
 	under1_5OddsRanges,
+	under3_5OddsRanges,
 
   over0_5OddsRanges,
   over2_5OddsRanges,
@@ -77,6 +83,11 @@ export function getOver2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number 
 export function getUnder2_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
   const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
   const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "under 2.5")?.odd);
+  return Number.isFinite(odd) && odd > 1 ? odd : null;
+}
+export function getUnder3_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {
+  const market = odds.find((item) => ["goals over/under", "goals over under"].includes(item.name.trim().toLowerCase()));
+  const odd = Number(market?.values.find((item) => item.value.trim().toLowerCase() === "under 3.5")?.odd);
   return Number.isFinite(odd) && odd > 1 ? odd : null;
 }
 export function getUnder1_5ReferenceOdd(odds: ReadonlyArray<OddsMarket>): number | null {

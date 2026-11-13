@@ -227,6 +227,11 @@
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/over-0-5" onclick={() => (strategiesMenuOpen = false)}>Over 0.5 goals</a>
 						{/if}
 						<div class="my-1 border-t border-slate-100"></div>
+						{#if page.url.pathname === '/strategies/under-3-5'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Under 3.5 goals</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/under-3-5" onclick={() => (strategiesMenuOpen = false)}>Under 3.5 goals</a>
+						{/if}
 						{#if page.url.pathname === '/strategies/under-2-5'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Under 2.5 goals</span>
 						{:else}

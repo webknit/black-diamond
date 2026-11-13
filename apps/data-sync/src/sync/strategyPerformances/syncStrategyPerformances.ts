@@ -15,6 +15,7 @@ import {
   getOver1_5ReferenceOdd,
   getOver2_5ReferenceOdd,
 	getUnder2_5ReferenceOdd,
+	getUnder3_5ReferenceOdd,
 	getUnder1_5ReferenceOdd,
 	getOver0_5ReferenceOdd,
 	getBettableOddsBandIds,
@@ -30,6 +31,8 @@ import {
 	 over2_5RateStrategyVariations,
 	 under2_5StrategyVariations,
 	 matchesUnder2_5StrategyVariation,
+	under3_5StrategyVariations,
+	matchesUnder3_5StrategyVariation,
 	 under1_5StrategyVariations,
 	 matchesUnder1_5StrategyVariation,
 	 over0_5StrategyVariations,
@@ -53,6 +56,7 @@ const strategyIds = [
   ...teamFilterVariations.map((strategy) => strategy.id),
   ...over2_5RateStrategyVariations.map((strategy) => strategy.id),
   ...under2_5StrategyVariations.map((strategy) => strategy.id),
+  ...under3_5StrategyVariations.map((strategy) => strategy.id),
   ...under1_5StrategyVariations.map((strategy) => strategy.id),
   ...over0_5StrategyVariations.map((strategy) => strategy.id),
   ...over1_5StrategyVariations.map((strategy) => strategy.id),
@@ -60,11 +64,12 @@ const strategyIds = [
   ...bttnsStrategyVariations.map((strategy) => strategy.id),
   ...leagueRateStrategyVariations.map((strategy) => strategy.id),
 ];
-const strategyMarkets = new Map<string, "over2_5" | "under2_5" | "over1_5" | "under1_5" | "over0_5" | "btts" | "bttns">(
+const strategyMarkets = new Map<string, "over2_5" | "under3_5" | "under2_5" | "over1_5" | "under1_5" | "over0_5" | "btts" | "bttns">(
 	[
 		...teamFilterVariations.map((strategy) => [strategy.id, "over2_5"] as const),
 		...over2_5RateStrategyVariations.map((strategy) => [strategy.id, "over2_5"] as const),
 		...under2_5StrategyVariations.map((strategy) => [strategy.id, "under2_5"] as const),
+		...under3_5StrategyVariations.map((strategy) => [strategy.id, "under3_5"] as const),
 		...under1_5StrategyVariations.map((strategy) => [strategy.id, "under1_5"] as const),
 		...over0_5StrategyVariations.map((strategy) => [strategy.id, "over0_5"] as const),
 		...over1_5StrategyVariations.map((strategy) => [strategy.id, "over1_5"] as const),
@@ -302,6 +307,20 @@ async function createStrategyPerformances(
         matchesUnder2_5StrategyVariation(snapshot, variation),
         under2_5Won,
         under2_5ReferenceOdd,
+      );
+    }
+
+    const under3_5Won =
+      fixture.goals.home !== null &&
+      fixture.goals.away !== null &&
+      fixture.goals.home + fixture.goals.away < 4;
+    const under3_5ReferenceOdd = getUnder3_5ReferenceOdd(storedOdds.odds);
+    for (const variation of under3_5StrategyVariations) {
+      record(
+        variation.id,
+        matchesUnder3_5StrategyVariation(snapshot, variation),
+        under3_5Won,
+        under3_5ReferenceOdd,
       );
     }
 

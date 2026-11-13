@@ -1,0 +1,62 @@
+import type { FixtureStatsSnapshot } from '../types/fixtureStatsSnapshot.js';
+
+type TeamMode = 'bothTeams' | 'atLeastOneTeam';
+
+export type Under3_5StrategyVariation = {
+	id: string;
+	title: string;
+	description: string;
+	scoringThreshold?: number;
+	defensiveThreshold?: number;
+	mode?: TeamMode;
+	under3_5RateThreshold?: number;
+};
+
+const thresholds = [0.5, 0.7, 0.9, 1.1, 1.3, 1.5, 1.7] as const;
+const label = (mode: TeamMode) => mode === 'bothTeams' ? 'Both teams' : 'At least one team';
+
+function createVariation(scoringThreshold: number | undefined, defensiveThreshold: number | undefined, mode: TeamMode): Under3_5StrategyVariation {
+	const requirements = [
+		scoringThreshold === undefined ? null : `${label(mode)}: score <= ${scoringThreshold}`,
+		defensiveThreshold === undefined ? null : `${label(mode)}: concede <= ${defensiveThreshold}`
+	].filter((item): item is string => item !== null);
+	return {
+		id: `under3_5-${[scoringThreshold === undefined ? null : `score${scoringThreshold}`, defensiveThreshold === undefined ? null : `concede${defensiveThreshold}`, mode].filter(Boolean).join('-')}`,
+		title: requirements.join(' · '),
+		description: `Last 5 relevant-venue matches must meet: ${requirements.join('; ')}.`,
+		scoringThreshold,
+		defensiveThreshold,
+		mode
+	};
+}
+
+export const under3_5StrategyVariations: Under3_5StrategyVariation[] = [
+	{ id: 'under3_5-base', title: 'Base · no team filters', description: 'Every fixture with a stored pre-match Under 3.5 price above the odds floor.' },
+	...[40, 60, 80].map((threshold) => ({
+		id: `under3_5-rate${threshold}-last5`,
+		title: `Both teams: last 5 Under 3.5 >= ${threshold}%`,
+		description: `Each team had Under 3.5 goals in at least ${threshold}% of its previous 5 relevant-venue matches.`,
+		under3_5RateThreshold: threshold
+	})),
+	...thresholds.flatMap((threshold) => (['bothTeams', 'atLeastOneTeam'] as const).map((mode) => createVariation(threshold, undefined, mode))),
+	...thresholds.flatMap((threshold) => (['bothTeams', 'atLeastOneTeam'] as const).map((mode) => createVariation(undefined, threshold, mode))),
+	...thresholds.flatMap((threshold) => (['bothTeams', 'atLeastOneTeam'] as const).map((mode) => createVariation(threshold, threshold, mode)))
+];
+
+function average(goals: number, played: number) { return played === 0 ? null : goals / played; }
+function meets(values: Array<number | null>, threshold: number, mode: TeamMode) {
+	if (values.some((value) => value === null)) return false;
+	return mode === 'bothTeams' ? values.every((value) => value! <= threshold) : values.some((value) => value! <= threshold);
+}
+
+export function matchesUnder3_5StrategyVariation(snapshot: FixtureStatsSnapshot, variation: Under3_5StrategyVariation) {
+	const home = snapshot.home.last5Venue;
+	const away = snapshot.away.last5Venue;
+	if (variation.under3_5RateThreshold === undefined && variation.scoringThreshold === undefined && variation.defensiveThreshold === undefined) return true;
+	if (home.played !== 5 || away.played !== 5) return false;
+	if (variation.under3_5RateThreshold !== undefined && (home.summary.under3_5.percentage < variation.under3_5RateThreshold || away.summary.under3_5.percentage < variation.under3_5RateThreshold)) return false;
+	const mode = variation.mode ?? 'bothTeams';
+	if (variation.scoringThreshold !== undefined && !meets([average(home.goalsFor, home.played), average(away.goalsFor, away.played)], variation.scoringThreshold, mode)) return false;
+	if (variation.defensiveThreshold !== undefined && !meets([average(home.goalsAgainst, home.played), average(away.goalsAgainst, away.played)], variation.defensiveThreshold, mode)) return false;
+	return true;
+}

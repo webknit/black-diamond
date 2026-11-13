@@ -11,6 +11,7 @@ import {
   teamFilterVariations,
   under1_5StrategyVariations,
   under2_5StrategyVariations,
+	under3_5StrategyVariations,
 } from "@black-diamond/core/strategies";
 import { getStrategyPerformanceSeasonTotals } from "@black-diamond/database/strategyPerformances";
 
@@ -19,6 +20,7 @@ const minimumLeagueBets = 20;
 type MarketKey =
   | "over2_5"
   | "under2_5"
+	| "under3_5"
   | "over1_5"
   | "under1_5"
   | "over0_5"
@@ -38,6 +40,7 @@ const marketDetails: Record<
 > = {
   over2_5: { market: "Over 2.5 goals", href: "/strategies/over-2-5" },
   under2_5: { market: "Under 2.5 goals", href: "/strategies/under-2-5" },
+	under3_5: { market: "Under 3.5 goals", href: "/strategies/under-3-5" },
   over1_5: { market: "Over 1.5 goals", href: "/strategies/over-1-5" },
   under1_5: { market: "Under 1.5 goals", href: "/strategies/under-1-5" },
   over0_5: { market: "Over 0.5 goals", href: "/strategies/over-0-5" },
@@ -63,6 +66,7 @@ const strategyDefinitions: StrategyDefinition[] = [
   ),
   ...withMarket(over2_5RateStrategyVariations, "over2_5"),
   ...withMarket(under2_5StrategyVariations, "under2_5"),
+	...withMarket(under3_5StrategyVariations, "under3_5"),
   ...withMarket(under1_5StrategyVariations, "under1_5"),
   ...withMarket(over0_5StrategyVariations, "over0_5"),
   ...withMarket(over1_5StrategyVariations, "over1_5"),
@@ -116,6 +120,7 @@ export async function load() {
     { label: "Over/Under 2.5, BTTS & BTNTS", minimumOdds: getBettableMinimumOdds("over2_5") },
     { label: "Over 1.5", minimumOdds: getBettableMinimumOdds("over1_5") },
     { label: "Over 0.5", minimumOdds: getBettableMinimumOdds("over0_5") },
+		{ label: "Under 3.5", minimumOdds: getBettableMinimumOdds("under3_5") },
     { label: "Under 1.5", minimumOdds: getBettableMinimumOdds("under1_5") },
   ];
 
