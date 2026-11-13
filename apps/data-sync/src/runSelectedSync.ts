@@ -7,16 +7,16 @@ import {
   scheduledSyncRunNames,
   type ScheduledSyncRunName,
 } from "@black-diamond/database/syncRunStates";
-import { runDailySync } from "./runs/dailySync.js";
-import { runBackfill } from "./runs/backfill.js";
-import { runStrategyResultsBackfill } from "./runs/backfillStrategyResults.js";
-import { runFullSync } from "./runs/fullSync.js";
-import { runHourlySync } from "./runs/hourlySync.js";
-import { runLiveSync } from "./runs/liveSync.js";
-import { runThreeHourlySync } from "./runs/threeHourlySync.js";
-import { runWeeklySync } from "./runs/weeklySync.js";
-import { syncBotdFixtures } from "./sync/botdFixtures/syncBotdFixtures.js";
-import { logSyncStep } from "./utils/logging/logSyncStep.js";
+import { runDailySync } from "./runs/dailySync";
+import { runBackfill } from "./runs/backfill";
+import { runStrategyResultsBackfill } from "./runs/backfillStrategyResults";
+import { runFullSync } from "./runs/fullSync";
+import { runHourlySync } from "./runs/hourlySync";
+import { runLiveSync } from "./runs/liveSync";
+import { runThreeHourlySync } from "./runs/threeHourlySync";
+import { runWeeklySync } from "./runs/weeklySync";
+import { syncBotdFixtures } from "./sync/botdFixtures/syncBotdFixtures";
+import { logSyncStep } from "./utils/logging/logSyncStep";
 
 const syncRuns = {
   all: { label: "full sync", run: runFullSync },

@@ -6,15 +6,15 @@ const mocks = vi.hoisted(() => ({
   syncPrediction: vi.fn(),
 }));
 
-vi.mock("../sync/fixtures/syncFixturesInProgress.js", () => ({
+vi.mock("../sync/fixtures/syncFixturesInProgress", () => ({
   syncFixturesInProgress: mocks.syncFixturesInProgress,
 }));
-vi.mock("../sync/standings/syncLeagueStandings.js", () => ({
+vi.mock("../sync/standings/syncLeagueStandings", () => ({
   syncLeagueStandings: mocks.syncLeagueStandings,
 }));
-vi.mock("../sync/predictions/syncPrediction.js", () => ({ syncPrediction: mocks.syncPrediction }));
+vi.mock("../sync/predictions/syncPrediction", () => ({ syncPrediction: mocks.syncPrediction }));
 
-import { runHourlySync } from "./hourlySync.js";
+import { runHourlySync } from "./hourlySync";
 
 describe("hourly sync run", () => {
   beforeEach(() => vi.clearAllMocks());

@@ -3,11 +3,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ get: vi.fn(), upsertLeague: vi.fn() }));
 
 vi.mock("@black-diamond/database/leagues", () => ({ upsertLeague: mocks.upsertLeague }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
+vi.mock("../../providers/api-football/client/apiFootball", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { syncLeague } from "./syncLeague.js";
+import { syncLeague } from "./syncLeague";
 
 describe("syncLeague", () => {
   beforeEach(() => vi.clearAllMocks());

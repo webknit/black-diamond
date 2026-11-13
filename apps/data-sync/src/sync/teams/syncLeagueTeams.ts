@@ -1,7 +1,7 @@
 import { getLeagueById } from "@black-diamond/database/leagues";
 import { upsertLeagueTeam, upsertTeam } from "@black-diamond/database/teams";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballTeamsResponse } from "../../providers/api-football/types/teams.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballTeamsResponse } from "../../providers/api-football/types/teams";
 
 export async function syncLeagueTeams(leagueId: number) {
   const league = await getLeagueById(leagueId);

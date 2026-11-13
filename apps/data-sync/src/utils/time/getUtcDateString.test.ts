@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { getUtcDateString } from "./getUtcDateString.js";
+import { getUtcDateString } from "./getUtcDateString";
 
 describe("getUtcDateString", () => {
   it("formats a date in UTC and supports day offsets", () => {

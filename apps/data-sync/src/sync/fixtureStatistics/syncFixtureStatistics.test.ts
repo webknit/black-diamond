@@ -5,11 +5,11 @@ const mocks = vi.hoisted(() => ({ get: vi.fn(), upsertFixtureStatistics: vi.fn()
 vi.mock("@black-diamond/database/fixtureStatistics", () => ({
   upsertFixtureStatistics: mocks.upsertFixtureStatistics,
 }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
+vi.mock("../../providers/api-football/client/apiFootball", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { syncFixtureStatistics } from "./syncFixtureStatistics.js";
+import { syncFixtureStatistics } from "./syncFixtureStatistics";
 
 describe("syncFixtureStatistics", () => {
   beforeEach(() => vi.clearAllMocks());

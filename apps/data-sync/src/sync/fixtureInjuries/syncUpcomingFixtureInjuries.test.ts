@@ -13,11 +13,11 @@ vi.mock("@black-diamond/database/fixtures", () => ({
 vi.mock("@black-diamond/database/fixtureInjuries", () => ({
   upsertFixtureInjuries: mocks.upsertFixtureInjuries,
 }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
+vi.mock("../../providers/api-football/client/apiFootball", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { syncUpcomingFixtureInjuries } from "./syncUpcomingFixtureInjuries.js";
+import { syncUpcomingFixtureInjuries } from "./syncUpcomingFixtureInjuries";
 
 function fixture(id: number, timestamp: number, status: string): Fixture {
   return {

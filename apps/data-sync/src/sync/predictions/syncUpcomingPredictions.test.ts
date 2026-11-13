@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ getFixturesBetweenDates: vi.fn(), syncPrediction: vi.fn() }));
 vi.mock("@black-diamond/database/fixtures", () => ({ getFixturesBetweenDates: mocks.getFixturesBetweenDates }));
-vi.mock("./syncPrediction.js", () => ({ syncPrediction: mocks.syncPrediction }));
-import { syncUpcomingPredictions } from "./syncUpcomingPredictions.js";
+vi.mock("./syncPrediction", () => ({ syncPrediction: mocks.syncPrediction }));
+import { syncUpcomingPredictions } from "./syncUpcomingPredictions";
 
 describe("syncUpcomingPredictions", () => {
   it("syncs predictions for the next seven days of fixtures", async () => {

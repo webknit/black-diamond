@@ -1,6 +1,6 @@
 import { upsertFixtureEvents } from "@black-diamond/database/fixtureEvents";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixtureEventsResponse } from "../../providers/api-football/types/fixtureEvents.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixtureEventsResponse } from "../../providers/api-football/types/fixtureEvents";
 
 export async function syncFixtureEvents(fixtureIds: number[]): Promise<number> {
   const apiFootball = getApiFootballClient();

@@ -15,10 +15,10 @@ vi.mock("@black-diamond/database/fullSeasonFixtureSyncStates", () => ({
   isFullSeasonFixtureSyncCompleted: mocks.isFullSeasonFixtureSyncCompleted,
   setFullSeasonFixtureSyncCompleted: mocks.setFullSeasonFixtureSyncCompleted,
 }));
-vi.mock("./syncLeagueFixtures.js", () => ({
+vi.mock("./syncLeagueFixtures", () => ({
   syncLeagueFixtures: mocks.syncLeagueFixtures,
 }));
-vi.mock("./syncFullCurrentSeasonFixtures.js", () => ({
+vi.mock("./syncFullCurrentSeasonFixtures", () => ({
   syncFullCurrentSeasonFixtures: mocks.syncFullCurrentSeasonFixtures,
 }));
 
@@ -26,7 +26,7 @@ import {
   getDailyFixtureDateRange,
   getFixtureRecoveryDateRange,
   syncCurrentSeasonFixtures,
-} from "./syncCurrentSeasonFixtures.js";
+} from "./syncCurrentSeasonFixtures";
 
 const league = { seasons: [{ year: 2026, current: true }] };
 

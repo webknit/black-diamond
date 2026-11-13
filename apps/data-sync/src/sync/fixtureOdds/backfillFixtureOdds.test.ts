@@ -13,9 +13,9 @@ vi.mock("@black-diamond/database/fixtures", () => ({
 vi.mock("@black-diamond/database/fixtureOdds", () => ({
   getFixtureOddsForFixtures: mocks.getFixtureOddsForFixtures,
 }));
-vi.mock("./syncFixtureOdds.js", () => ({ syncFixtureOdds: mocks.syncFixtureOdds }));
+vi.mock("./syncFixtureOdds", () => ({ syncFixtureOdds: mocks.syncFixtureOdds }));
 
-import { backfillFixtureOdds } from "./backfillFixtureOdds.js";
+import { backfillFixtureOdds } from "./backfillFixtureOdds";
 
 function fixture(id: number, timestamp: number, status: string, leagueId = 39): Fixture {
   return {

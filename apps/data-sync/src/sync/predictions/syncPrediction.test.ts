@@ -2,8 +2,8 @@ import { describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({ get: vi.fn(), getApiFootballClient: vi.fn(), upsertPrediction: vi.fn() }));
 vi.mock("@black-diamond/database/predictions", () => ({ upsertPrediction: mocks.upsertPrediction }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({ getApiFootballClient: mocks.getApiFootballClient }));
-import { syncPrediction } from "./syncPrediction.js";
+vi.mock("../../providers/api-football/client/apiFootball", () => ({ getApiFootballClient: mocks.getApiFootballClient }));
+import { syncPrediction } from "./syncPrediction";
 
 describe("syncPrediction", () => {
   it("stores the API response under its fixture ID", async () => {

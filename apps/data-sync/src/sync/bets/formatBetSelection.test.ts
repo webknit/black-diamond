@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { formatBetSelection } from "./formatBetSelection.js";
+import { formatBetSelection } from "./formatBetSelection";
 
 describe("formatBetSelection", () => {
   it("uses BTTS labels instead of API yes and no values", () => {

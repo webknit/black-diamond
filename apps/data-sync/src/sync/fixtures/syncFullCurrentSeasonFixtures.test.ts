@@ -8,11 +8,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@black-diamond/database/leagues", () => ({ getLeagueById: mocks.getLeagueById }));
 vi.mock("@black-diamond/database/fixtures", () => ({ upsertFixtures: mocks.upsertFixtures }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
+vi.mock("../../providers/api-football/client/apiFootball", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { syncFullCurrentSeasonFixtures } from "./syncFullCurrentSeasonFixtures.js";
+import { syncFullCurrentSeasonFixtures } from "./syncFullCurrentSeasonFixtures";
 
 describe("syncFullCurrentSeasonFixtures", () => {
   beforeEach(() => {

@@ -21,7 +21,7 @@ vi.mock("@black-diamond/database/leagues", () => ({ getLeaguesByIds: mocks.getLe
 vi.mock("@black-diamond/database/leagueStats", () => ({ getLeagueStats: mocks.getLeagueStats }));
 vi.mock("@black-diamond/database/strategyPerformances", () => ({ getStrategyPerformanceSeasonTotals: mocks.getStrategyPerformanceSeasonTotals }));
 vi.mock("@black-diamond/database/botdDays", () => ({ upsertBotdDays: mocks.upsertBotdDays }));
-import { syncBotdFixtures } from "./syncBotdFixtures.js";
+import { syncBotdFixtures } from "./syncBotdFixtures";
 
 function fixture(id: number, timestamp: number, status = "NS") {
   return { fixture: { id, timestamp, status: { short: status } }, league: { id: 39 } } as unknown as Fixture;

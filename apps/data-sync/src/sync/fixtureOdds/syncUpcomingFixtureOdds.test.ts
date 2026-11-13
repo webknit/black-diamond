@@ -9,9 +9,9 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@black-diamond/database/fixtures", () => ({
   getFixturesBetweenDates: mocks.getFixturesBetweenDates,
 }));
-vi.mock("./syncFixtureOdds.js", () => ({ syncFixtureOdds: mocks.syncFixtureOdds }));
+vi.mock("./syncFixtureOdds", () => ({ syncFixtureOdds: mocks.syncFixtureOdds }));
 
-import { syncUpcomingFixtureOdds } from "./syncUpcomingFixtureOdds.js";
+import { syncUpcomingFixtureOdds } from "./syncUpcomingFixtureOdds";
 
 function fixture(id: number, timestamp: number, status: string): Fixture {
   return {

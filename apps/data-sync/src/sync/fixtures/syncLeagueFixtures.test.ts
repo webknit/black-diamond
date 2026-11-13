@@ -4,9 +4,9 @@ const mocks = vi.hoisted(() => ({ get: vi.fn(), getLeagueById: vi.fn(), upsertFi
 
 vi.mock("@black-diamond/database/leagues", () => ({ getLeagueById: mocks.getLeagueById }));
 vi.mock("@black-diamond/database/fixtures", () => ({ upsertFixtures: mocks.upsertFixtures }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({ getApiFootballClient: () => ({ get: mocks.get }) }));
+vi.mock("../../providers/api-football/client/apiFootball", () => ({ getApiFootballClient: () => ({ get: mocks.get }) }));
 
-import { syncLeagueFixtures } from "./syncLeagueFixtures.js";
+import { syncLeagueFixtures } from "./syncLeagueFixtures";
 
 describe("syncLeagueFixtures", () => {
   beforeEach(() => { vi.clearAllMocks(); mocks.getLeagueById.mockResolvedValue({ seasons: [{ year: 2026, current: true }] }); });

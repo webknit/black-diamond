@@ -1,9 +1,9 @@
-import { syncFixturesInProgress } from "../sync/fixtures/syncFixturesInProgress.js";
-import { syncFixtureEvents } from "../sync/fixtureEvents/syncFixtureEvents.js";
-import { syncFixtureStatistics } from "../sync/fixtureStatistics/syncFixtureStatistics.js";
-import { syncFixtureLineups } from "../sync/fixtureLineups/syncFixtureLineups.js";
-import { syncBetResults } from "../sync/bets/syncBetResults.js";
-import { logSyncStep } from "../utils/logging/logSyncStep.js";
+import { syncFixturesInProgress } from "../sync/fixtures/syncFixturesInProgress";
+import { syncFixtureEvents } from "../sync/fixtureEvents/syncFixtureEvents";
+import { syncFixtureStatistics } from "../sync/fixtureStatistics/syncFixtureStatistics";
+import { syncFixtureLineups } from "../sync/fixtureLineups/syncFixtureLineups";
+import { syncBetResults } from "../sync/bets/syncBetResults";
+import { logSyncStep } from "../utils/logging/logSyncStep";
 import {
   getFixturesForLineupSync,
   getRecentlyFinishedFixtures,

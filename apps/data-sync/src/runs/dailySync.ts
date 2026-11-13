@@ -1,17 +1,17 @@
-import { syncFixtures } from "../sync/fixtures/syncFixtures.js";
-import { syncLeagueStats } from "../sync/leagueStats/syncLeagueStats.js";
-import { syncSelectedLeagues } from "../sync/leagues/syncSelectedLeagues.js";
-import { syncStandings } from "../sync/standings/syncStandings.js";
-import { syncTeams } from "../sync/teams/syncTeams.js";
-import { syncTeamStatsForTodaysFixtures } from "../sync/teamStats/syncTeamStatsForTodaysFixtures.js";
-import { syncUpcomingPredictions } from "../sync/predictions/syncUpcomingPredictions.js";
-import { syncFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots.js";
-import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures.js";
-import { syncBetResults } from "../sync/bets/syncBetResults.js";
-import { syncStrategyPerformances } from "../sync/strategyPerformances/syncStrategyPerformances.js";
-import { syncUpcomingFixtureInjuries } from "../sync/fixtureInjuries/syncUpcomingFixtureInjuries.js";
-import { getFixtureRecoveryDateRange } from "../sync/fixtures/syncCurrentSeasonFixtures.js";
-import { logSyncStep } from "../utils/logging/logSyncStep.js";
+import { syncFixtures } from "../sync/fixtures/syncFixtures";
+import { syncLeagueStats } from "../sync/leagueStats/syncLeagueStats";
+import { syncSelectedLeagues } from "../sync/leagues/syncSelectedLeagues";
+import { syncStandings } from "../sync/standings/syncStandings";
+import { syncTeams } from "../sync/teams/syncTeams";
+import { syncTeamStatsForTodaysFixtures } from "../sync/teamStats/syncTeamStatsForTodaysFixtures";
+import { syncUpcomingPredictions } from "../sync/predictions/syncUpcomingPredictions";
+import { syncFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots";
+import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures";
+import { syncBetResults } from "../sync/bets/syncBetResults";
+import { syncStrategyPerformances } from "../sync/strategyPerformances/syncStrategyPerformances";
+import { syncUpcomingFixtureInjuries } from "../sync/fixtureInjuries/syncUpcomingFixtureInjuries";
+import { getFixtureRecoveryDateRange } from "../sync/fixtures/syncCurrentSeasonFixtures";
+import { logSyncStep } from "../utils/logging/logSyncStep";
 
 export async function runDailySync(lastCompletedAt?: Date) {
   const fixtureDateRange = getFixtureRecoveryDateRange(lastCompletedAt);

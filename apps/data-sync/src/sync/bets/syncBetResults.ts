@@ -1,10 +1,10 @@
 import { getPendingBets, settleBet } from "@black-diamond/database/bets";
 import { upsertFixtures } from "@black-diamond/database/fixtures";
 import type { Fixture } from "@black-diamond/core/fixture";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures.js";
-import { didBetSelectionWin } from "./didBetSelectionWin.js";
-import { notifyAccumulatorSettlement } from "./notifyAccumulatorSettlement.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures";
+import { didBetSelectionWin } from "./didBetSelectionWin";
+import { notifyAccumulatorSettlement } from "./notifyAccumulatorSettlement";
 const settledStatuses = new Set(["FT", "AET", "PEN"]);
 export async function syncBetResults() {
   const pendingBets = await getPendingBets();

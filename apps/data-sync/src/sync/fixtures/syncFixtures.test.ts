@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const syncCurrentSeasonFixtures = vi.hoisted(() => vi.fn());
-vi.mock("./syncCurrentSeasonFixtures.js", () => ({ syncCurrentSeasonFixtures }));
+vi.mock("./syncCurrentSeasonFixtures", () => ({ syncCurrentSeasonFixtures }));
 
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { syncFixtures } from "./syncFixtures.js";
+import { syncFixtures } from "./syncFixtures";
 
 describe("syncFixtures", () => {
   beforeEach(() => vi.clearAllMocks());

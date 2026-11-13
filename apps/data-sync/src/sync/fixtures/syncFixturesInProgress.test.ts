@@ -10,7 +10,7 @@ vi.mock("@black-diamond/database/fixtures", () => ({
   getFixturesAwaitingResult: mocks.getFixturesAwaitingResult,
   upsertFixtures: mocks.upsertFixtures,
 }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
+vi.mock("../../providers/api-football/client/apiFootball", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
@@ -18,7 +18,7 @@ import {
   didFixtureScoreIncrease,
   formatMatchMinute,
   syncFixturesInProgress,
-} from "./syncFixturesInProgress.js";
+} from "./syncFixturesInProgress";
 
 describe("syncFixturesInProgress", () => {
   beforeEach(() => vi.clearAllMocks());

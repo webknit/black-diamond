@@ -1,6 +1,6 @@
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { syncTeamStatsForLeague } from "../sync/teamStats/syncTeamStatsForLeague.js";
-import { logSyncStep } from "../utils/logging/logSyncStep.js";
+import { syncTeamStatsForLeague } from "../sync/teamStats/syncTeamStatsForLeague";
+import { logSyncStep } from "../utils/logging/logSyncStep";
 
 export async function runWeeklySync() {
   for (const league of selectedLeagues) {

@@ -1,9 +1,9 @@
 import type { FixtureInjury } from "@black-diamond/core/fixtureInjuries";
 import { upsertFixtureInjuries } from "@black-diamond/database/fixtureInjuries";
 import { getFixturesBetweenDates } from "@black-diamond/database/fixtures";
-import { getUtcDateString } from "../../utils/time/getUtcDateString.js";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixtureInjuriesResponse } from "../../providers/api-football/types/fixtureInjuries.js";
+import { getUtcDateString } from "../../utils/time/getUtcDateString";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixtureInjuriesResponse } from "../../providers/api-football/types/fixtureInjuries";
 
 const maximumFixtureIdsPerRequest = 20;
 const daysAhead = 7;

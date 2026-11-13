@@ -1,6 +1,6 @@
 import { upsertFixtureLineups } from "@black-diamond/database/fixtureLineups";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixtureLineupsResponse } from "../../providers/api-football/types/fixtureLineups.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixtureLineupsResponse } from "../../providers/api-football/types/fixtureLineups";
 
 export async function syncFixtureLineups(fixtureIds: number[]): Promise<number> {
   const apiFootball = getApiFootballClient();

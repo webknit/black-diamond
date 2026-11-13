@@ -5,7 +5,7 @@ const getDatabase = vi.hoisted(() => vi.fn());
 
 vi.mock("@black-diamond/database/mongodb", () => ({ getDatabase }));
 
-import { checkDatabaseConnection } from "./checkDatabaseConnection.js";
+import { checkDatabaseConnection } from "./checkDatabaseConnection";
 
 describe("checkDatabaseConnection", () => {
   it("pings MongoDB and returns its database name", async () => {

@@ -1,4 +1,4 @@
-import { createApiFootballClient } from "./client.js";
+import { createApiFootballClient } from "./client";
 
 let apiFootballClient: ReturnType<typeof createApiFootballClient> | undefined;
 

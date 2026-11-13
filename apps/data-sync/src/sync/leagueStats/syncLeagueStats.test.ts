@@ -5,11 +5,11 @@ const mocks = vi.hoisted(() => ({ syncLeagueStatsForLeague: vi.fn() }));
 vi.mock("@black-diamond/core/selectedLeagues", () => ({
   selectedLeagues: [{ id: 39 }, { id: 140 }],
 }));
-vi.mock("./syncLeagueStatsForLeague.js", () => ({
+vi.mock("./syncLeagueStatsForLeague", () => ({
   syncLeagueStatsForLeague: mocks.syncLeagueStatsForLeague,
 }));
 
-import { syncLeagueStats } from "./syncLeagueStats.js";
+import { syncLeagueStats } from "./syncLeagueStats";
 
 describe("syncLeagueStats", () => {
   beforeEach(() => vi.clearAllMocks());

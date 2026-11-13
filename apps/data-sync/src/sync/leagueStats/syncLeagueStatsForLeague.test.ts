@@ -14,7 +14,7 @@ vi.mock("@black-diamond/database/leagues", () => ({
   getLeagueById: mocks.getLeagueById,
 }));
 
-import { syncLeagueStatsForLeague } from "./syncLeagueStatsForLeague.js";
+import { syncLeagueStatsForLeague } from "./syncLeagueStatsForLeague";
 
 describe("syncLeagueStatsForLeague", () => {
   beforeEach(() => vi.clearAllMocks());

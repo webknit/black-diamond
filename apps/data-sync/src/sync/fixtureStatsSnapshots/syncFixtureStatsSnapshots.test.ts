@@ -3,8 +3,8 @@ import type { Fixture } from "@black-diamond/core/fixture";
 
 const mocks = vi.hoisted(() => ({ getFixturesBetweenDates: vi.fn(), syncFixtureStatsSnapshot: vi.fn() }));
 vi.mock("@black-diamond/database/fixtures", () => ({ getFixturesBetweenDates: mocks.getFixturesBetweenDates }));
-vi.mock("./syncFixtureStatsSnapshot.js", () => ({ syncFixtureStatsSnapshot: mocks.syncFixtureStatsSnapshot }));
-import { syncFixtureStatsSnapshots } from "./syncFixtureStatsSnapshots.js";
+vi.mock("./syncFixtureStatsSnapshot", () => ({ syncFixtureStatsSnapshot: mocks.syncFixtureStatsSnapshot }));
+import { syncFixtureStatsSnapshots } from "./syncFixtureStatsSnapshots";
 
 function upcoming(id: number, timestamp: number, status = "NS") {
   return { fixture: { id, timestamp, status: { short: status } } } as unknown as Fixture;

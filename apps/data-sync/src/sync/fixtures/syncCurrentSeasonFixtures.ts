@@ -6,9 +6,9 @@ import { getLeagueById } from "@black-diamond/database/leagues";
 import {
   syncLeagueFixtures,
   type FixtureDateRange,
-} from "./syncLeagueFixtures.js";
-import { syncFullCurrentSeasonFixtures } from "./syncFullCurrentSeasonFixtures.js";
-import { getUtcDateString } from "../../utils/time/getUtcDateString.js";
+} from "./syncLeagueFixtures";
+import { syncFullCurrentSeasonFixtures } from "./syncFullCurrentSeasonFixtures";
+import { getUtcDateString } from "../../utils/time/getUtcDateString";
 
 export async function syncCurrentSeasonFixtures(
   leagueId: number,

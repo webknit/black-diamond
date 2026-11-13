@@ -15,11 +15,11 @@ vi.mock("@black-diamond/database/fixtures", () => ({
 vi.mock("@black-diamond/database/leagues", () => ({
   getLeagueById: mocks.getLeagueById,
 }));
-vi.mock("./syncLeagueStatsForLeague.js", () => ({
+vi.mock("./syncLeagueStatsForLeague", () => ({
   syncLeagueStatsForLeague: mocks.syncLeagueStatsForLeague,
 }));
 
-import { backfillLeagueStats } from "./backfillLeagueStats.js";
+import { backfillLeagueStats } from "./backfillLeagueStats";
 
 describe("backfillLeagueStats", () => {
   beforeEach(() => vi.clearAllMocks());

@@ -1,6 +1,6 @@
-import { syncUpcomingFixtureOdds } from "../sync/fixtureOdds/syncUpcomingFixtureOdds.js";
-import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures.js";
-import { logSyncStep } from "../utils/logging/logSyncStep.js";
+import { syncUpcomingFixtureOdds } from "../sync/fixtureOdds/syncUpcomingFixtureOdds";
+import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures";
+import { logSyncStep } from "../utils/logging/logSyncStep";
 
 export async function runThreeHourlySync() {
   await logSyncStep("sync upcoming fixture odds", syncUpcomingFixtureOdds);

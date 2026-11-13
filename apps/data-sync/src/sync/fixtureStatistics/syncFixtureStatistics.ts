@@ -1,7 +1,7 @@
 import type { Fixture } from "@black-diamond/core/fixture";
 import { upsertFixtureStatistics } from "@black-diamond/database/fixtureStatistics";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixtureStatisticsResponse } from "../../providers/api-football/types/fixtureStatistics.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixtureStatisticsResponse } from "../../providers/api-football/types/fixtureStatistics";
 
 function getStatistic(
   statistics: Array<{ type: string; value: number | string | null }> | undefined,

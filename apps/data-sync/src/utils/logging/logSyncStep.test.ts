@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { logSyncStep } from "./logSyncStep.js";
+import { logSyncStep } from "./logSyncStep";
 
 describe("logSyncStep", () => {
   afterEach(() => vi.restoreAllMocks());

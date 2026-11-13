@@ -10,13 +10,13 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@black-diamond/database/indexes", () => ({
   ensureDatabaseIndexes: mocks.ensureDatabaseIndexes,
 }));
-vi.mock("./dailySync.js", () => ({ runDailySync: mocks.runDailySync }));
-vi.mock("./threeHourlySync.js", () => ({
+vi.mock("./dailySync", () => ({ runDailySync: mocks.runDailySync }));
+vi.mock("./threeHourlySync", () => ({
   runThreeHourlySync: mocks.runThreeHourlySync,
 }));
-vi.mock("./weeklySync.js", () => ({ runWeeklySync: mocks.runWeeklySync }));
+vi.mock("./weeklySync", () => ({ runWeeklySync: mocks.runWeeklySync }));
 
-import { runFullSync } from "./fullSync.js";
+import { runFullSync } from "./fullSync";
 
 describe("full sync run", () => {
   beforeEach(() => vi.clearAllMocks());

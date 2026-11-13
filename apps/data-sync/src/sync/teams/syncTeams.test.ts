@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const syncLeagueTeams = vi.hoisted(() => vi.fn());
-vi.mock("./syncLeagueTeams.js", () => ({ syncLeagueTeams }));
+vi.mock("./syncLeagueTeams", () => ({ syncLeagueTeams }));
 
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { syncTeams } from "./syncTeams.js";
+import { syncTeams } from "./syncTeams";
 
 describe("syncTeams", () => {
   beforeEach(() => vi.clearAllMocks());

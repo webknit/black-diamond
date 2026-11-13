@@ -1,6 +1,6 @@
 import { getTeamsWithFixturesOnDate } from "@black-diamond/database/teams";
-import { getUtcDateString } from "../../utils/time/getUtcDateString.js";
-import { syncTeamStats } from "./syncTeamStats.js";
+import { getUtcDateString } from "../../utils/time/getUtcDateString";
+import { syncTeamStats } from "./syncTeamStats";
 
 export async function syncTeamStatsForTodaysFixtures(now = new Date()) {
   const teams = await getTeamsWithFixturesOnDate(getUtcDateString(now));

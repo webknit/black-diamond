@@ -6,9 +6,9 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@black-diamond/database/leagues", () => ({ getLeagueById: mocks.getLeagueById }));
 vi.mock("@black-diamond/database/teams", () => ({ upsertTeam: mocks.upsertTeam, upsertLeagueTeam: mocks.upsertLeagueTeam }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({ getApiFootballClient: () => ({ get: mocks.get }) }));
+vi.mock("../../providers/api-football/client/apiFootball", () => ({ getApiFootballClient: () => ({ get: mocks.get }) }));
 
-import { syncLeagueTeams } from "./syncLeagueTeams.js";
+import { syncLeagueTeams } from "./syncLeagueTeams";
 
 describe("syncLeagueTeams", () => {
   beforeEach(() => { vi.clearAllMocks(); mocks.getLeagueById.mockResolvedValue({ seasons: [{ year: 2026, current: true }] }); });

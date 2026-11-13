@@ -15,38 +15,38 @@ const mocks = vi.hoisted(() => ({
   teams: vi.fn(),
 }));
 
-vi.mock("../sync/fixtures/syncFixtures.js", () => ({ syncFixtures: mocks.fixtures }));
-vi.mock("../sync/leagues/syncSelectedLeagues.js", () => ({
+vi.mock("../sync/fixtures/syncFixtures", () => ({ syncFixtures: mocks.fixtures }));
+vi.mock("../sync/leagues/syncSelectedLeagues", () => ({
   syncSelectedLeagues: mocks.leagues,
 }));
-vi.mock("../sync/leagueStats/syncLeagueStats.js", () => ({
+vi.mock("../sync/leagueStats/syncLeagueStats", () => ({
   syncLeagueStats: mocks.syncLeagueStats,
 }));
-vi.mock("../sync/teamStats/syncTeamStatsForTodaysFixtures.js", () => ({
+vi.mock("../sync/teamStats/syncTeamStatsForTodaysFixtures", () => ({
   syncTeamStatsForTodaysFixtures: mocks.syncTeamStatsForTodaysFixtures,
 }));
-vi.mock("../sync/predictions/syncUpcomingPredictions.js", () => ({
+vi.mock("../sync/predictions/syncUpcomingPredictions", () => ({
   syncUpcomingPredictions: mocks.syncUpcomingPredictions,
 }));
-vi.mock("../sync/fixtureInjuries/syncUpcomingFixtureInjuries.js", () => ({
+vi.mock("../sync/fixtureInjuries/syncUpcomingFixtureInjuries", () => ({
   syncUpcomingFixtureInjuries: mocks.syncUpcomingFixtureInjuries,
 }));
-vi.mock("../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots.js", () => ({
+vi.mock("../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots", () => ({
   syncFixtureStatsSnapshots: mocks.syncFixtureStatsSnapshots,
 }));
-vi.mock("../sync/botdFixtures/syncBotdFixtures.js", () => ({ syncBotdFixtures: mocks.syncBotdFixtures }));
-vi.mock("../sync/bets/syncBetResults.js", () => ({
+vi.mock("../sync/botdFixtures/syncBotdFixtures", () => ({ syncBotdFixtures: mocks.syncBotdFixtures }));
+vi.mock("../sync/bets/syncBetResults", () => ({
   syncBetResults: mocks.syncBetResults,
 }));
-vi.mock("../sync/strategyPerformances/syncStrategyPerformances.js", () => ({
+vi.mock("../sync/strategyPerformances/syncStrategyPerformances", () => ({
   syncStrategyPerformances: mocks.syncStrategyPerformances,
 }));
-vi.mock("../sync/standings/syncStandings.js", () => ({
+vi.mock("../sync/standings/syncStandings", () => ({
   syncStandings: mocks.standings,
 }));
-vi.mock("../sync/teams/syncTeams.js", () => ({ syncTeams: mocks.teams }));
+vi.mock("../sync/teams/syncTeams", () => ({ syncTeams: mocks.teams }));
 
-import { runDailySync } from "./dailySync.js";
+import { runDailySync } from "./dailySync";
 
 describe("daily sync run", () => {
   beforeEach(() => vi.clearAllMocks());

@@ -1,7 +1,7 @@
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
 import { getFixtureSeasonsForLeague } from "@black-diamond/database/fixtures";
 import { getLeagueById } from "@black-diamond/database/leagues";
-import { syncLeagueStatsForLeague } from "./syncLeagueStatsForLeague.js";
+import { syncLeagueStatsForLeague } from "./syncLeagueStatsForLeague";
 
 export async function backfillLeagueStats(): Promise<void> {
   for (const selectedLeague of selectedLeagues) {

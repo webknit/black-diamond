@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getOver0_5ReferenceOdd, matchesOver0_5StrategyVariation, over0_5StrategyVariations } from '@black-diamond/core/strategies';
-import { addStrategyResult } from './syncStrategyPerformances.js';
+import { addStrategyResult } from './syncStrategyPerformances';
 function snapshot(homeRate = 100, awayRate = 100, homeGoals = 3, awayGoals = 3) { const venue = (goals: number, rate: number) => ({ played: 5, goalsFor: goals * 5, goalsAgainst: goals * 5, summary: { over0_5: { percentage: rate } } }); return { home: { last5Venue: venue(homeGoals, homeRate) }, away: { last5Venue: venue(awayGoals, awayRate) } } as never; }
 describe('Over 0.5 strategies', () => {
 	it('has unique variation ids', () => expect(new Set(over0_5StrategyVariations.map((s) => s.id)).size).toBe(over0_5StrategyVariations.length));

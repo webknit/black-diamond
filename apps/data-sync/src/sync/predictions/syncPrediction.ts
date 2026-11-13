@@ -1,5 +1,5 @@
 import { upsertPrediction } from "@black-diamond/database/predictions";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
 export async function syncPrediction(fixtureId: number) {
   const response = await getApiFootballClient().get<{ response: Record<string, unknown>[] }>("/predictions", { fixture: fixtureId });
   const prediction = response.response[0];

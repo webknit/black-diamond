@@ -1,6 +1,6 @@
 import { upsertTeamStats } from "@black-diamond/database/teamStats";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballTeamStatisticsResponse } from "../../providers/api-football/types/teams.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballTeamStatisticsResponse } from "../../providers/api-football/types/teams";
 import type { TeamStats } from "@black-diamond/core/teamStats";
 
 function isTeamStats(value: TeamStats | []): value is TeamStats {

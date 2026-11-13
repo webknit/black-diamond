@@ -1,5 +1,5 @@
-import { backfillFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/backfillFixtureStatsSnapshots.js";
-import { logSyncStep } from "../utils/logging/logSyncStep.js";
+import { backfillFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/backfillFixtureStatsSnapshots";
+import { logSyncStep } from "../utils/logging/logSyncStep";
 
 export async function runFixtureStatsSnapshotBackfill(): Promise<void> {
   await logSyncStep(

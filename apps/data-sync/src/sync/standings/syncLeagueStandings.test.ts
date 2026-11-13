@@ -12,11 +12,11 @@ vi.mock("@black-diamond/database/leagues", () => ({
 vi.mock("@black-diamond/database/leagueStandings", () => ({
   upsertLeagueStandings: mocks.upsertLeagueStandings,
 }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({
+vi.mock("../../providers/api-football/client/apiFootball", () => ({
   getApiFootballClient: () => ({ get: mocks.get }),
 }));
 
-import { syncLeagueStandings } from "./syncLeagueStandings.js";
+import { syncLeagueStandings } from "./syncLeagueStandings";
 
 describe("syncLeagueStandings", () => {
   beforeEach(() => {

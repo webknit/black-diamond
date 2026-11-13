@@ -1,5 +1,5 @@
 import { upsertFixtureOdds } from "@black-diamond/database/fixtureOdds";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
 
 const preferredBookmakers = [
   { id: 8, name: "Bet365" as const },

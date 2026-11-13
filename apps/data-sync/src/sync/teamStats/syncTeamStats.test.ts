@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({ get: vi.fn(), getApiFootballClient: vi.fn(), upsertTeamStats: vi.fn() }));
 vi.mock("@black-diamond/database/teamStats", () => ({ upsertTeamStats: mocks.upsertTeamStats }));
-vi.mock("../../providers/api-football/client/apiFootball.js", () => ({ getApiFootballClient: mocks.getApiFootballClient }));
-import { syncTeamStats } from "./syncTeamStats.js";
+vi.mock("../../providers/api-football/client/apiFootball", () => ({ getApiFootballClient: mocks.getApiFootballClient }));
+import { syncTeamStats } from "./syncTeamStats";
 
 describe("syncTeamStats", () => {
   it("requests and stores the full API team-statistics response", async () => {

@@ -1,4 +1,4 @@
-import { createRateLimiter } from "./rateLimiter.js";
+import { createRateLimiter } from "./rateLimiter";
 
 const API_FOOTBALL_BASE_URL = "https://v3.football.api-sports.io";
 // Leave room below the provider limit for another scheduled job that happens

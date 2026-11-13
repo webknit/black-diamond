@@ -3,8 +3,8 @@ import {
   getFixturesBetweenDates,
 } from "@black-diamond/database/fixtures";
 import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
-import { getUtcDateString } from "../../utils/time/getUtcDateString.js";
-import { syncFixtureOdds } from "./syncFixtureOdds.js";
+import { getUtcDateString } from "../../utils/time/getUtcDateString";
+import { syncFixtureOdds } from "./syncFixtureOdds";
 
 const completedFixtureStatuses = new Set(["FT", "AET", "PEN"]);
 const oddsHistoryDays = 7;

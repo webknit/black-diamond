@@ -8,19 +8,19 @@ const mocks = vi.hoisted(() => ({
   syncBotdFixtures: vi.fn(),
 }));
 
-vi.mock("../sync/fixtureOdds/backfillFixtureOdds.js", () => ({
+vi.mock("../sync/fixtureOdds/backfillFixtureOdds", () => ({
   backfillFixtureOdds: mocks.backfillFixtureOdds,
 }));
-vi.mock("../utils/logging/logSyncStep.js", () => ({ logSyncStep: mocks.logSyncStep }));
-vi.mock("./backfillFixtureStatsSnapshots.js", () => ({
+vi.mock("../utils/logging/logSyncStep", () => ({ logSyncStep: mocks.logSyncStep }));
+vi.mock("./backfillFixtureStatsSnapshots", () => ({
   runFixtureStatsSnapshotBackfill: mocks.runFixtureStatsSnapshotBackfill,
 }));
-vi.mock("../sync/strategyPerformances/syncStrategyPerformances.js", () => ({
+vi.mock("../sync/strategyPerformances/syncStrategyPerformances", () => ({
   syncStrategyPerformances: mocks.syncStrategyPerformances,
 }));
-vi.mock("../sync/botdFixtures/syncBotdFixtures.js", () => ({ syncBotdFixtures: mocks.syncBotdFixtures }));
+vi.mock("../sync/botdFixtures/syncBotdFixtures", () => ({ syncBotdFixtures: mocks.syncBotdFixtures }));
 
-import { runBackfill } from "./backfill.js";
+import { runBackfill } from "./backfill";
 
 describe("backfill run", () => {
   beforeEach(() => vi.clearAllMocks());

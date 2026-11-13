@@ -25,17 +25,17 @@ vi.mock("@black-diamond/database/syncRunStates", () => ({
   markSyncRunStarted: mocks.markSyncRunStarted,
   scheduledSyncRunNames: ["daily", "hourly", "live", "three-hourly", "weekly"],
 }));
-vi.mock("./runs/dailySync.js", () => ({ runDailySync: mocks.runDailySync }));
-vi.mock("./runs/backfill.js", () => ({ runBackfill: mocks.runBackfill }));
-vi.mock("./runs/fullSync.js", () => ({ runFullSync: mocks.runFullSync }));
-vi.mock("./runs/hourlySync.js", () => ({ runHourlySync: mocks.runHourlySync }));
-vi.mock("./runs/liveSync.js", () => ({ runLiveSync: mocks.runLiveSync }));
-vi.mock("./runs/threeHourlySync.js", () => ({
+vi.mock("./runs/dailySync", () => ({ runDailySync: mocks.runDailySync }));
+vi.mock("./runs/backfill", () => ({ runBackfill: mocks.runBackfill }));
+vi.mock("./runs/fullSync", () => ({ runFullSync: mocks.runFullSync }));
+vi.mock("./runs/hourlySync", () => ({ runHourlySync: mocks.runHourlySync }));
+vi.mock("./runs/liveSync", () => ({ runLiveSync: mocks.runLiveSync }));
+vi.mock("./runs/threeHourlySync", () => ({
   runThreeHourlySync: mocks.runThreeHourlySync,
 }));
-vi.mock("./runs/weeklySync.js", () => ({ runWeeklySync: mocks.runWeeklySync }));
+vi.mock("./runs/weeklySync", () => ({ runWeeklySync: mocks.runWeeklySync }));
 
-import { getSyncRun, runSelectedSync } from "./runSelectedSync.js";
+import { getSyncRun, runSelectedSync } from "./runSelectedSync";
 
 describe("selected sync run", () => {
   beforeEach(() => {

@@ -1,8 +1,8 @@
 import { getLeagueById } from "@black-diamond/database/leagues";
 import { upsertFixtures } from "@black-diamond/database/fixtures";
 
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures";
 
 export async function syncFullCurrentSeasonFixtures(leagueId: number) {
   const league = await getLeagueById(leagueId);

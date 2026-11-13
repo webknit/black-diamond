@@ -13,7 +13,7 @@ vi.mock("@black-diamond/database/fixtureStatsSnapshots", () => ({
   upsertFixtureStatsSnapshot: mocks.upsertFixtureStatsSnapshot,
 }));
 
-import { syncFixtureStatsSnapshot } from "./syncFixtureStatsSnapshot.js";
+import { syncFixtureStatsSnapshot } from "./syncFixtureStatsSnapshot";
 
 function fixture(id: number, timestamp: number, homeId: number, awayId: number, homeGoals: number, awayGoals: number): Fixture {
   return {

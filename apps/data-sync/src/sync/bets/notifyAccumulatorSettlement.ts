@@ -3,7 +3,7 @@ import type { Fixture } from "@black-diamond/core/fixture";
 import { getWatchingAccountIds } from "@black-diamond/database/fixtureWatchlist";
 import { getPushSubscriptionsByAccountIds } from "@black-diamond/database/pushSubscriptions";
 import webpush from "web-push";
-import { formatBetSelection } from "./formatBetSelection.js";
+import { formatBetSelection } from "./formatBetSelection";
 
 export async function notifyAccumulatorSettlement(
   bet: Bet,

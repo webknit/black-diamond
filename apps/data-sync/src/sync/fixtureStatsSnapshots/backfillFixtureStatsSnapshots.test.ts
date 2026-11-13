@@ -8,12 +8,12 @@ const mocks = vi.hoisted(() => ({
 vi.mock("@black-diamond/database/fixtures", () => ({
   getFixturesForStatsSnapshotBackfill: mocks.getFixturesForStatsSnapshotBackfill,
 }));
-vi.mock("./syncFixtureStatsSnapshot.js", () => ({
+vi.mock("./syncFixtureStatsSnapshot", () => ({
   syncFixtureStatsSnapshot: mocks.syncFixtureStatsSnapshot,
 }));
 
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { backfillFixtureStatsSnapshots } from "./backfillFixtureStatsSnapshots.js";
+import { backfillFixtureStatsSnapshots } from "./backfillFixtureStatsSnapshots";
 
 describe("backfillFixtureStatsSnapshots", () => {
   it("calculates missing snapshots in chronological order for selected leagues", async () => {

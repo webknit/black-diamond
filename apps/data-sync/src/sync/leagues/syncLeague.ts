@@ -1,7 +1,7 @@
 import { upsertLeague } from "@black-diamond/database/leagues";
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballLeaguesResponse } from "../../providers/api-football/types/leagues.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballLeaguesResponse } from "../../providers/api-football/types/leagues";
 
 type SelectedLeague = (typeof selectedLeagues)[number];
 

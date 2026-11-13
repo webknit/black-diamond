@@ -1,6 +1,6 @@
 import { getLeagueTeams } from "@black-diamond/database/teams";
 import { getLeagueById } from "@black-diamond/database/leagues";
-import { syncTeamStats } from "./syncTeamStats.js";
+import { syncTeamStats } from "./syncTeamStats";
 
 export async function syncTeamStatsForLeague(leagueId: number) {
   const league = await getLeagueById(leagueId);

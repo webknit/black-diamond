@@ -1,4 +1,4 @@
-import { checkDatabaseConnection } from "./database/checkDatabaseConnection.js";
+import { checkDatabaseConnection } from "./database/checkDatabaseConnection";
 
 const databaseName = await checkDatabaseConnection();
 

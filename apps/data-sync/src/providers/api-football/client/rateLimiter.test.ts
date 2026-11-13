@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createRateLimiter } from "./rateLimiter.js";
+import { createRateLimiter } from "./rateLimiter";
 
 describe("createRateLimiter", () => {
   it("spaces requests by the configured minimum interval", async () => {

@@ -1,5 +1,5 @@
 import { selectedLeagues } from "@black-diamond/core/selectedLeagues";
-import { syncLeagueStandings } from "./syncLeagueStandings.js";
+import { syncLeagueStandings } from "./syncLeagueStandings";
 
 export async function syncStandings() {
   for (const league of selectedLeagues) {

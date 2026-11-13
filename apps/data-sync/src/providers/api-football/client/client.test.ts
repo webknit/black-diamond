@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createApiFootballClient } from "./client.js";
+import { createApiFootballClient } from "./client";
 
 describe("createApiFootballClient", () => {
   it("sends a GET request with only the API-Football key header", async () => {

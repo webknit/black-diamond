@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { didBetSelectionWin } from "./didBetSelectionWin.js";
+import { didBetSelectionWin } from "./didBetSelectionWin";
 
 const fixture = (home: number, away: number) => ({ score: { fulltime: { home, away } } }) as never;
 const selection = (market: Record<string, unknown>) => ({ market }) as never;

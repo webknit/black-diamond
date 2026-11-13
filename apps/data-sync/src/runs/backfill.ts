@@ -1,9 +1,9 @@
-import { backfillFixtureOdds } from "../sync/fixtureOdds/backfillFixtureOdds.js";
-import { backfillLeagueStats } from "../sync/leagueStats/backfillLeagueStats.js";
-import { syncStrategyPerformances } from "../sync/strategyPerformances/syncStrategyPerformances.js";
-import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures.js";
-import { logSyncStep } from "../utils/logging/logSyncStep.js";
-import { runFixtureStatsSnapshotBackfill } from "./backfillFixtureStatsSnapshots.js";
+import { backfillFixtureOdds } from "../sync/fixtureOdds/backfillFixtureOdds";
+import { backfillLeagueStats } from "../sync/leagueStats/backfillLeagueStats";
+import { syncStrategyPerformances } from "../sync/strategyPerformances/syncStrategyPerformances";
+import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures";
+import { logSyncStep } from "../utils/logging/logSyncStep";
+import { runFixtureStatsSnapshotBackfill } from "./backfillFixtureStatsSnapshots";
 
 export async function runBackfill(): Promise<void> {
   await runFixtureStatsSnapshotBackfill();

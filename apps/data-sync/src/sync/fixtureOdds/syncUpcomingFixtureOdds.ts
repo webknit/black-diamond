@@ -1,6 +1,6 @@
 import { getFixturesBetweenDates } from "@black-diamond/database/fixtures";
-import { getUtcDateString } from "../../utils/time/getUtcDateString.js";
-import { syncFixtureOdds } from "./syncFixtureOdds.js";
+import { getUtcDateString } from "../../utils/time/getUtcDateString";
+import { syncFixtureOdds } from "./syncFixtureOdds";
 export async function syncUpcomingFixtureOdds(now = new Date()) {
   const fixtures = await getFixturesBetweenDates(getUtcDateString(now), getUtcDateString(now, 8));
   for (const fixture of fixtures) {

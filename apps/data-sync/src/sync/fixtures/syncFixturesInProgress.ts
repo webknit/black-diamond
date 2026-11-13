@@ -3,14 +3,14 @@ import {
   upsertFixtures,
 } from "@black-diamond/database/fixtures";
 
-import { getApiFootballClient } from "../../providers/api-football/client/apiFootball.js";
-import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures.js";
+import { getApiFootballClient } from "../../providers/api-football/client/apiFootball";
+import type { ApiFootballFixturesResponse } from "../../providers/api-football/types/fixtures";
 import { getWatchingAccountIds } from "@black-diamond/database/fixtureWatchlist";
 import { getPushSubscriptionsByAccountIds } from "@black-diamond/database/pushSubscriptions";
 import webpush from "web-push";
 import { getBetsForFixturesByAccountId } from "@black-diamond/database/bets";
-import { didBetSelectionWin } from "../bets/didBetSelectionWin.js";
-import { formatBetSelection } from "../bets/formatBetSelection.js";
+import { didBetSelectionWin } from "../bets/didBetSelectionWin";
+import { formatBetSelection } from "../bets/formatBetSelection";
 import type { Fixture } from "@black-diamond/core/fixture";
 
 export function didFixtureScoreIncrease(

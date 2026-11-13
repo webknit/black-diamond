@@ -11,26 +11,26 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 	  getFixturesForLineupSync: vi.fn(),
 }));
 
-vi.mock("../sync/fixtures/syncFixturesInProgress.js", () => ({
+vi.mock("../sync/fixtures/syncFixturesInProgress", () => ({
   syncFixturesInProgress: mocks.syncFixturesInProgress,
 }));
-vi.mock("../sync/fixtureEvents/syncFixtureEvents.js", () => ({
+vi.mock("../sync/fixtureEvents/syncFixtureEvents", () => ({
   syncFixtureEvents: mocks.syncFixtureEvents,
 }));
-vi.mock("../sync/fixtureStatistics/syncFixtureStatistics.js", () => ({
+vi.mock("../sync/fixtureStatistics/syncFixtureStatistics", () => ({
   syncFixtureStatistics: mocks.syncFixtureStatistics,
 }));
-vi.mock("../sync/fixtureLineups/syncFixtureLineups.js", () => ({
+vi.mock("../sync/fixtureLineups/syncFixtureLineups", () => ({
   syncFixtureLineups: mocks.syncFixtureLineups,
 }));
-vi.mock("../sync/bets/syncBetResults.js", () => ({ syncBetResults: mocks.syncBetResults }));
+vi.mock("../sync/bets/syncBetResults", () => ({ syncBetResults: mocks.syncBetResults }));
 vi.mock("@black-diamond/database/fixtures", () => ({
   getRecentlyFinishedFixtures: mocks.getRecentlyFinishedFixtures,
   getFixturesForLineupSync: mocks.getFixturesForLineupSync,
 }));
 vi.mock("@black-diamond/database/fixtureEvents", () => ({ getFixtureEventsForFixtures: mocks.getFixtureEventsForFixtures }));
 
-import { runLiveSync } from "./liveSync.js";
+import { runLiveSync } from "./liveSync";
 
 describe("live sync run", () => {
   beforeEach(() => vi.clearAllMocks());

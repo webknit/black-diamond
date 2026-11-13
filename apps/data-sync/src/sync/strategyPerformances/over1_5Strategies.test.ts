@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getOver1_5ReferenceOdd, leagueRateStrategyVariations, matchesLeagueRateStrategyVariation, matchesOver1_5StrategyVariation, over1_5StrategyVariations } from '@black-diamond/core/strategies';
-import { addStrategyResult } from './syncStrategyPerformances.js';
+import { addStrategyResult } from './syncStrategyPerformances';
 
 function snapshot(homeRate = 60, awayRate = 60, homeGoals = 1.5, awayGoals = 1.5) {
 	const venue = (goals: number, rate: number) => ({ played: 5, goalsFor: goals * 5, goalsAgainst: goals * 5, summary: { over1_5: { percentage: rate } } });
