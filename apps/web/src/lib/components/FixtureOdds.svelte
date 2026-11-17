@@ -46,6 +46,20 @@
 			});
 	}
 
+	function doubleChanceSelections(): OddsSelection[] {
+		const values = oddsFor(['double chance']);
+		const canonicalValues = [
+			{ value: 'Home/Draw', aliases: ['home/draw', 'draw/home', 'home or draw', 'draw or home'] },
+			{ value: 'Home/Away', aliases: ['home/away', 'away/home', 'home or away', 'away or home'] },
+			{ value: 'Draw/Away', aliases: ['draw/away', 'away/draw', 'draw or away', 'away or draw'] }
+		];
+
+		return canonicalValues.map(({ value, aliases }) => {
+			const selection = values.find((item) => aliases.includes(item.value.trim().toLowerCase()));
+			return { value, odd: selection?.odd ?? null };
+		});
+	}
+
 	function formatOddsLabel(value: string) {
 		const normalized = value.toLowerCase();
 		if (normalized === 'home') return 'H';
@@ -97,7 +111,7 @@
 						{market.title}
 					</p>
 					<div class="flex flex-wrap justify-evenly gap-1">
-						{#each oddsFor(market.markets, market.title === '1X2' ? ['Home', 'Draw', 'Away'] : ['Home/Draw', 'Home/Away', 'Draw/Away']) as selection}
+						{#each market.title === '1X2' ? oddsFor(market.markets, ['Home', 'Draw', 'Away']) : doubleChanceSelections() as selection}
 							<button type="button" onclick={() => selectOdd(market.markets, selection)} class="flex min-w-0 items-center overflow-hidden rounded border border-slate-200 text-[10px] leading-5 transition hover:border-emerald-500 hover:bg-emerald-50" class:border-emerald-300={isPlaced(market.markets, selection)} class:bg-emerald-100={isPlaced(market.markets, selection)} class:border-indigo-600={isRecommended(market.markets, selection)} class:bg-indigo-50={isRecommended(market.markets, selection)} style:box-shadow={isRecommended(market.markets, selection) ? 'inset 0 0 0 2px rgb(79 70 229)' : undefined}>
 								<span class={`truncate border-r px-1.5 text-slate-600 ${isPlaced(market.markets, selection) ? 'border-emerald-200 bg-emerald-100' : isRecommended(market.markets, selection) ? 'border-indigo-200 bg-indigo-100' : 'border-slate-200 bg-slate-50'}`}>
 									{formatOddsLabel(selection.value)}

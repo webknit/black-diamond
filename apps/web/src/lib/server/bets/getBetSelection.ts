@@ -19,11 +19,17 @@ export function getBetSelection(marketName: string, selection: string): BetSelec
 	if (normalizedMarket === 'double chance') {
 		const outcomes: Record<string, BetOutcome> = {
 			'home/draw': 'homeDraw',
+			'draw/home': 'homeDraw',
 			'home or draw': 'homeDraw',
+			'draw or home': 'homeDraw',
 			'home/away': 'homeAway',
+			'away/home': 'homeAway',
 			'home or away': 'homeAway',
+			'away or home': 'homeAway',
 			'draw/away': 'drawAway',
-			'draw or away': 'drawAway'
+			'away/draw': 'drawAway',
+			'draw or away': 'drawAway',
+			'away or draw': 'drawAway'
 		};
 		const outcome = outcomes[normalizedSelection];
 		return outcome ? { type: 'doubleChance', outcome, line: null } : null;
