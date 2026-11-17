@@ -27,6 +27,7 @@ export const selectedLeagues = [
   { id: 103, name: "Eliteserien", country: "Norway" },
   { id: 94, name: "Primeira Liga", country: "Portugal" },
   { id: 71, name: "Serie A", country: "Brazil" },
+  { id: 44, name: "Womens Super League", country: "England" },
 
   { id: 72, name: "Serie B", country: "Brazil" },
   { id: 253, name: "Major League Soccer", country: "USA" },
@@ -96,6 +97,8 @@ export const selectedLeagues = [
   { id: 15, name: "FIFA Club World Cup", country: "World" },
   { id: 531, name: "UEFA Super Cup", country: "World" },
   { id: 10, name: "Friendlies", country: "World" },
+  { id: 6, name: "African Cup of Nations", country: "World" },
+  { id: 36, name: "Africa Cup of Nations - Qualification", country: "World" },
   { id: 32, name: "World Cup - Qualification Europe", country: "World" },
   { id: 30, name: "World Cup - Qualification Asia", country: "World" },
   { id: 29, name: "World Cup - Qualification Africa", country: "World" },
