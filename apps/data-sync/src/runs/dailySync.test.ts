@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({
   syncLeagueStats: vi.fn(),
   syncTeamStatsForTodaysFixtures: vi.fn(),
   syncUpcomingPredictions: vi.fn(),
+  syncUpcomingFixtureOdds: vi.fn(),
   syncUpcomingFixtureInjuries: vi.fn(),
   syncFixtureStatsSnapshots: vi.fn(),
   syncBotdFixtures: vi.fn(),
@@ -27,6 +28,9 @@ vi.mock("../sync/teamStats/syncTeamStatsForTodaysFixtures", () => ({
 }));
 vi.mock("../sync/predictions/syncUpcomingPredictions", () => ({
   syncUpcomingPredictions: mocks.syncUpcomingPredictions,
+}));
+vi.mock("../sync/fixtureOdds/syncUpcomingFixtureOdds", () => ({
+  syncUpcomingFixtureOdds: mocks.syncUpcomingFixtureOdds,
 }));
 vi.mock("../sync/fixtureInjuries/syncUpcomingFixtureInjuries", () => ({
   syncUpcomingFixtureInjuries: mocks.syncUpcomingFixtureInjuries,
@@ -51,7 +55,7 @@ import { runDailySync } from "./dailySync";
 describe("daily sync run", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("runs leagues, teams, recovered fixtures, bets, snapshots, BotD, predictions, injuries, stats, standings, then strategy performances", async () => {
+  it("runs leagues, teams, recovered fixtures, bets, snapshots, odds, BotD, predictions, injuries, stats, standings, then strategy performances", async () => {
     await runDailySync();
 
     expect(mocks.leagues).toHaveBeenCalledBefore(mocks.teams);
@@ -63,6 +67,7 @@ describe("daily sync run", () => {
     expect(mocks.syncLeagueStats).toHaveBeenCalledBefore(mocks.standings);
     expect(mocks.standings).toHaveBeenCalledBefore(mocks.syncStrategyPerformances);
     expect(mocks.syncUpcomingPredictions).toHaveBeenCalledOnce();
+    expect(mocks.syncUpcomingFixtureOdds).toHaveBeenCalledOnce();
     expect(mocks.syncUpcomingFixtureInjuries).toHaveBeenCalledOnce();
   });
 });
