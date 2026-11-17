@@ -163,6 +163,7 @@
 			</section>
 			<div class="mt-4 flex flex-wrap gap-3">
 				<a class="inline-flex rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700" href="/account/bets">View bets</a>
+				<a class="inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50" href="/account/bets-summary">Bet summary</a>
 				<a class="inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-800 hover:bg-slate-50" href="/account/balance-history">View balance history</a>
 			</div>
 		</div>
