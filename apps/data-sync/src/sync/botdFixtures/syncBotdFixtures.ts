@@ -84,6 +84,7 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
       const fixtureDate = getUkDateKey(new Date(fixture.fixture.timestamp * 1000));
       matchesByDate.get(fixtureDate)?.push({
         fixtureId: fixture.fixture.id,
+        leagueId: fixture.league.id,
         matches: matchingStrategies.map(({ strategy, tier, totals }) => ({
           strategyId: strategy.id,
           referenceOdd: getBotdReferenceOdd(oddsByFixtureId.get(fixture.fixture.id)?.odds ?? [], strategy.market),

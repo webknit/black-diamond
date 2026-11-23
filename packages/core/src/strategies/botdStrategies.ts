@@ -21,6 +21,23 @@ export type BotdStrategy = {
 	market: BotdMarket;
 };
 
+/** How much fixture-specific evidence a strategy contributes to a BotD pick. */
+export type BotdEvidenceScope = "teamFiltered" | "leagueAndTeam" | "leagueOnly";
+
+/**
+ * Base strategies and league-rate variations without a team condition are
+ * useful league trends, but do not distinguish one fixture from another.
+ */
+export function getBotdStrategyEvidenceScope(strategy: BotdStrategy): BotdEvidenceScope {
+	const leagueRate = leagueRateStrategyVariations.find((variation) => variation.id === strategy.id);
+	if (leagueRate) {
+		return leagueRate.scoringThreshold === undefined && leagueRate.defensiveThreshold === undefined
+			? "leagueOnly"
+			: "leagueAndTeam";
+	}
+	return strategy.id.endsWith("-base") ? "leagueOnly" : "teamFiltered";
+}
+
 function asBotdStrategy(
 	strategy: Pick<BotdStrategy, 'id' | 'title' | 'description'>,
 	market: BotdMarket

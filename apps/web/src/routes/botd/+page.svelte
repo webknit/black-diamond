@@ -93,7 +93,7 @@
 			<div>
 				<h1 class="text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Bet of the day</h1>
 				<p class="mt-1 text-sm text-slate-600">League-aware candidates only. {data.totalFixtureCount} {data.totalFixtureCount === 1 ? 'fixture has' : 'fixtures have'} a league-qualified recommendation.</p>
-				<p class="mt-1 text-xs text-slate-500">In All markets, each fixture appears once and BOTD highlights its strongest locally supported strategy.</p>
+				<p class="mt-1 text-xs text-slate-500">Top picks require team-level evidence and are diversified to a maximum of two picks per league. Base league trends remain available in All recommendations.</p>
 				<p class="mt-1 text-xs text-slate-500">Evidence bands: <span class="text-rose-700">Low confidence 20–29</span> · <span class="text-orange-700">Eligible 30–49</span> · <span class="text-emerald-700">Strong 50–99</span> · <span class="text-indigo-700">High confidence 100+</span> local qualifying bets.</p>
 			</div>
 			<div class="flex flex-wrap items-end gap-3">

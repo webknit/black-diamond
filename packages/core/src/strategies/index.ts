@@ -9,7 +9,9 @@ export {
   botdStrategies,
   getBotdMarketLabel,
   getBotdReferenceOdd,
+  getBotdStrategyEvidenceScope,
   matchesBotdStrategy,
+  type BotdEvidenceScope,
   type BotdMarket,
   type BotdStrategy,
 } from "./botdStrategies.js";

@@ -55,6 +55,7 @@ import {
   botdStrategies,
   getBotdMarketLabel,
   getBotdReferenceOdd,
+  getBotdStrategyEvidenceScope,
   matchesBotdStrategy,
 } from "./botdStrategies.js";
 
@@ -86,6 +87,14 @@ describe("BOTD strategies", () => {
     expect(matchesBotdStrategy({} as never, {} as never, {
       id: "unknown", title: "Unknown", description: "Unknown", market: "over2_5",
     })).toBe(false);
+  });
+
+  it("distinguishes league-only trends from team-specific strategy evidence", () => {
+    expect(getBotdStrategyEvidenceScope({
+      id: "under3_5-base", title: "Base", description: "Base", market: "under3_5",
+    })).toBe("leagueOnly");
+    expect(getBotdStrategyEvidenceScope(botdStrategies.find((strategy) => strategy.id === "league-rate")!)).toBe("leagueOnly");
+    expect(getBotdStrategyEvidenceScope(botdStrategies.find((strategy) => strategy.id === "team-filter")!)).toBe("teamFiltered");
   });
 
   it.each([

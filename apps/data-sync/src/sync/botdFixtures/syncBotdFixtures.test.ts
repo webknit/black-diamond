@@ -76,6 +76,7 @@ describe("syncBotdFixtures", () => {
       fixtureDate: "2026-10-21",
       fixtures: [{
         fixtureId: 1,
+        leagueId: 39,
         matches: [{ strategyId: "score1.3-eitherTeam-last5", referenceOdd: 1.8, tier: "eligible", leaguePerformance: { bets: 30, wins: 20, losses: 10, profit: 5 } }],
         hasLeagueTable: true,
       }],
