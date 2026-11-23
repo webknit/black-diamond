@@ -89,11 +89,34 @@
 	function hasResult(score: { home: number | null; away: number | null } | undefined) {
 		return score?.home !== null && score?.home !== undefined && score.away !== null && score.away !== undefined;
 	}
+
+	function getRecommendationResult(): 'won' | 'lost' | null {
+		const score = fixture.fullTimeScore;
+		if (!recommendation || !completedStatuses.has(fixture.status.short) || !score || score.home === null || score.away === null) return null;
+		const totalGoals = score.home + score.away;
+		const won = recommendation.market === 'over0_5' ? totalGoals > 0
+			: recommendation.market === 'over1_5' ? totalGoals > 1.5
+			: recommendation.market === 'over2_5' ? totalGoals > 2.5
+			: recommendation.market === 'over3_5' ? totalGoals > 3.5
+			: recommendation.market === 'under1_5' ? totalGoals < 1.5
+			: recommendation.market === 'under2_5' ? totalGoals < 2.5
+			: recommendation.market === 'under3_5' ? totalGoals < 3.5
+			: recommendation.market === 'btts' ? score.home > 0 && score.away > 0
+			: score.home === 0 || score.away === 0;
+		return won ? 'won' : 'lost';
+	}
 </script>
 
 <article class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
 	{#if recommendation?.leaguePerformance}
-		<div class="border-b px-4 py-2 text-[10px]" class:border-rose-100={recommendation.tier === 'lowConfidence'} class:bg-rose-50={recommendation.tier === 'lowConfidence'} class:text-rose-900={recommendation.tier === 'lowConfidence'} class:border-orange-100={recommendation.tier === 'eligible'} class:bg-orange-50={recommendation.tier === 'eligible'} class:text-orange-900={recommendation.tier === 'eligible'} class:border-emerald-100={recommendation.tier === 'strong'} class:bg-emerald-50={recommendation.tier === 'strong'} class:text-emerald-900={recommendation.tier === 'strong'} class:border-indigo-100={recommendation.tier === 'highConfidence'} class:bg-indigo-50={recommendation.tier === 'highConfidence'} class:text-indigo-900={recommendation.tier === 'highConfidence'}><p class="font-semibold"><span class="font-bold uppercase tracking-wide">{recommendation.tier === 'highConfidence' ? 'High confidence' : recommendation.tier === 'strong' ? 'Strong evidence' : recommendation.tier === 'eligible' ? 'Eligible' : 'Low confidence'}</span><span class="mx-1 opacity-40">·</span><span>{recommendation.marketLabel}</span><span class="mx-1 opacity-40">·</span><span>{recommendation.strategyTitle}</span></p><p class="mt-0.5">{recommendation.leaguePerformance.bets} bets <span class="mx-1 opacity-40">·</span>{recommendation.leaguePerformance.wins} / {recommendation.leaguePerformance.losses} <span class="mx-1 opacity-40">·</span><span class="font-semibold">{recommendation.leaguePerformance.profit > 0 ? '+' : ''}£{recommendation.leaguePerformance.profit.toFixed(2)}</span><span class="mx-1 opacity-40">·</span>{((recommendation.leaguePerformance.profit / recommendation.leaguePerformance.bets) * 100).toFixed(1)}% ROI</p></div>
+		<div class="border-b px-4 py-2 text-[10px]" class:border-rose-100={recommendation.tier === 'lowConfidence'} class:bg-rose-50={recommendation.tier === 'lowConfidence'} class:text-rose-900={recommendation.tier === 'lowConfidence'} class:border-orange-100={recommendation.tier === 'eligible'} class:bg-orange-50={recommendation.tier === 'eligible'} class:text-orange-900={recommendation.tier === 'eligible'} class:border-emerald-100={recommendation.tier === 'strong'} class:bg-emerald-50={recommendation.tier === 'strong'} class:text-emerald-900={recommendation.tier === 'strong'} class:border-indigo-100={recommendation.tier === 'highConfidence'} class:bg-indigo-50={recommendation.tier === 'highConfidence'} class:text-indigo-900={recommendation.tier === 'highConfidence'}>
+			<div class="flex items-start justify-between gap-2">
+				<p class="font-semibold"><span class="font-bold uppercase tracking-wide">{recommendation.tier === 'highConfidence' ? 'High confidence' : recommendation.tier === 'strong' ? 'Strong evidence' : recommendation.tier === 'eligible' ? 'Eligible' : 'Low confidence'}</span><span class="mx-1 opacity-40">·</span><span>{recommendation.marketLabel}</span><span class="mx-1 opacity-40">·</span><span>{recommendation.strategyTitle}</span></p>
+				{#if getRecommendationResult() === 'won'}<span class="shrink-0 rounded-full bg-emerald-700 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">Won</span>{/if}
+				{#if getRecommendationResult() === 'lost'}<span class="shrink-0 rounded-full bg-rose-700 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white">Lost</span>{/if}
+			</div>
+			<p class="mt-0.5">{recommendation.leaguePerformance.bets} bets <span class="mx-1 opacity-40">·</span>{recommendation.leaguePerformance.wins} / {recommendation.leaguePerformance.losses} <span class="mx-1 opacity-40">·</span><span class="font-semibold">{recommendation.leaguePerformance.profit > 0 ? '+' : ''}£{recommendation.leaguePerformance.profit.toFixed(2)}</span><span class="mx-1 opacity-40">·</span>{((recommendation.leaguePerformance.profit / recommendation.leaguePerformance.bets) * 100).toFixed(1)}% ROI</p>
+		</div>
 	{/if}
 	<header class="flex items-center gap-3 border-b border-slate-100 px-4 py-2.5">
 		{#if fixture.leagueLogo}

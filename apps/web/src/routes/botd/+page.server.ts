@@ -6,6 +6,7 @@ import { actions, load as loadFixtures } from '../+page.server.js';
 export { actions };
 
 const markets: BotdMarket[] = ['over2_5', 'over3_5', 'over1_5', 'over0_5', 'under3_5', 'under2_5', 'under1_5', 'btts', 'bttns'];
+const completedFixtureStatuses = new Set(['FT', 'AET', 'PEN']);
 
 function getSelectedDate(value: string | null) {
 	return value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : getUkDateKey(new Date());
@@ -15,6 +16,19 @@ function getStrategyBannerTitle(title: string, marketLabel: string) {
 	let result = title;
 	while (result.startsWith(`${marketLabel} · `)) result = result.slice(marketLabel.length + 3);
 	return result;
+}
+
+function didMarketWin(market: BotdMarket, homeGoals: number, awayGoals: number) {
+	const totalGoals = homeGoals + awayGoals;
+	if (market === 'over0_5') return totalGoals > 0;
+	if (market === 'over1_5') return totalGoals > 1.5;
+	if (market === 'over2_5') return totalGoals > 2.5;
+	if (market === 'over3_5') return totalGoals > 3.5;
+	if (market === 'under1_5') return totalGoals < 1.5;
+	if (market === 'under2_5') return totalGoals < 2.5;
+	if (market === 'under3_5') return totalGoals < 3.5;
+	if (market === 'btts') return homeGoals > 0 && awayGoals > 0;
+	return homeGoals === 0 || awayGoals === 0;
 }
 
 export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
@@ -58,6 +72,27 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		milliseconds: Math.round(performance.now() - fixturePageStartedAt),
 		fixtureCount: fixtureIds.length
 	});
+	const fixtureById = new Map(fixturePage.fixtures.map((fixture) => [fixture.id, fixture]));
+	const settledRecommendations = displayedRecommendations.flatMap(({ fixtureId, recommendation }) => {
+		const fixture = fixtureById.get(fixtureId);
+		const score = fixture?.fullTimeScore;
+		if (!fixture || !completedFixtureStatuses.has(fixture.status.short) || score?.home === null || score?.away === null || score === undefined || recommendation.referenceOdd === null) return [];
+		return [{ won: didMarketWin(recommendation.market, score.home, score.away), odd: recommendation.referenceOdd }];
+	});
+	const wonRecommendationCount = settledRecommendations.filter((recommendation) => recommendation.won).length;
+	const profitLoss = settledRecommendations.reduce(
+		(total, recommendation) => total + (recommendation.won ? recommendation.odd - 1 : -1),
+		0
+	);
+	const hypotheticalSummary = {
+		recommendationCount: displayedRecommendations.length,
+		settledCount: settledRecommendations.length,
+		pendingCount: displayedRecommendations.length - settledRecommendations.length,
+		wonCount: wonRecommendationCount,
+		lostCount: settledRecommendations.length - wonRecommendationCount,
+		profitLoss,
+		roi: settledRecommendations.length > 0 ? (profitLoss / settledRecommendations.length) * 100 : null
+	};
 	console.info('[botd] total load', { milliseconds: Math.round(performance.now() - startedAt) });
 
 	return {
@@ -67,6 +102,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 		selectedEvidence,
 		markets,
 		recommendedMarket: null,
-		recommendationByFixtureId
+		recommendationByFixtureId,
+		hypotheticalSummary
 	};
 }

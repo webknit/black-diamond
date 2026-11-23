@@ -34,6 +34,10 @@
 		void updateQuery({ evidence: input.value });
 	}
 
+	function signedCurrency(value: number) {
+		return `${value >= 0 ? '+' : '-'}£${Math.abs(value).toFixed(2)}`;
+	}
+
 	async function updateQuery(values: { date?: string; market?: string | null; evidence?: string }) {
 		const url = new URL(page.url.href);
 		if (values.date) url.searchParams.set('date', values.date);
@@ -101,6 +105,13 @@
 				<div><label for="botd-evidence" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Evidence</label><select id="botd-evidence" value={data.selectedEvidence} onchange={changeEvidence} disabled={isLoading} class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-wait disabled:opacity-60"><option value="top">Top picks</option><option value="eligible">Eligible+</option><option value="strong">Strong+</option><option value="all">All recommendations</option></select></div>
 			</div>
 		</header>
+		<section class="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs shadow-sm" aria-label="Hypothetical Bet of the Day performance">
+			<span class="font-medium text-slate-600">£1 stakes:</span>
+			<span class="tabular-nums" class:text-emerald-700={data.hypotheticalSummary.profitLoss >= 0} class:text-rose-700={data.hypotheticalSummary.profitLoss < 0}>P/L <strong>{signedCurrency(data.hypotheticalSummary.profitLoss)}</strong></span>
+			<span class="tabular-nums text-slate-600">ROI <strong class="text-slate-950">{data.hypotheticalSummary.roi === null ? '–' : `${data.hypotheticalSummary.roi.toFixed(2)}%`}</strong></span>
+			<span class="tabular-nums text-slate-600"><strong class="text-slate-950">{data.hypotheticalSummary.wonCount}W · {data.hypotheticalSummary.lostCount}L</strong></span>
+			{#if data.hypotheticalSummary.pendingCount > 0}<span class="tabular-nums text-slate-500">{data.hypotheticalSummary.pendingCount} awaiting</span>{/if}
+		</section>
 
 
 		<FixtureGrid
