@@ -60,8 +60,8 @@ describe("syncBotdFixtures", () => {
     }]);
     mocks.getFixtureStatsSnapshots.mockResolvedValue([{
       fixtureId: 1,
-      home: { last5Venue: { played: 5, goalsFor: 8, goalsAgainst: 4 } },
-      away: { last5Venue: { played: 5, goalsFor: 7, goalsAgainst: 5 } },
+      home: { last5: { played: 5 }, last5Venue: { played: 5, goalsFor: 8, goalsAgainst: 4 } },
+      away: { last5: { played: 5 }, last5Venue: { played: 5, goalsFor: 7, goalsAgainst: 5 } },
     }]);
     mocks.getFixtureOddsForFixtures.mockResolvedValue([{
       fixtureId: 1,

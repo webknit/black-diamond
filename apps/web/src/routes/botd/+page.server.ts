@@ -61,7 +61,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 			}];
 		});
 	});
-	const minimumTier = selectedEvidence === 'strong' ? 3 : selectedEvidence === 'all' ? 1 : 2;
+	const minimumTier = selectedEvidence === 'strong' ? 4 : selectedEvidence === 'all' ? 1 : 3;
 	const filteredCandidates = candidates.filter((candidate) => getTierScore(candidate.tier) >= minimumTier);
 	const recommendations = chooseFixtureCandidates(filteredCandidates as BotdCandidate[]);
 	const topRecommendations = recommendations.filter((recommendation) => recommendation.evidenceScope !== 'leagueOnly');

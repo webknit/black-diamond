@@ -25,7 +25,7 @@ function didWin(market: BotdMarket, homeGoals: number, awayGoals: number) {
 		: market === 'under1_5' ? goals < 2 : market === 'btts' ? homeGoals > 0 && awayGoals > 0 : homeGoals === 0 || awayGoals === 0;
 }
 function selectDailyRecommendations(candidates: BotdCandidate[], mode: Mode) {
-	const minimumTier = mode === 'strong' ? 3 : mode === 'all' ? 1 : 2;
+	const minimumTier = mode === 'strong' ? 4 : mode === 'all' ? 1 : 3;
 	const recommendations = chooseFixtureCandidates(candidates.filter((candidate) => getTierScore(candidate.tier) >= minimumTier));
 	return mode === 'top' ? diversifyTopCandidates(recommendations.filter((candidate) => candidate.evidenceScope !== 'leagueOnly')).slice(0, 10) : recommendations;
 }

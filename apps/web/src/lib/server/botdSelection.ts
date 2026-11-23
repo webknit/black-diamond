@@ -9,11 +9,11 @@ export type BotdCandidate = {
   strategyTitle: string;
   referenceOdd: number | null;
   evidenceScope: BotdEvidenceScope;
-  tier: "lowConfidence" | "eligible" | "strong" | "highConfidence";
+  tier: "emerging" | "lowConfidence" | "eligible" | "strong" | "highConfidence";
   leaguePerformance: { bets: number; wins: number; losses: number; profit: number };
 };
 
-const tierScore = { lowConfidence: 1, eligible: 2, strong: 3, highConfidence: 4 } as const;
+const tierScore = { emerging: 1, lowConfidence: 2, eligible: 3, strong: 4, highConfidence: 5 } as const;
 const scopeScore = { leagueOnly: 1, leagueAndTeam: 2, teamFiltered: 3 } as const;
 
 export function getTierScore(tier: BotdCandidate["tier"]) {

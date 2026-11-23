@@ -10,7 +10,7 @@ import { getLeagueStats } from "@black-diamond/database/leagueStats";
 import { getStrategyPerformanceSeasonTotals } from "@black-diamond/database/strategyPerformances";
 
 const fixtureBatchSize = 100;
-const emergingMinimumBets = 20;
+const emergingMinimumBets = 5;
 
 function splitIntoBatches<T>(values: T[]): T[][] {
   return Array.from({ length: Math.ceil(values.length / fixtureBatchSize) }, (_, index) =>
@@ -71,13 +71,15 @@ export async function syncBotdFixtures(now = new Date()): Promise<void> {
         if (!league || !matchesBotdStrategy(snapshot, leagueStatsById.get(fixture.league.id), strategy)) return [];
 		const totals = league?.bettablePerformance ?? { bets: 0, wins: 0, losses: 0, profit: 0 };
         if (totals.bets < emergingMinimumBets || totals.profit <= 0) return [];
-        const tier: "lowConfidence" | "eligible" | "strong" | "highConfidence" = totals.bets >= 100
+        const tier: "emerging" | "lowConfidence" | "eligible" | "strong" | "highConfidence" = totals.bets >= 100
           ? "highConfidence"
           : totals.bets >= 50
             ? "strong"
             : totals.bets >= 30
               ? "eligible"
-              : "lowConfidence";
+              : totals.bets >= 20
+                ? "lowConfidence"
+                : "emerging";
         return [{ strategy, tier, totals }];
       });
       if (matchingStrategies.length === 0) continue;
