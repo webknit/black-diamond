@@ -1,21 +1,26 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	let { data }: PageProps = $props();
+	let isLoading = $state(false);
 	const currency = (value: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP', signDisplay: 'always' }).format(value);
 	const plainCurrency = (value: number) => new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(value);
 	const percentage = (value: number | null) => value === null ? '—' : `${value.toFixed(1)}%`;
 	const modeLabel = { top: 'Top 10 BotD', eligible: 'Eligible+', strong: 'Strong+', all: 'All recommendations' };
+	$effect(() => {
+		data;
+		isLoading = false;
+	});
 </script>
 <svelte:head><title>Black Diamond · BotD simulator</title></svelte:head>
 <main class="min-h-screen bg-slate-100"><div class="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-6">
 	<header class="mb-4 sm:mb-6"><p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Historical BotD replay</p><h1 class="mt-1 text-xl font-semibold tracking-tight text-slate-950 sm:text-3xl">Strategy simulator</h1><p class="mt-2 max-w-3xl text-sm text-slate-600">Replay the exact daily BotD selection rules—ranking, deduplication and diversification included. This is read-only and never changes your account.</p></header>
-	<form method="GET" class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+	<form method="GET" onsubmit={() => (isLoading = true)} class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"><div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
 		<label class="block text-xs font-medium text-slate-700">Recommendation set<select name="mode" value={data.mode} class="mt-1 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm"><option value="top">Top 10 BotD</option><option value="eligible">Eligible+</option><option value="strong">Strong+</option><option value="all">All recommendations</option></select></label>
 		<label class="block text-xs font-medium text-slate-700">From<input name="start" type="date" min={data.earliestDate ?? undefined} max={data.latestDate ?? undefined} value={data.start} class="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></label>
 		<label class="block text-xs font-medium text-slate-700">To<input name="end" type="date" min={data.earliestDate ?? undefined} max={data.latestDate ?? undefined} value={data.end} class="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></label>
 		<label class="block text-xs font-medium text-slate-700">Starting bank<input name="bank" type="number" min="0.01" step="0.01" value={data.startingBank} class="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></label>
 		<label class="block text-xs font-medium text-slate-700">Flat stake per bet<input name="stake" type="number" min="0.01" step="0.01" value={data.stake} class="mt-1 block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm" /></label>
-	</div><div class="mt-4 flex items-center justify-between gap-3"><p class="text-xs text-slate-500">{modeLabel[data.mode]} · {data.availableDays} stored BotD day{data.availableDays === 1 ? '' : 's'} in period.</p><button type="submit" class="rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">Run simulation</button></div></form>
+	</div><div class="mt-4 flex items-center justify-between gap-3"><p class="text-xs text-slate-500">{modeLabel[data.mode]} · {data.availableDays} stored BotD day{data.availableDays === 1 ? '' : 's'} in period.</p><button type="submit" disabled={isLoading} class="inline-flex min-w-32 items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-wait disabled:opacity-70">{#if isLoading}<svg aria-hidden="true" viewBox="0 0 20 20" fill="none" class="size-4 animate-spin" stroke="currentColor" stroke-width="2"><circle cx="10" cy="10" r="7" class="opacity-25" /><path d="M10 3a7 7 0 0 1 7 7" /></svg><span>Running…</span>{:else}<span>Run simulation</span>{/if}</button></div></form>
 	<section class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
 		<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Ending bank</p><p class="mt-1 text-2xl font-semibold tabular-nums text-slate-950">{plainCurrency(data.results.endingBank)}</p><p class="mt-1 text-xs font-medium tabular-nums" class:text-emerald-700={data.results.profit > 0} class:text-rose-700={data.results.profit < 0}>{currency(data.results.profit)}</p></div>
 		<div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"><p class="text-[10px] font-bold uppercase tracking-wide text-slate-500">Bets / win rate</p><p class="mt-1 text-2xl font-semibold tabular-nums text-slate-950">{data.results.betCount ? percentage((data.results.wins / data.results.betCount) * 100) : '—'}</p><p class="mt-1 text-xs text-slate-600">{data.results.wins} won / {data.results.losses} lost</p></div>
