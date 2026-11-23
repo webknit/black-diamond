@@ -77,17 +77,29 @@ describe("BOTD strategies", () => {
   });
 
   it("dispatches every known strategy and rejects unknown or context-less league strategies", () => {
+		const snapshotWithFivePriorMatches = {
+			home: { last5: { played: 5 } },
+			away: { last5: { played: 5 } },
+		} as never;
     for (const strategy of botdStrategies.filter((strategy) => strategy.id !== "league-rate")) {
-      expect(matchesBotdStrategy({} as never, undefined, strategy)).toBe(true);
+			expect(matchesBotdStrategy(snapshotWithFivePriorMatches, undefined, strategy)).toBe(true);
     }
 
     const leagueStrategy = botdStrategies.find((strategy) => strategy.id === "league-rate")!;
-    expect(matchesBotdStrategy({} as never, undefined, leagueStrategy)).toBe(false);
-    expect(matchesBotdStrategy({} as never, {} as never, leagueStrategy)).toBe(true);
-    expect(matchesBotdStrategy({} as never, {} as never, {
+		expect(matchesBotdStrategy(snapshotWithFivePriorMatches, undefined, leagueStrategy)).toBe(false);
+		expect(matchesBotdStrategy(snapshotWithFivePriorMatches, {} as never, leagueStrategy)).toBe(true);
+		expect(matchesBotdStrategy(snapshotWithFivePriorMatches, {} as never, {
       id: "unknown", title: "Unknown", description: "Unknown", market: "over2_5",
     })).toBe(false);
   });
+
+	it("does not assess a strategy until each team has five prior matches", () => {
+		const strategy = botdStrategies[0];
+		expect(matchesBotdStrategy({
+			home: { last5: { played: 4 } },
+			away: { last5: { played: 5 } },
+		} as never, undefined, strategy)).toBe(false);
+	});
 
   it("distinguishes league-only trends from team-specific strategy evidence", () => {
     expect(getBotdStrategyEvidenceScope({

@@ -9,6 +9,7 @@ export {
   botdStrategies,
   getBotdMarketLabel,
   getBotdReferenceOdd,
+	  hasFivePreviousMatches,
   getBotdStrategyEvidenceScope,
   matchesBotdStrategy,
   type BotdEvidenceScope,

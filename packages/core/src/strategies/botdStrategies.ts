@@ -69,7 +69,13 @@ export const botdStrategies: BotdStrategy[] = [
 	...leagueRateStrategyVariations.map((strategy) => asBotdStrategy(strategy, strategy.market))
 ];
 
+/** A strategy never assesses a fixture until both teams have five prior matches. */
+export function hasFivePreviousMatches(snapshot: FixtureStatsSnapshot): boolean {
+	return snapshot.home.last5.played >= 5 && snapshot.away.last5.played >= 5;
+}
+
 export function matchesBotdStrategy(snapshot: FixtureStatsSnapshot, league: LeagueRateContext | undefined, strategy: BotdStrategy): boolean {
+	if (!hasFivePreviousMatches(snapshot)) return false;
 	const teamFilter = teamFilterVariations.find((variation) => variation.id === strategy.id);
 	if (teamFilter) return matchesTeamFilterVariation(snapshot, teamFilter);
 	const over2_5Rate = over2_5RateStrategyVariations.find((variation) => variation.id === strategy.id);

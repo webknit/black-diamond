@@ -260,6 +260,12 @@
 							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/btnts" onclick={() => (strategiesMenuOpen = false)}>BTNTS</a>
 						{/if}
 						<div class="my-1 border-t border-slate-100"></div>
+						{#if page.url.pathname === '/strategies/simulator'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Simulator</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/simulator" onclick={() => (strategiesMenuOpen = false)}>Simulator</a>
+						{/if}
+						<div class="my-1 border-t border-slate-100"></div>
 						{#if page.url.pathname === '/strategies/top'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Top strategies · overall</span>
 						{:else}

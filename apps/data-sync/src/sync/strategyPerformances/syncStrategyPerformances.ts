@@ -17,6 +17,7 @@ import {
   getUnder1_5ReferenceOdd,
   getOver0_5ReferenceOdd,
   getBettableOddsBandIds,
+	  hasFivePreviousMatches,
   matchesBttsStrategyVariation,
   matchesBttnsStrategyVariation,
   matchesOver2_5RateStrategyVariation,
@@ -331,6 +332,10 @@ async function createStrategyPerformances(
       fixturesAtCurrentKickoff.push(fixture);
       continue;
     }
+	if (!hasFivePreviousMatches(snapshot)) {
+		fixturesAtCurrentKickoff.push(fixture);
+		continue;
+	}
 
     const date = new Date(fixture.fixture.timestamp * 1000);
     const week = getUkWeekStartDateKey(date);
