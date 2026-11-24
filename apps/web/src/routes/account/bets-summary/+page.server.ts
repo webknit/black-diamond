@@ -1,6 +1,13 @@
 import { getBetsByAccountId } from '@black-diamond/database/bets';
 import { redirect } from '@sveltejs/kit';
 
+function betTypeLabel(selection: { market: { type: string; outcome: string; selection: string } }) {
+	if (selection.market.type === 'btts') {
+		return selection.market.outcome === 'yes' ? 'BTTS' : 'BTNTS';
+	}
+	return selection.market.selection;
+}
+
 export async function load({ locals }: { locals: App.Locals }) {
 	if (!locals.accountId) throw redirect(303, '/login');
 
@@ -22,7 +29,7 @@ export async function load({ locals }: { locals: App.Locals }) {
 		oddsTotal: number;
 	}>();
 	for (const bet of settledBets) {
-		const betType = bet.selections.map((selection) => selection.market.selection).join(' + ');
+		const betType = bet.selections.map(betTypeLabel).join(' + ');
 		const current = byBetType.get(betType) ?? {
 			betType, bets: 0, wins: 0, losses: 0, voids: 0, stake: 0, profitLoss: 0, oddsTotal: 0
 		};
