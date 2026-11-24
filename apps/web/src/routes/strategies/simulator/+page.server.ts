@@ -1,4 +1,4 @@
-import { botdStrategies, getBettableMinimumOdds, getBotdMarketLabel, getBotdStrategyEvidenceScope, type BotdMarket } from '@black-diamond/core/strategies';
+import { botdStrategies, getBettableMinimumOdds, getBotdMarketLabel, getBotdStrategyEvidenceScope, isBotdBaseStrategy, type BotdMarket } from '@black-diamond/core/strategies';
 import { getBotdDays } from '@black-diamond/database/botdDays';
 import { getFixturesByIds } from '@black-diamond/database/fixtures';
 import { chooseFixtureCandidates, diversifyTopCandidates, getTierScore, type BotdCandidate } from '../../../lib/server/botdSelection.js';
@@ -46,7 +46,7 @@ export async function load({ url }: { url: URL }) {
 	for (const day of selectedDays) {
 		const candidates = day.fixtures.flatMap((fixture) => fixture.matches.flatMap((match) => {
 			const strategy = botdStrategies.find((item) => item.id === match.strategyId);
-			if (!strategy || match.referenceOdd === null || match.referenceOdd < getBettableMinimumOdds(strategy.market)) return [];
+			if (!strategy || isBotdBaseStrategy(strategy) || match.referenceOdd === null || match.referenceOdd < getBettableMinimumOdds(strategy.market)) return [];
 			return [{ ...match, fixtureId: fixture.fixtureId, leagueId: fixture.leagueId, market: strategy.market, marketLabel: getBotdMarketLabel(strategy.market), strategyTitle: strategy.title, evidenceScope: getBotdStrategyEvidenceScope(strategy) } satisfies BotdCandidate];
 		}));
 		for (const candidate of selectDailyRecommendations(candidates, mode)) {

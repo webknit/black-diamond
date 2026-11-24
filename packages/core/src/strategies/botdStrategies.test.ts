@@ -56,6 +56,7 @@ import {
   getBotdMarketLabel,
   getBotdReferenceOdd,
   getBotdStrategyEvidenceScope,
+	  isBotdBaseStrategy,
   matchesBotdStrategy,
 } from "./botdStrategies.js";
 
@@ -108,6 +109,12 @@ describe("BOTD strategies", () => {
     expect(getBotdStrategyEvidenceScope(botdStrategies.find((strategy) => strategy.id === "league-rate")!)).toBe("leagueOnly");
     expect(getBotdStrategyEvidenceScope(botdStrategies.find((strategy) => strategy.id === "team-filter")!)).toBe("teamFiltered");
   });
+
+	it("identifies base rules that must not be shown as BotD picks", () => {
+		expect(isBotdBaseStrategy({ id: "under3_5-base", title: "Base", description: "Base", market: "under3_5" })).toBe(true);
+		expect(isBotdBaseStrategy({ id: "noTeamFilters", title: "Base", description: "Base", market: "over2_5" })).toBe(true);
+		expect(isBotdBaseStrategy(botdStrategies.find((strategy) => strategy.id === "team-filter")!)).toBe(false);
+	});
 
   it.each([
     ["over2_5", "Over 2.5"], ["over3_5", "Over 3.5"], ["under3_5", "Under 3.5"],

@@ -38,6 +38,11 @@ export function getBotdStrategyEvidenceScope(strategy: BotdStrategy): BotdEviden
 	return strategy.id.endsWith("-base") ? "leagueOnly" : "teamFiltered";
 }
 
+/** Base rules provide no fixture-specific reason to recommend a match. */
+export function isBotdBaseStrategy(strategy: BotdStrategy): boolean {
+	return strategy.id === "noTeamFilters" || strategy.id.endsWith("-base");
+}
+
 function asBotdStrategy(
 	strategy: Pick<BotdStrategy, 'id' | 'title' | 'description'>,
 	market: BotdMarket

@@ -1,5 +1,13 @@
 export type FixtureStatsCount = { count: number; percentage: number };
-export type FixtureStatsRecord = { played: number; wins: number; draws: number; loses: number; goalsFor: number; goalsAgainst: number };
+export type FixtureStatsRecord = {
+  played: number;
+  wins: number;
+  draws: number;
+  loses: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  failedToScore: number;
+};
 export type FixtureStatsGoalSummary = {
   wins: FixtureStatsCount;
   draws: FixtureStatsCount;

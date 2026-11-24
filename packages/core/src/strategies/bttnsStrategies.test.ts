@@ -28,4 +28,16 @@ describe("BTNTS strategies", () => {
         bttnsStrategyVariations[0],
       ),
     ).toBe(false));
+  it("keeps an overall-last-five BTNTS rate strategy alongside the H/A version", () => {
+    const strategy = bttnsStrategyVariations.find(
+      (item) => item.id === "bttns-btts20-overall-last5",
+    )!;
+    const snapshot = strategySnapshot({ rates: { btts: 0 } }) as never as {
+      home: { last5: { btts: { percentage: number; count: number }; played: number } };
+      away: { last5: { btts: { percentage: number; count: number }; played: number } };
+    };
+    snapshot.home.last5.btts.percentage = 60;
+    snapshot.away.last5.btts.percentage = 60;
+    expect(matchesBttnsStrategyVariation(snapshot as never, strategy)).toBe(false);
+  });
 });

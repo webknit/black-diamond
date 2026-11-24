@@ -112,6 +112,7 @@ export async function syncFixtureStatsSnapshot(fixture: Fixture) {
         loses: items.length - wins - draws,
         goalsFor: gf,
         goalsAgainst: ga,
+        failedToScore: fts,
         cs,
         fts,
         summary: {

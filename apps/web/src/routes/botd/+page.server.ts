@@ -1,5 +1,5 @@
 import { getBotdDay } from '@black-diamond/database/botdDays';
-import { botdStrategies, getBettableMinimumOdds, getBotdMarketLabel, getBotdStrategyEvidenceScope, type BotdMarket } from '@black-diamond/core/strategies';
+import { botdStrategies, getBettableMinimumOdds, getBotdMarketLabel, getBotdStrategyEvidenceScope, isBotdBaseStrategy, type BotdMarket } from '@black-diamond/core/strategies';
 import { getUkDateKey } from '@black-diamond/core/time';
 import { actions, load as loadFixtures } from '../+page.server.js';
 import { chooseFixtureCandidates, diversifyTopCandidates, getTierScore, type BotdCandidate } from '../../lib/server/botdSelection.js';
@@ -47,7 +47,7 @@ export async function load({ url, locals }: { url: URL; locals: App.Locals }) {
 	const candidates = (botdDay?.fixtures ?? []).flatMap((fixture) => {
 		return fixture.matches.flatMap((match) => {
 			const strategy = botdStrategies.find((item) => item.id === match.strategyId);
-			if (!strategy || !match.leaguePerformance || (selectedMarket !== null && strategy.market !== selectedMarket)) return [];
+			if (!strategy || isBotdBaseStrategy(strategy) || !match.leaguePerformance || (selectedMarket !== null && strategy.market !== selectedMarket)) return [];
 			if (match.referenceOdd === null || match.referenceOdd < getBettableMinimumOdds(strategy.market)) return [];
 			const marketLabel = getBotdMarketLabel(strategy.market);
 			return [{

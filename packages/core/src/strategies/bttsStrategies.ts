@@ -7,6 +7,7 @@ export type BttsStrategyVariation = {
 	scoringThreshold?: number;
 	defensiveThreshold?: number;
 	bttsRateThreshold?: number;
+	bttsRateSample?: 'venue' | 'overall';
 	sample: 'last5' | 'season';
 };
 
@@ -39,18 +40,28 @@ function createVariation(
 	};
 }
 
-function createBttsRateVariation(threshold: number): BttsStrategyVariation {
+function createBttsRateVariation(
+	threshold: number,
+	bttsRateSample: NonNullable<BttsStrategyVariation['bttsRateSample']>
+): BttsStrategyVariation {
+	const venueSpecific = bttsRateSample === 'venue';
 	return {
-		id: `btts-rate${threshold}-last5`,
-		title: `Both teams: last 5 BTTS >= ${threshold}%`,
-		description: `Each team recorded BTTS in at least ${threshold}% of its previous 5 matches.`,
+		id: `btts-rate${threshold}-${venueSpecific ? 'last5' : 'overall-last5'}`,
+		title: venueSpecific
+			? `Both teams: last 5 H/A BTTS >= ${threshold}%`
+			: `Both teams: overall last 5 BTTS >= ${threshold}%`,
+		description: venueSpecific
+			? `Each team recorded BTTS in at least ${threshold}% of its previous 5 relevant-venue matches.`
+			: `Each team recorded BTTS in at least ${threshold}% of its previous 5 matches, regardless of venue.`,
 		bttsRateThreshold: threshold,
+		bttsRateSample,
 		sample: 'last5'
 	};
 }
 
 export const bttsStrategyVariations: BttsStrategyVariation[] = [
-	...([40, 60, 80] as const).map(createBttsRateVariation),
+	...([40, 60, 80] as const).map((threshold) => createBttsRateVariation(threshold, 'venue')),
+	...([40, 60, 80] as const).map((threshold) => createBttsRateVariation(threshold, 'overall')),
 	...scoringThresholds.map((threshold) => createVariation(threshold, undefined, 'last5')),
 	...defensiveThresholds.map((threshold) => createVariation(undefined, threshold, 'last5')),
 	...scoringThresholds.flatMap((scoringThreshold) =>
@@ -76,12 +87,23 @@ export function matchesBttsStrategyVariation(
 	const away = variation.sample === 'last5' ? snapshot.away.last5Venue : snapshot.away.fixtures.away;
 	if (!home || !away) return false;
 
-	if (
-		variation.bttsRateThreshold !== undefined &&
-		(snapshot.home.last5.btts.percentage < variation.bttsRateThreshold ||
-			snapshot.away.last5.btts.percentage < variation.bttsRateThreshold)
-	) {
-		return false;
+	if (variation.bttsRateThreshold !== undefined) {
+		const useVenueForm = variation.bttsRateSample !== 'overall';
+		const homeForm = useVenueForm ? snapshot.home.last5Venue : snapshot.home.last5;
+		const awayForm = useVenueForm ? snapshot.away.last5Venue : snapshot.away.last5;
+		const homeBttsRate = useVenueForm
+			? snapshot.home.last5Venue.summary.btts.percentage
+			: snapshot.home.last5.btts.percentage;
+		const awayBttsRate = useVenueForm
+			? snapshot.away.last5Venue.summary.btts.percentage
+			: snapshot.away.last5.btts.percentage;
+		if (homeForm.played !== 5 || awayForm.played !== 5) return false;
+		if (
+			homeBttsRate < variation.bttsRateThreshold ||
+			awayBttsRate < variation.bttsRateThreshold
+		) {
+			return false;
+		}
 	}
 
 	if (

@@ -212,6 +212,12 @@
 				</button>
 				{#if strategiesMenuOpen}
 					<div class="absolute left-0 top-full z-20 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg">
+						{#if page.url.pathname === '/strategies/all'}
+							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">All strategies</span>
+						{:else}
+							<a class="block rounded-md px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-slate-950" href="/strategies/all" onclick={() => (strategiesMenuOpen = false)}>All strategies</a>
+						{/if}
+						<div class="my-1 border-t border-slate-100"></div>
 						{#if page.url.pathname === '/strategies/over-2-5'}
 							<span aria-current="page" class="block rounded-md px-3 py-2 text-xs font-bold text-slate-950">Over 2.5 goals</span>
 						{:else}
