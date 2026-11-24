@@ -1,6 +1,6 @@
 import type { FixtureStatsSnapshot } from '../types/fixtureStatsSnapshot.js';
 
-type LowMetric = 'btts' | 'scoring' | 'defensive' | 'failedToScore' | 'combined';
+type LowMetric = 'btts' | 'scoring' | 'defensive' | 'failedToScore' | 'cleanSheets' | 'combined';
 
 export type BttnsStrategyVariation = {
 	id: string;
@@ -40,6 +40,10 @@ function createVariation(
 		failedToScore: {
 			title: `At least one team: failed to score in >= ${threshold}% of last 5`,
 			description: `At least one team failed to score in at least ${threshold}% of its previous 5 relevant-venue matches.`
+		},
+		cleanSheets: {
+			title: `At least one team: kept a clean sheet in >= ${threshold}% of last 5`,
+			description: `At least one team kept a clean sheet in at least ${threshold}% of its previous 5 relevant-venue matches.`
 		}
 	} as const;
 
@@ -60,6 +64,7 @@ export const bttnsStrategyVariations: BttnsStrategyVariation[] = [
 	...lowGoalThresholds.map((threshold) => createVariation('scoring', threshold)),
 	...lowGoalThresholds.map((threshold) => createVariation('defensive', threshold)),
 	...([40, 60, 80] as const).map((threshold) => createVariation('failedToScore', threshold)),
+	...([40, 60, 80] as const).map((threshold) => createVariation('cleanSheets', threshold)),
 	{
 		id: 'bttns-score0.7-concede0.7-last5',
 		title: 'At least one team: score <= 0.7 · At least one team: concede <= 0.7',
@@ -90,6 +95,14 @@ function failedToScoreRate(record: FixtureStatsSnapshot['home']['last5Venue']) {
 	return record.played === 0 ? null : (failedToScore / record.played) * 100;
 }
 
+function cleanSheetRate(record: FixtureStatsSnapshot['home']['last5Venue']) {
+	// Older saved snapshots used the short `cs` key. Keep them useful for
+	// historical assessment while new snapshots use the explicit field.
+	const legacyRecord = record as typeof record & { cs?: number };
+	const cleanSheets = record.cleanSheets ?? legacyRecord.cs ?? 0;
+	return record.played === 0 ? null : (cleanSheets / record.played) * 100;
+}
+
 export function matchesBttnsStrategyVariation(
 	snapshot: FixtureStatsSnapshot,
 	variation: BttnsStrategyVariation
@@ -108,6 +121,7 @@ export function matchesBttnsStrategyVariation(
 		average(away.goalsAgainst, away.played)
 	];
 	const failedToScoreRates = [failedToScoreRate(home), failedToScoreRate(away)];
+	const cleanSheetRates = [cleanSheetRate(home), cleanSheetRate(away)];
 
 	if (variation.metric === 'btts') {
 		if (variation.bttsRateSample === 'overall' && (snapshot.home.last5.played !== 5 || snapshot.away.last5.played !== 5)) {
@@ -119,6 +133,9 @@ export function matchesBttnsStrategyVariation(
 	if (variation.metric === 'defensive') return atLeastOneAtOrBelow(defensiveAverages, variation.threshold);
 	if (variation.metric === 'failedToScore') {
 		return atLeastOneAtOrAbove(failedToScoreRates, variation.threshold);
+	}
+	if (variation.metric === 'cleanSheets') {
+		return atLeastOneAtOrAbove(cleanSheetRates, variation.threshold);
 	}
 
 	return (

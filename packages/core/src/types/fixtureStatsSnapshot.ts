@@ -6,6 +6,7 @@ export type FixtureStatsRecord = {
   loses: number;
   goalsFor: number;
   goalsAgainst: number;
+  cleanSheets: number;
   failedToScore: number;
 };
 export type FixtureStatsGoalSummary = {
