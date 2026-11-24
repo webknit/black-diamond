@@ -4,14 +4,23 @@
 	let { hasPushSubscription }: { hasPushSubscription: boolean } = $props();
 	let notificationsOff = $state(false);
 
-	onMount(async () => {
-		if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+	onMount(() => {
+		function updateNotificationState(event: Event) {
+			if (event instanceof CustomEvent && typeof event.detail === 'boolean') {
+				notificationsOff = !event.detail;
+			}
+		}
 
-		const registration = await navigator.serviceWorker.getRegistration();
-		const browserSubscription = await registration?.pushManager.getSubscription();
-		notificationsOff = !hasPushSubscription ||
-			Notification.permission !== 'granted' ||
-			!browserSubscription;
+		window.addEventListener('push-notifications-changed', updateNotificationState);
+		if ('Notification' in window && 'serviceWorker' in navigator) {
+			void navigator.serviceWorker.getRegistration().then(async (registration) => {
+				const browserSubscription = await registration?.pushManager.getSubscription();
+				notificationsOff = !hasPushSubscription ||
+					Notification.permission !== 'granted' ||
+					!browserSubscription;
+			});
+		}
+		return () => window.removeEventListener('push-notifications-changed', updateNotificationState);
 	});
 </script>
 

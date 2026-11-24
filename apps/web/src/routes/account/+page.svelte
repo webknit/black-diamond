@@ -60,6 +60,7 @@
 			const response = await fetch('/api/push-subscription', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(subscription) });
 			notificationMessage = response.ok ? 'Notifications enabled for watched fixtures.' : 'Could not save notification settings.';
 			notificationsEnabled = response.ok;
+			if (response.ok) window.dispatchEvent(new CustomEvent('push-notifications-changed', { detail: true }));
 		} catch (error) { notificationMessage = error instanceof Error ? `Could not enable notifications: ${error.message}` : 'Could not enable notifications.'; }
 	}
 	async function disableNotifications() {
@@ -79,6 +80,7 @@
 			await subscription.unsubscribe();
 			notificationsEnabled = false;
 			notificationMessage = 'Notifications disabled on this device.';
+			window.dispatchEvent(new CustomEvent('push-notifications-changed', { detail: false }));
 		} catch (error) {
 			notificationMessage = error instanceof Error ? error.message : 'Could not disable notifications.';
 		}
