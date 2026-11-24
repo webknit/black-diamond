@@ -28,7 +28,7 @@ function fixture(id: number, timestamp: number, status: string): Fixture {
 describe("syncUpcomingFixtureInjuries", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("syncs the next seven days of upcoming fixtures in groups of up to twenty", async () => {
+  it("syncs the next 48 hours of upcoming fixtures in groups of up to twenty", async () => {
     const now = new Date("2026-10-26T12:00:00.000Z");
     mocks.getFixturesBetweenDates.mockResolvedValue([
       fixture(1, now.getTime() / 1000 + 60, "NS"),
@@ -50,7 +50,7 @@ describe("syncUpcomingFixtureInjuries", () => {
 
     await expect(syncUpcomingFixtureInjuries(now)).resolves.toBe(2);
 
-    expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-26", "2026-11-03");
+    expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-26", "2026-10-29");
     expect(mocks.get).toHaveBeenCalledWith("/injuries", { ids: "1-2" });
     expect(mocks.upsertFixtureInjuries).toHaveBeenCalledWith(expect.objectContaining({
       fixtureId: 1,

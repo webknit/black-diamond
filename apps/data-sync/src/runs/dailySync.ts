@@ -3,7 +3,6 @@ import { syncLeagueStats } from "../sync/leagueStats/syncLeagueStats";
 import { syncSelectedLeagues } from "../sync/leagues/syncSelectedLeagues";
 import { syncStandings } from "../sync/standings/syncStandings";
 import { syncTeams } from "../sync/teams/syncTeams";
-import { syncTeamStatsForTodaysFixtures } from "../sync/teamStats/syncTeamStatsForTodaysFixtures";
 import { syncUpcomingPredictions } from "../sync/predictions/syncUpcomingPredictions";
 import { syncFixtureStatsSnapshots } from "../sync/fixtureStatsSnapshots/syncFixtureStatsSnapshots";
 import { syncBotdFixtures } from "../sync/botdFixtures/syncBotdFixtures";
@@ -22,7 +21,6 @@ export async function runDailySync(lastCompletedAt?: Date) {
   await logSyncStep("sync fixtures", () => syncFixtures(fixtureDateRange));
   await logSyncStep("settle completed bets", syncBetResults);
   await logSyncStep("sync fixture stats snapshots", syncFixtureStatsSnapshots);
-  await logSyncStep("sync team stats for today's fixtures", syncTeamStatsForTodaysFixtures);
   await logSyncStep("sync missing upcoming fixture odds", syncUpcomingFixtureOdds);
   await logSyncStep("sync upcoming predictions", syncUpcomingPredictions);
   await logSyncStep("sync upcoming fixture injuries", syncUpcomingFixtureInjuries);

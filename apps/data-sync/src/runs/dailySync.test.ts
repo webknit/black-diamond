@@ -3,7 +3,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
   fixtures: vi.fn(),
   syncLeagueStats: vi.fn(),
-  syncTeamStatsForTodaysFixtures: vi.fn(),
   syncUpcomingPredictions: vi.fn(),
   syncUpcomingFixtureOdds: vi.fn(),
   syncUpcomingFixtureInjuries: vi.fn(),
@@ -22,9 +21,6 @@ vi.mock("../sync/leagues/syncSelectedLeagues", () => ({
 }));
 vi.mock("../sync/leagueStats/syncLeagueStats", () => ({
   syncLeagueStats: mocks.syncLeagueStats,
-}));
-vi.mock("../sync/teamStats/syncTeamStatsForTodaysFixtures", () => ({
-  syncTeamStatsForTodaysFixtures: mocks.syncTeamStatsForTodaysFixtures,
 }));
 vi.mock("../sync/predictions/syncUpcomingPredictions", () => ({
   syncUpcomingPredictions: mocks.syncUpcomingPredictions,

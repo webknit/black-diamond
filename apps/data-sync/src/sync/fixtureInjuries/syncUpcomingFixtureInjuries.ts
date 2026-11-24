@@ -6,7 +6,7 @@ import { getApiFootballClient } from "../../providers/api-football/client/apiFoo
 import type { ApiFootballFixtureInjuriesResponse } from "../../providers/api-football/types/fixtureInjuries";
 
 const maximumFixtureIdsPerRequest = 20;
-const daysAhead = 7;
+const injuryWindowMilliseconds = 48 * 60 * 60 * 1000;
 
 function groupFixtureIds(fixtureIds: number[]): number[][] {
   return Array.from(
@@ -16,10 +16,18 @@ function groupFixtureIds(fixtureIds: number[]): number[][] {
 }
 
 export async function syncUpcomingFixtureInjuries(now = new Date()): Promise<number> {
-  const fixtures = await getFixturesBetweenDates(getUtcDateString(now), getUtcDateString(now, daysAhead + 1));
+  const fixtures = await getFixturesBetweenDates(
+    getUtcDateString(now),
+    getUtcDateString(new Date(now.getTime() + injuryWindowMilliseconds), 1),
+  );
   const fixtureIds = [...new Set(
     fixtures
-      .filter((fixture) => fixture.fixture.status.short === "NS" && fixture.fixture.timestamp * 1000 > now.getTime())
+      .filter(
+        (fixture) =>
+          fixture.fixture.status.short === "NS" &&
+          fixture.fixture.timestamp * 1000 > now.getTime() &&
+          fixture.fixture.timestamp * 1000 <= now.getTime() + injuryWindowMilliseconds,
+      )
       .map((fixture) => fixture.fixture.id),
   )];
   const apiFootball = getApiFootballClient();
