@@ -65,4 +65,17 @@ describe("syncFixtureStatsSnapshot", () => {
       }),
     );
   });
+
+  it("uses supplied history without making another database query", async () => {
+    const target = fixture(100, 10_000, 1, 2, null as never, null as never);
+    target.fixture.status.short = "NS";
+    const priorFixtures = [fixture(1, 1_000, 1, 3, 2, 0)];
+
+    await syncFixtureStatsSnapshot(target, priorFixtures);
+
+    expect(mocks.getFixturesBefore).not.toHaveBeenCalled();
+    expect(mocks.upsertFixtureStatsSnapshot).toHaveBeenCalledWith(
+      expect.objectContaining({ fixtureId: 100 }),
+    );
+  });
 });

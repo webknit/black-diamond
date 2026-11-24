@@ -2,12 +2,19 @@ import { getFixturesBefore } from "@black-diamond/database/fixtures";
 import { upsertFixtureStatsSnapshot } from "@black-diamond/database/fixtureStatsSnapshots";
 import type { Fixture } from "@black-diamond/core/fixture";
 
-export async function syncFixtureStatsSnapshot(fixture: Fixture) {
-  const prior = await getFixturesBefore(
-    fixture.league.id,
-    fixture.league.season,
-    fixture.fixture.timestamp,
-  );
+export async function syncFixtureStatsSnapshot(
+  fixture: Fixture,
+  cachedPriorFixtures?: Fixture[],
+) {
+  const prior = cachedPriorFixtures
+    ? cachedPriorFixtures.filter(
+        (item) => item.fixture.timestamp < fixture.fixture.timestamp,
+      )
+    : await getFixturesBefore(
+        fixture.league.id,
+        fixture.league.season,
+        fixture.fixture.timestamp,
+      );
   const leagueTable = new Map<
     number,
     { points: number; goalsFor: number; goalsAgainst: number }
