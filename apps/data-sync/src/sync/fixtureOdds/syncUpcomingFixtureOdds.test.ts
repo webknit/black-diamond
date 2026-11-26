@@ -24,13 +24,13 @@ function fixture(id: number, timestamp: number, status: string): Fixture {
 }
 
 describe("syncUpcomingFixtureOdds", () => {
-  it("only fetches missing odds while the fixture is upcoming and within two days", async () => {
+  it("only fetches missing odds while the fixture is upcoming and within three days", async () => {
     const now = new Date("2026-10-25T12:00:00.000Z");
     mocks.getFixturesBetweenDates.mockResolvedValue([
       fixture(1, now.getTime() / 1000 + 60, "NS"),
       fixture(2, now.getTime() / 1000 - 60, "NS"),
       fixture(3, now.getTime() / 1000 + 60, "1H"),
-      fixture(4, now.getTime() / 1000 + 49 * 60 * 60, "NS"),
+      fixture(4, now.getTime() / 1000 + 3 * 24 * 60 * 60 + 60, "NS"),
     ]);
     mocks.getFixtureOddsForFixtures.mockResolvedValue([]);
 
@@ -38,7 +38,7 @@ describe("syncUpcomingFixtureOdds", () => {
 
     expect(mocks.syncFixtureOdds).toHaveBeenCalledTimes(1);
     expect(mocks.syncFixtureOdds).toHaveBeenCalledWith(1);
-    expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-25", "2026-10-28");
+    expect(mocks.getFixturesBetweenDates).toHaveBeenCalledWith("2026-10-25", "2026-10-29");
   });
 
   it("does not re-fetch odds that are already stored", async () => {

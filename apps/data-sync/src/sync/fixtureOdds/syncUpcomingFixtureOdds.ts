@@ -3,7 +3,7 @@ import { getFixtureOddsForFixtures } from "@black-diamond/database/fixtureOdds";
 import { getUtcDateString } from "../../utils/time/getUtcDateString";
 import { syncFixtureOdds } from "./syncFixtureOdds";
 
-const oddsWindowMilliseconds = 48 * 60 * 60 * 1000;
+const oddsWindowMilliseconds = 3 * 24 * 60 * 60 * 1000;
 
 export async function syncUpcomingFixtureOdds(now = new Date()) {
   const fixtures = await getFixturesBetweenDates(
