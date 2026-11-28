@@ -97,6 +97,7 @@
 				<p class="mt-1 text-xs text-slate-500">Evidence bands: <span class="text-slate-700">Emerging 5–19</span> · <span class="text-rose-700">Low confidence 20–29</span> · <span class="text-orange-700">Eligible 30–49</span> · <span class="text-emerald-700">Strong 50–99</span> · <span class="text-indigo-700">High confidence 100+</span> local qualifying bets.</p>
 			</div>
 			<div class="flex flex-wrap items-end gap-3">
+				<a href="/botd/performance" class="mb-0.5 text-sm font-medium text-slate-700 hover:text-slate-950 hover:underline">Performance</a>
 				<FixtureDatePicker date={data.date} onDateChange={changeDate} />
 				<div>
 					<label for="botd-market" class="mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-500">Market</label>
